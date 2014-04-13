@@ -21,6 +21,15 @@ public abstract class Skill implements java.io.Serializable {
         this.description = description;
     }
 
+    // TODO: extra check by GUI
+    public boolean levelUp() {
+        if (level < MAX_LEVEL) {
+            level++;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Just some ideas at this stage
      *

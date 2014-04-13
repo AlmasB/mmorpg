@@ -7,10 +7,12 @@ public abstract class ActiveSkill extends Skill {
      */
     private static final long serialVersionUID = 3482667800827843763L;
 
+    // TODO: cooldown ?
+
     public ActiveSkill(String name, String description) {
         super(""+uniqueSkillID++, name, description);
     }
 
-    public abstract int getManaCost(int level);
+    public abstract int getManaCost();
     public abstract void use(GameCharacter caster, GameCharacter target);
 }
