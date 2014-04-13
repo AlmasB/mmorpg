@@ -176,6 +176,8 @@ public class GameServer {
         aiRules.add(rule5);
 
 
+
+
         // start main server loop
         new Thread(new ServerLoop()).start();
     }

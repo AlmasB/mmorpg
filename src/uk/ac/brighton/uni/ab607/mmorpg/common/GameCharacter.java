@@ -48,7 +48,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             MDEF = 5,
             ARM = 6,    // % damage reduction
             MARM = 7,
-            ASPD = 8,   // attack speed, not implemented yet
+            ASPD = 8,   // attack speed
             MSPD = 9,
             CRIT = 10,  // chance
             MCRIT = 11;
@@ -217,6 +217,17 @@ public abstract class GameCharacter implements java.io.Serializable {
         }
 
         return totalDamage;
+    }
+
+    public void useSkill(GameCharacter target) {
+        /*new ActiveSkill() {
+
+            @Override
+            public void use(GameCharacter caster, GameCharacter target) {
+                caster.sp += 10;
+            }
+
+        };*/
     }
 
     /**
