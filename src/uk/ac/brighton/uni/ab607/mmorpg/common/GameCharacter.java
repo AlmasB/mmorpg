@@ -186,8 +186,22 @@ public abstract class GameCharacter implements java.io.Serializable {
         bStats[stat.ordinal()] += bonus;
     }
 
+    /**
+     *
+     * @return
+     *          current HP
+     */
     public int getHP() {
         return hp;
+    }
+
+    /**
+     *
+     * @return
+     *          current SP
+     */
+    public int getSP() {
+        return sp;
     }
 
     public abstract Element getWeaponElement();

@@ -8,6 +8,7 @@ public abstract class ActiveSkill extends Skill {
     private static final long serialVersionUID = 3482667800827843763L;
 
     // TODO: cooldown ?
+    // TODO: reduce mana within use() ?
 
     public ActiveSkill(String name, String description) {
         super(""+uniqueSkillID++, name, description);

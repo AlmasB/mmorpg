@@ -40,7 +40,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     private int x, y;
 
-    private HashMap<GameItem, Integer> drops = new HashMap<GameItem, Integer>();
+    private HashMap<GameItem, Integer> drops = new HashMap<GameItem, Integer>();    // TODO: add droppable items as ctor args
 
     // TODO where do we spawn mobs
     // TODO deal with mob attributes ?
@@ -213,7 +213,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
         }
         else {
             // TODO: fuzzy logic should be here
-            Out.debug("NULL");
+            //Out.debug("NULL");
 
             xSpeed = -5;
             ySpeed = -5;

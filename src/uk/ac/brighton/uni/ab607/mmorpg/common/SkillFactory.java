@@ -7,6 +7,7 @@ public class SkillFactory {
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
     // TODO: skills could kill target, check for that somewhere
     static {
+        // HEAL
         add(new ActiveSkill("Heal", "Restores HP to target") {
             /**
              *
@@ -27,6 +28,7 @@ public class SkillFactory {
             }
         });
 
+        // MANA BURN
         add(new ActiveSkill("Mana Burn", "Burns target's SP and deals damage based on the SP burnt") {
             /**
              *
@@ -46,6 +48,36 @@ public class SkillFactory {
             }
         });
 
+        // FINAL STRIKE
+        add(new ActiveSkill("Final Strike", "Drains all HP/SP leaving 1 HP/0 SP. "
+                + "For each HP/SP drained the skill damage increases by 0.3%") {
+
+            /**
+             *
+             */
+            private static final long serialVersionUID = 2091028246707933529L;
+
+            @Override
+            public int getManaCost() {
+                return 100 + level * 100;
+            }
+
+            @Override
+            public void use(GameCharacter caster, GameCharacter target) {
+                int total = caster.hp - 1 + caster.sp;
+                caster.hp = 1;
+                caster.sp = 0;
+                target.hp -= 500 * level + total * 0.003f;
+            }
+        });
+
+
+        /*
+         * Soul Slash - 7 consecutive attacks.
+         * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
+         * Deals 850% of your base ATK.
+         * Final hit is of type GHOST.
+         * Deals 200% of your total ATK*/
     }
 
     /*public static Skill getSkillById(String id) {

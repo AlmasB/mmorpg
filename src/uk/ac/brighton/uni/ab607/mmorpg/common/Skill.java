@@ -40,12 +40,6 @@ public abstract class Skill implements java.io.Serializable {
      * Deals 200% of your total ATK
      *
      *
-     * Final Strike
-     * Drains all HP/SP leaving 1 HP/0 SP.
-     * Initial skill damage - 1000
-     * For each HP/SP drained the skill damage increases by 0.3%
-     *
-     *
      * Cleanse
      *
      *

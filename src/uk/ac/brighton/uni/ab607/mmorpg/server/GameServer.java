@@ -285,6 +285,7 @@ public class GameServer {
         }
     }
 
+    // TODO: do we process skill usage here ?
     private void parseActions(String[] actions) throws BadActionRequestException {
         for (String action : actions) {
             String[] tokens = action.split(",");
@@ -378,7 +379,7 @@ public class GameServer {
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             //Out.debug("Called execute");
                             // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                            rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -417,7 +418,7 @@ public class GameServer {
 
                             e.AI.currentTarget = getLastKnownLocation();
 
-                            Out.debug(e.AI.currentTarget.getX() + " " + e.AI.currentTarget.getY());
+                            //Out.debug(e.AI.currentTarget.getX() + " " + e.AI.currentTarget.getY());
                         }
 
                         //if (e.AI.currentGoal == AgentGoal.KILL_PLAYER && e.AI.currentTarget != null)
@@ -455,18 +456,24 @@ public class GameServer {
                 for (Player p : tmpPlayers) {
                     for (Enemy e : enemies) {
                         if (e.getX() == p.getX() && e.getY() == p.getY()) {
-                            // test
-                            // each player will have his own atkTime++ based on ASPD
                             if (++p.atkTime >= ATK_INTERVAL / (1 + p.getTotalStat(GameCharacter.ASPD)/100.0)) {
                                 int dmg = p.dealDamage(e);
                                 animations.add(new Animation(p.getX(), p.getY(), 0.5f, 0, 25, dmg+""));
                                 p.atkTime = 0;
+                                if (e.getHP() <= 0) {   // TODO: do similar checks when using skills
+                                    p.gainBaseExperience(e.experience);
+                                    p.gainJobExperience(e.experience);
+                                    p.gainStatExperience(e.experience);
+                                    chests.add(e.onDeath());
+                                    //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+                                }
                             }
 
                             if (++e.atkTime >= ATK_INTERVAL / (1 + e.getTotalStat(GameCharacter.ASPD)/100.0)) {
                                 int dmg = e.dealDamage(p);
                                 animations.add(new Animation(p.getX(), p.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 e.atkTime = 0;
+                                // TODO: check player death ?
                             }
                         }
                     }
