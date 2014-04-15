@@ -51,7 +51,6 @@ public class SkillFactory {
         // FINAL STRIKE
         add(new ActiveSkill("Final Strike", "Drains all HP/SP leaving 1 HP/0 SP. "
                 + "For each HP/SP drained the skill damage increases by 0.3%") {
-
             /**
              *
              */
@@ -71,6 +70,25 @@ public class SkillFactory {
             }
         });
 
+        // PIERCING TOUCH
+        add(new ActiveSkill("Piercing Touch", "Deals physical damage based on target's armor. "
+                + "The more armor target has the greater the damage") {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1513947512801417510L;
+
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void use(GameCharacter caster, GameCharacter target) {
+                float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
+                target.hp -= dmg;
+            }
+        });
 
         /*
          * Soul Slash - 7 consecutive attacks.

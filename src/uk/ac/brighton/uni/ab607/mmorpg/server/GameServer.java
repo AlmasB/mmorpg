@@ -473,7 +473,14 @@ public class GameServer {
                                 int dmg = e.dealDamage(p);
                                 animations.add(new Animation(p.getX(), p.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 e.atkTime = 0;
-                                // TODO: check player death ?
+                                if (p.getHP() <= 0) {
+                                    /*p.xSpeed = -p.getX();
+                                    p.ySpeed = -p.getY();
+                                    p.move();
+                                    p.xSpeed = 0;
+                                    p.ySpeed = 0;*/
+                                }
+
                             }
                         }
                     }

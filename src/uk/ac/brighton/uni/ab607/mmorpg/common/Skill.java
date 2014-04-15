@@ -49,6 +49,13 @@ public abstract class Skill implements java.io.Serializable {
      * Increases cost of all skills by that % for 30s
      *
      *
+     * Piercing Touch
+     * Deals physical damage based on target's armor.
+     * The more armor target has the greater the damage
+     * High DEX also increases the skill damage
+     *
+     * Piercing Touch
+     * Deals 15 + 10 * level * (target.armor / 100.0f) + (caster.dex / 10.0f) physical damage
      *
      *
      */
