@@ -308,7 +308,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
                 + B + this.name + B_END + BR
                 + "Class: " + BLUE + charClass.toString() + FBR
                 + "Base/Stat/Job <b>" + BLUE + baseLevel + FONT_END + "/" + PURPLE + statLevel + FONT_END + "/" + MAGENTA + jobLevel + "</b>" + FBR
-                + "HP: <b>" + RED + hp + "/" + getTotalStat(MAX_HP) + FONT_END + "</b> SP: <b>" + DARK_BLUE + sp + "/" + getTotalStat(MAX_SP) + "</b>" + FBR
+                + "HP: <b>" + RED + hp + "/" + (int)getTotalStat(MAX_HP) + FONT_END + "</b> SP: <b>" + DARK_BLUE + sp + "/" + (int)getTotalStat(MAX_SP) + "</b>" + FBR
                 + "ATK: " + BLUE + stats[ATK] + "+" + bStats[ATK] + FONT_END + " MATK: " + BLUE + stats[MATK] + "+" + bStats[MATK] + FBR
                 + "DEF: " + BLUE + stats[DEF] + "+" + bStats[DEF] + FONT_END + " MDEF: " + BLUE + stats[MDEF] + "+" + bStats[MDEF] + FBR
                 + "ARM: " + BLUE + (stats[ARM] + bStats[ARM]) + "%" + FONT_END + " MARM: " + BLUE + (stats[MARM] + bStats[MARM]) + "%" + FBR

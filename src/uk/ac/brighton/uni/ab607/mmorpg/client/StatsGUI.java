@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -18,7 +19,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 public class StatsGUI extends DoubleBufferWindow {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4879390243081905006L;
 
@@ -101,5 +102,7 @@ public class StatsGUI extends DoubleBufferWindow {
 
     @Override
     protected void createPicture(Graphics2D g) {
+        attributes.repaint();
+        stats.repaint();
     }
 }

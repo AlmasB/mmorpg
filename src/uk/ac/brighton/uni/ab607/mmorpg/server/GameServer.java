@@ -64,10 +64,14 @@ public class GameServer {
     public static final String ATTR_UP = "ATTR_UP",
             EQUIP = "EQUIP",
             UNEQUIP = "UNEQUIP",
-            REFINE = "REFINE";
+            REFINE = "REFINE",
+            SKILL_USE = "SKILL_USE";
 
     private static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;
+
+    // TODO: for players not implemented yet
+    private int runtimeID = 1;
 
     private UDPServer server = null;
 
@@ -94,10 +98,10 @@ public class GameServer {
         chests.add(new Chest(80, 80, 1000, WeaponFactory.getWeaponById("4003"), WeaponFactory.getWeaponById("4001")));
         chests.add(new Chest(0, 80, 2033, ArmorFactory.getArmorById("5004"), ArmorFactory.getArmorById("5003")));
 
-        enemies.add(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
-        enemies.add(new Enemy("Orc Scout", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 640, 640));
-        enemies.add(new Enemy("Orc Scout2", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 1280, 1200));
-        enemies.add(new Enemy("Elven Mercenary", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null), Element.NEUTRAL, 5, 720, 720));
+        spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
+        spawnEnemy(new Enemy("Orc Scout", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 640, 640));
+        spawnEnemy(new Enemy("Orc Scout2", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 1280, 1200));
+        spawnEnemy(new Enemy("Elven Mercenary", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null), Element.NEUTRAL, 5, 720, 720));
 
         // AI RULES
 
@@ -305,6 +309,16 @@ public class GameServer {
                 throw new BadActionRequestException("Bad value: " + tokens[2]);
             }
 
+            int value2 = 0; // for skill use, specifies runtimeID of the target
+            if (tokens.length == 4) {
+                try {
+                    value2 = Integer.parseInt(tokens[3]);
+                }
+                catch (NumberFormatException e) {
+                    throw new BadActionRequestException("Bad value: " + tokens[2]);
+                }
+            }
+
             switch (cmd) {
                 case ATTR_UP:
                     player.increaseAttr(value);
@@ -340,6 +354,11 @@ public class GameServer {
                     else
                         throw new BadActionRequestException("Item not found: " + value);
                     break;
+                case SKILL_USE:
+                    GameCharacter target = getGameCharacterByRuntimeID(value2);
+                    if (target != null)
+                        player.useSkill(value, target);
+                    break;
                 default:
                     throw new BadActionRequestException("No such command: " + tokens[0]);
             }
@@ -351,6 +370,14 @@ public class GameServer {
             if (p.name.equals(name))
                 return p;
 
+        return null;
+    }
+
+    // TODO: add players
+    private GameCharacter getGameCharacterByRuntimeID(int id) {
+        for (Enemy e : enemies)
+            if (e.getRuntimeID() == id)
+                return e;
         return null;
     }
 
@@ -543,4 +570,8 @@ public class GameServer {
     }
 
 
+    private void spawnEnemy(Enemy e) {
+        e.setRuntimeID(runtimeID++);
+        enemies.add(e);
+    }
 }

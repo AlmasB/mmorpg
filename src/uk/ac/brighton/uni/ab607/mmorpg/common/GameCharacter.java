@@ -10,7 +10,17 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     private static final long serialVersionUID = -4840633591092062960L;
 
+    /**
+     * id - object ID in database
+     * name - in game name
+     * description - info about object
+     */
     public final String id, name, description;
+
+    /**
+     * ID of the object in 1 instance of the game
+     */
+    private int runtimeID = 0;
 
     /**
      * How attributes modify stats
@@ -65,7 +75,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     public int atkTime = 0;
     public boolean alive = true;
 
-    protected double atkCritDmg = 0.0, matkCritDmg = 0.0; // these are % modifiers for ex 2.0 = 200%
+    protected float atkCritDmg = 0.0f, matkCritDmg = 0.0f; // these are % modifiers for ex 2.0 = 200%
 
     protected GameCharacterClass charClass;
 
@@ -158,9 +168,9 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         stats[MCRIT] = (int) ( (luck*MODIFIER_HIGH + willpower*MODIFIER_LOW + perception*MODIFIER_VERY_LOW) );
 
-        atkCritDmg  = 2 + luck*0.01;
+        atkCritDmg  = 2 + luck*0.01f;
 
-        matkCritDmg = 2 + luck*0.01;
+        matkCritDmg = 2 + luck*0.01f;
     }
 
     /**
@@ -205,6 +215,14 @@ public abstract class GameCharacter implements java.io.Serializable {
         return sp;
     }
 
+    public void setRuntimeID(int id) {
+        runtimeID = id;
+    }
+
+    public int getRuntimeID() {
+        return runtimeID;
+    }
+
     public abstract Element getWeaponElement();
     public abstract Element getArmorElement();
 
@@ -234,15 +252,28 @@ public abstract class GameCharacter implements java.io.Serializable {
         return totalDamage;
     }
 
-    public void useSkill(GameCharacter target) {
-        /*new ActiveSkill() {
+    public void useSkill(int skillCode, GameCharacter target) {
+        ActiveSkill sk = new ActiveSkill("Heal", "heal") {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 299880583047861121L;
 
             @Override
             public void use(GameCharacter caster, GameCharacter target) {
-                caster.sp += 10;
+                caster.hp += 10;
             }
 
-        };*/
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+        };
+
+        // TODO: implement array of skills from which code is used
+        if (skillCode < 5) {
+            sk.use(this, target);
+        }
     }
 
     /**

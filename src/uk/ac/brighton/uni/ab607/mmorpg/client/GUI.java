@@ -4,16 +4,22 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 //import javax.swing.JTextField;
+
+
+
 
 
 
@@ -65,6 +71,8 @@ public class GUI extends DoubleBufferWindow {
     private ArrayList<Animation> tmpAnims = new ArrayList<Animation>();
     //private ArrayList<Animation> animsToDraw = new ArrayList<Animation>();
 
+    private ArrayList<String> actionsUI = new ArrayList<String>();
+
     private boolean stop = false;
 
     private Player player;
@@ -87,6 +95,7 @@ public class GUI extends DoubleBufferWindow {
         name = playerName;
 
         this.setLocation(0, 0);
+        this.addKeyListener(new Keyboard());
         this.addMouseListener(mouse);
         //this.addMouseMotionListener(mouse);
 
@@ -285,9 +294,15 @@ public class GUI extends DoubleBufferWindow {
                 tmp2.toArray(actions2);
                 inv.actions.clear();
 
+                String[] actions3 = new String[actionsUI.size()];
+                ArrayList<String> tmp3 = new ArrayList<String>(actionsUI);
+                tmp3.toArray(actions3);
+                actionsUI.clear();
+
                 client.send(new DataPacket(player));
                 client.send(new DataPacket(actions));
                 client.send(new DataPacket(actions2));
+                client.send(new DataPacket(actions3));  // main ui actions
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -350,6 +365,26 @@ public class GUI extends DoubleBufferWindow {
         //chat.repaint();
     }
 
+    private boolean choosingTarget = false; // if player is choosing target for skill or smth
+    private char input = ' ';
+
+    class Keyboard implements KeyListener {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            input = e.getKeyChar();
+            choosingTarget = true;
+
+
+            // once skill is clicked cursor changes
+            // choose target and send action to server if target is valid
+
+        }
+        @Override
+        public void keyPressed(KeyEvent e) {}
+        @Override
+        public void keyReleased(KeyEvent e) {}
+    }
+
     class Mouse implements MouseListener, MouseMotionListener {
 
         private boolean isPressed = false;
@@ -392,8 +427,20 @@ public class GUI extends DoubleBufferWindow {
             mouseX = e.getX();
             mouseY = e.getY();
 
-            movePlayer(mouseX, mouseY);
-            isPressed = true;
+            if (!choosingTarget) {
+                movePlayer(mouseX, mouseY);
+                isPressed = true;
+            }
+            else {
+                choosingTarget = false;
+                for (Enemy enemy : tmpEnemies) {
+                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                        actionsUI.add("SKILL_USE," + player.name + "," + input + "," + enemy.getRuntimeID());
+                        return;
+                    }
+                }
+            }
         }
 
         @Override

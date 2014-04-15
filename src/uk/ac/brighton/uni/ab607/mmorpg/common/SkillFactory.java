@@ -95,7 +95,18 @@ public class SkillFactory {
          * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
          * Deals 850% of your base ATK.
          * Final hit is of type GHOST.
-         * Deals 200% of your total ATK*/
+         * Deals 200% of your total ATK
+         *
+         *
+         *  Cleanse
+         *
+         *
+         *
+         * Mind Blast
+         * Drains % of target's SP based on target's level.
+         * Increases cost of all skills by that % for 30s
+         *
+         * */
     }
 
     /*public static Skill getSkillById(String id) {
