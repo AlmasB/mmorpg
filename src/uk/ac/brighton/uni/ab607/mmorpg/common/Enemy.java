@@ -58,6 +58,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
     }
 
     public Chest onDeath() {
+        alive = false;
         Chest drop = new Chest(x, y, GameMath.random(this.baseLevel * 100));
         for (GameItem item : drops.keySet()) {
             if (GameMath.checkChance(drops.get(item))) {

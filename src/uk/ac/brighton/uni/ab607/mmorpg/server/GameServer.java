@@ -379,7 +379,7 @@ public class GameServer {
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             //Out.debug("Called execute");
                             // disable AI
-                            rule.execute(e, ai.currentTarget);
+                            //rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -455,7 +455,7 @@ public class GameServer {
                 // process combat
                 for (Player p : tmpPlayers) {
                     for (Enemy e : enemies) {
-                        if (e.getX() == p.getX() && e.getY() == p.getY()) {
+                        if (e.alive && e.getX() == p.getX() && e.getY() == p.getY()) {
                             if (++p.atkTime >= ATK_INTERVAL / (1 + p.getTotalStat(GameCharacter.ASPD)/100.0)) {
                                 int dmg = p.dealDamage(e);
                                 animations.add(new Animation(p.getX(), p.getY(), 0.5f, 0, 25, dmg+""));

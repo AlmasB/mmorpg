@@ -63,6 +63,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             hp = 0, sp = 0; // these are current hp/sp
 
     public int atkTime = 0;
+    public boolean alive = true;
 
     protected double atkCritDmg = 0.0, matkCritDmg = 0.0; // these are % modifiers for ex 2.0 = 200%
 
