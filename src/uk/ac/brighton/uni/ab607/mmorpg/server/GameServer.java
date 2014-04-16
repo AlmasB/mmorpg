@@ -319,8 +319,8 @@ public class GameServer {
                     throw new BadActionRequestException("Bad value: " + tokens[2]);
                 }
             }
-            
-            // if tokens.length == 5 chat 
+
+            // if tokens.length == 5 chat
 
             switch (cmd) {
                 case ATTR_UP:

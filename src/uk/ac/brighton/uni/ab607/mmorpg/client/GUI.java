@@ -133,9 +133,9 @@ public class GUI extends DoubleBufferWindow {
                 String chatText = e.getActionCommand();
                 actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
                 chat.setText("");
-                
+
                 //Out.println(e.getActionCommand());
-                
+
             }
         });
         this.add(chat);
@@ -338,9 +338,13 @@ public class GUI extends DoubleBufferWindow {
             g.drawImage(Resources.getImage("chest.png"), 0 + ch.x - renderX, 0 + 10 + ch.y - renderY, this);
         }
 
-        for (Enemy ch : tmpEnemies) {
-            g.drawImage(Resources.getImage("enemy.png"), ch.getX() - renderX, ch.getY() - renderY, this);
-            g.drawString(ch.name + " " + ch.getHP() + "", ch.getX() - renderX, 50 + ch.getY() - renderY);
+        for (Enemy e : tmpEnemies) {
+            //g.drawImage(Resources.getImage("enemy1.png"), ch.getX() - renderX, ch.getY() - renderY, this);
+            g.drawImage(Resources.getImage("enemy3.png"),
+                    e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
+                    e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
+
+            g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
         }
 
         for (Player p : tmpPlayers) {
