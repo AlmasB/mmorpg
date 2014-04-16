@@ -65,6 +65,7 @@ public class GameServer {
             EQUIP = "EQUIP",
             UNEQUIP = "UNEQUIP",
             REFINE = "REFINE",
+            ATTACK = "ATTACK",
             SKILL_USE = "SKILL_USE",
             CHAT = "CHAT";
 
@@ -357,10 +358,36 @@ public class GameServer {
                     else
                         throw new BadActionRequestException("Item not found: " + value);
                     break;
+                case ATTACK:
+                    // we only have player enemy interaction atm so ID will be an enemy
+                    Enemy target = (Enemy) getGameCharacterByRuntimeID(value);
+                    if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                        int dmg = player.dealDamage(target);
+                        animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
+                        player.atkTime = 0;
+                        if (target.getHP() <= 0) {   // TODO: do similar checks when using skills
+                            player.gainBaseExperience(target.experience);
+                            player.gainJobExperience(target.experience);
+                            player.gainStatExperience(target.experience);
+                            chests.add(target.onDeath());
+                            //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+                        }
+                    }
+
+                    if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                        int dmg = target.dealDamage(player);
+                        animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
+                        target.atkTime = 0;
+                        if (player.getHP() <= 0) {
+                            // TODO: implement player death
+                        }
+
+                    }
+                    break;
                 case SKILL_USE:
-                    GameCharacter target = getGameCharacterByRuntimeID(value2);
-                    if (target != null)
-                        player.useSkill(value, target);
+                    GameCharacter skTarget = getGameCharacterByRuntimeID(value2);
+                    if (skTarget != null)
+                        player.useSkill(value, skTarget);
                     break;
                 case CHAT:
                     animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, player.name + ":" + tokens[4]));
@@ -486,7 +513,7 @@ public class GameServer {
                 }
 
                 // process combat
-                for (Player p : tmpPlayers) {
+                /*for (Player p : tmpPlayers) {
                     for (Enemy e : enemies) {
                         if (e.alive && e.getX() == p.getX() && e.getY() == p.getY()) {
                             if (++p.atkTime >= ATK_INTERVAL / (1 + p.getTotalStat(GameCharacter.ASPD)/100.0)) {
@@ -511,13 +538,13 @@ public class GameServer {
                                     p.ySpeed = -p.getY();
                                     p.move();
                                     p.xSpeed = 0;
-                                    p.ySpeed = 0;*/
+                                    p.ySpeed = 0;
                                 }
 
                             }
                         }
                     }
-                }
+                }*/
 
                 Player[] toSend = new Player[tmpPlayers.size()];
                 for (int i = 0; i < tmpPlayers.size(); i++)

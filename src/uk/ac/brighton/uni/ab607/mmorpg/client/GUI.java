@@ -67,6 +67,8 @@ public class GUI extends DoubleBufferWindow {
 
     private ArrayList<String> actionsUI = new ArrayList<String>();
 
+    private int targetRuntimeID = 0;    // this is for attacking
+
     private boolean stop = false;
 
     private Player player;
@@ -287,6 +289,12 @@ public class GUI extends DoubleBufferWindow {
             renderY = player.getY() - 360;  // half of height
         }
 
+        checkRuntimeID();
+
+        if (targetRuntimeID != 0) {
+            actionsUI.add("ATTACK," + player.name + "," + targetRuntimeID);
+        }
+
         if (!stop) {
             try {
                 String[] actions = new String[st.actions.size()];
@@ -339,7 +347,6 @@ public class GUI extends DoubleBufferWindow {
         }
 
         for (Enemy e : tmpEnemies) {
-            //g.drawImage(Resources.getImage("enemy1.png"), ch.getX() - renderX, ch.getY() - renderY, this);
             g.drawImage(Resources.getImage("enemy3.png"),
                     e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
                     e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
@@ -361,8 +368,6 @@ public class GUI extends DoubleBufferWindow {
         if (target != null) {
             g.drawImage(Resources.getImage("target.png"), target.getX()*40 - renderX, target.getY()*40 - renderY, this);
         }
-
-        //System.out.println(tmpAnims.size() + "");
 
         for (Animation a : tmpAnims) {
             g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
@@ -436,7 +441,21 @@ public class GUI extends DoubleBufferWindow {
             mouseX = e.getX();
             mouseY = e.getY();
 
-            if (!choosingTarget) {
+            if (!choosingTarget) {  // if not choosing skill target
+
+                for (Enemy enemy : tmpEnemies) {
+                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                        targetRuntimeID = enemy.getRuntimeID();
+                        //actionsUI.add("ATTACK," + player.name + "," + enemy.getRuntimeID());
+                        return;
+                    }
+                }
+
+                targetRuntimeID = 0;
+
+                // if no enemy in that selection then move player to that cell
+
                 movePlayer(mouseX, mouseY);
                 isPressed = true;
             }
@@ -501,5 +520,13 @@ public class GUI extends DoubleBufferWindow {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    private void checkRuntimeID() {
+        for (Enemy e : tmpEnemies) {
+            if (e.getRuntimeID() == targetRuntimeID)
+                return;
+        }
+        targetRuntimeID = 0;
     }
 }
