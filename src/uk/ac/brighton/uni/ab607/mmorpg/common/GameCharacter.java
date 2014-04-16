@@ -73,7 +73,12 @@ public abstract class GameCharacter implements java.io.Serializable {
             hp = 0, sp = 0; // these are current hp/sp
 
     public int atkTime = 0;
-    public boolean alive = true;
+
+    /**
+     * Signifies whether character is alive
+     * Typically hp <= 0 means character is NOT alive
+     */
+    protected boolean alive = true;
 
     protected float atkCritDmg = 0.0f, matkCritDmg = 0.0f; // these are % modifiers for ex 2.0 = 200%
 
@@ -221,6 +226,10 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public int getRuntimeID() {
         return runtimeID;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 
     public abstract Element getWeaponElement();

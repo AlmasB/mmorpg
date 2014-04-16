@@ -361,33 +361,42 @@ public class GameServer {
                 case ATTACK:
                     // we only have player enemy interaction atm so ID will be an enemy
                     Enemy target = (Enemy) getGameCharacterByRuntimeID(value);
-                    if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                        int dmg = player.dealDamage(target);
-                        animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
-                        player.atkTime = 0;
-                        if (target.getHP() <= 0) {   // TODO: do similar checks when using skills
-                            player.gainBaseExperience(target.experience);
-                            player.gainJobExperience(target.experience);
-                            player.gainStatExperience(target.experience);
-                            chests.add(target.onDeath());
-                            //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
-                        }
-                    }
-
-                    if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                        int dmg = target.dealDamage(player);
-                        animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
-                        target.atkTime = 0;
-                        if (player.getHP() <= 0) {
-                            // TODO: implement player death
+                    if (target != null && target.isAlive()) {
+                        if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                            int dmg = player.dealDamage(target);
+                            animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
+                            player.atkTime = 0;
+                            if (target.getHP() <= 0) {
+                                player.gainBaseExperience(target.experience);
+                                player.gainJobExperience(target.experience);
+                                player.gainStatExperience(target.experience);
+                                chests.add(target.onDeath());
+                                //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+                            }
                         }
 
+                        if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                            int dmg = target.dealDamage(player);
+                            animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
+                            target.atkTime = 0;
+                            if (player.getHP() <= 0) {
+                                // TODO: implement player death
+                            }
+                        }
                     }
                     break;
                 case SKILL_USE:
-                    GameCharacter skTarget = getGameCharacterByRuntimeID(value2);
-                    if (skTarget != null)
+                    Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
+                    if (skTarget != null) {
                         player.useSkill(value, skTarget);
+
+                        if (skTarget.getHP() <= 0) {
+                            player.gainBaseExperience(skTarget.experience);
+                            player.gainJobExperience(skTarget.experience);
+                            player.gainStatExperience(skTarget.experience);
+                            chests.add(skTarget.onDeath());
+                        }
+                    }
                     break;
                 case CHAT:
                     animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, player.name + ":" + tokens[4]));
@@ -420,7 +429,6 @@ public class GameServer {
             List<Player> tmpPlayers = new ArrayList<Player>();
 
             while (true) {
-
                 tmpPlayers = new ArrayList<Player>(players);
 
                 for (Iterator<Animation> itA = animations.iterator(); itA.hasNext(); ) {
@@ -429,7 +437,6 @@ public class GameServer {
                     if (a.duration <= 0)
                         itA.remove();
                 }
-
 
                 // process AI
                 for (Enemy e : enemies) {
@@ -443,8 +450,6 @@ public class GameServer {
                         }
                     }
                 }
-
-                //Out.debug(players.size() + "");
 
                 // move players
                 for (Player p : tmpPlayers) {
@@ -465,24 +470,13 @@ public class GameServer {
 
                         if (e.AI.currentGoal == AgentGoal.FIND_PLAYER && e.canSee(p)) {
                             locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
-
-
-
-                            //if (!facts.contains(p))
-                            //facts.add(p);
                             e.AI.currentTarget = p;
                         }
 
                         if (e.AI.currentGoal == AgentGoal.KILL_PLAYER && e.AI.currentTarget == null
                                 && locationFacts.size() > 0) {
-
                             e.AI.currentTarget = getLastKnownLocation();
-
-                            //Out.debug(e.AI.currentTarget.getX() + " " + e.AI.currentTarget.getY());
                         }
-
-                        //if (e.AI.currentGoal == AgentGoal.KILL_PLAYER && e.AI.currentTarget != null)
-
                     }
                 }
 
@@ -493,11 +487,7 @@ public class GameServer {
                     pairs.setValue((float) (pairs.getValue() - 0.005));
                     if (pairs.getValue() < 0)
                         iter.remove();
-
-                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
                 }
-
-                //System.out.println(locationFacts.size() + "");
 
                 // process player - chest interaction
                 for (Player p : tmpPlayers) {   // make chests unavailable if picked and check for it (alive ? )
@@ -512,40 +502,6 @@ public class GameServer {
                     }
                 }
 
-                // process combat
-                /*for (Player p : tmpPlayers) {
-                    for (Enemy e : enemies) {
-                        if (e.alive && e.getX() == p.getX() && e.getY() == p.getY()) {
-                            if (++p.atkTime >= ATK_INTERVAL / (1 + p.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                                int dmg = p.dealDamage(e);
-                                animations.add(new Animation(p.getX(), p.getY(), 0.5f, 0, 25, dmg+""));
-                                p.atkTime = 0;
-                                if (e.getHP() <= 0) {   // TODO: do similar checks when using skills
-                                    p.gainBaseExperience(e.experience);
-                                    p.gainJobExperience(e.experience);
-                                    p.gainStatExperience(e.experience);
-                                    chests.add(e.onDeath());
-                                    //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
-                                }
-                            }
-
-                            if (++e.atkTime >= ATK_INTERVAL / (1 + e.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                                int dmg = e.dealDamage(p);
-                                animations.add(new Animation(p.getX(), p.getY() + 80, 0.5f, 0, 25, dmg+""));
-                                e.atkTime = 0;
-                                if (p.getHP() <= 0) {
-                                    /*p.xSpeed = -p.getX();
-                                    p.ySpeed = -p.getY();
-                                    p.move();
-                                    p.xSpeed = 0;
-                                    p.ySpeed = 0;
-                                }
-
-                            }
-                        }
-                    }
-                }*/
-
                 Player[] toSend = new Player[tmpPlayers.size()];
                 for (int i = 0; i < tmpPlayers.size(); i++)
                     toSend[i] = tmpPlayers.get(i);
@@ -553,6 +509,13 @@ public class GameServer {
                 // clean chests
                 for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
                     if (it.next().isOpened()) {
+                        it.remove();
+                    }
+                }
+
+                // clean enemies
+                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
+                    if (!it.next().isAlive()) {
                         it.remove();
                     }
                 }

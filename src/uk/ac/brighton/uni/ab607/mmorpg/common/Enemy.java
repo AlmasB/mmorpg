@@ -52,7 +52,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
         this.element = element;
         this.x = x;
         this.y = y;
-        this.hp = 5000;
+        this.hp = 300;
         this.experience = 15;
         //AI = new AgentBehaviour(aiType, null);
     }

@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -30,7 +31,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
 public class InventoryGUI extends JFrame {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8003620530720788503L;
 
@@ -99,7 +100,7 @@ public class InventoryGUI extends JFrame {
     // also check if items themselves have changed ie rune or essence added maybe use PseudoHTML for checking ?
     // TODO: check the exact items in inventory and perhaps player equip and then repaint if needed
     public void repaint(Player p) {
-        if (!player.getInventory().toString().equals(p.getInventory().toString()) || !isSameEquip(p)) {
+        if (!player.getInventory().toString().equals(p.getInventory().toString()) || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
             player = p;
             repaint();
         }
@@ -183,6 +184,10 @@ public class InventoryGUI extends JFrame {
         }
 
         g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
+
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Courier", Font.PLAIN, 20));
+        g.drawString(player.getMoney() + "", 100, 285);
     }
 
     @Override
@@ -250,7 +255,7 @@ public class InventoryGUI extends JFrame {
     /**
      * Checks whether mouse clicked any of the body parts
      * of player
-     * 
+     *
      * @param x
      *          mouse x
      * @param y

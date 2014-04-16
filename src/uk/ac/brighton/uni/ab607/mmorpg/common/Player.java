@@ -282,13 +282,13 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     @Override
     public int dealDamage(GameCharacter target) {
         int dmg = super.dealDamage(target);
-        if (target.hp <= 0 && target instanceof Enemy) {
+        /*if (target.hp <= 0 && target instanceof Enemy) {
             Enemy mob = (Enemy) target;
             gainBaseExperience(mob.experience);
             gainStatExperience(mob.experience);
             gainJobExperience(mob.experience);
             // TODO: possibly move onDeath of mob here to add drops straight to player inventory
-        }
+        }*/
         return dmg;
     }
 
