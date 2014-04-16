@@ -10,21 +10,15 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-//import javax.swing.JTextField;
-
-
-
-
-
-
-
-
+import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
@@ -78,7 +72,7 @@ public class GUI extends DoubleBufferWindow {
     private Player player;
     private Player currentPlayer;
 
-    //private JTextField chat = new JTextField();
+    private JTextField chat = new JTextField();
 
     private InventoryGUI inv = null;
     private StatsGUI st = null;
@@ -131,9 +125,20 @@ public class GUI extends DoubleBufferWindow {
             e.printStackTrace();
         }
 
-        //chat.setLayout(null);
-        //chat.setBounds(10, 720 - 60, 1280 - 30, 20);
-        //this.add(chat);
+        chat.setLayout(null);
+        chat.setBounds(10, 720 - 60, 1280 - 30, 20);
+        chat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String chatText = e.getActionCommand();
+                actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
+                chat.setText("");
+                
+                //Out.println(e.getActionCommand());
+                
+            }
+        });
+        this.add(chat);
 
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
@@ -362,7 +367,7 @@ public class GUI extends DoubleBufferWindow {
             g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
         }
 
-        //chat.repaint();
+        chat.repaint();
     }
 
     private boolean choosingTarget = false; // if player is choosing target for skill or smth

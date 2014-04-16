@@ -52,20 +52,21 @@ class Point implements java.io.Serializable, AgentGoalTarget {
 
 public class GameServer {
 
-    public enum Command {
+    /*public enum Command {
         ATTR_UP, EQUIP, UNEQUIP, REFINE;
 
         @Override
         public String toString() {
             return this.name();
         }
-    }
+    }*/
 
     public static final String ATTR_UP = "ATTR_UP",
             EQUIP = "EQUIP",
             UNEQUIP = "UNEQUIP",
             REFINE = "REFINE",
-            SKILL_USE = "SKILL_USE";
+            SKILL_USE = "SKILL_USE",
+            CHAT = "CHAT";
 
     private static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;
@@ -318,6 +319,8 @@ public class GameServer {
                     throw new BadActionRequestException("Bad value: " + tokens[2]);
                 }
             }
+            
+            // if tokens.length == 5 chat 
 
             switch (cmd) {
                 case ATTR_UP:
@@ -358,6 +361,9 @@ public class GameServer {
                     GameCharacter target = getGameCharacterByRuntimeID(value2);
                     if (target != null)
                         player.useSkill(value, target);
+                    break;
+                case CHAT:
+                    animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, player.name + ":" + tokens[4]));
                     break;
                 default:
                     throw new BadActionRequestException("No such command: " + tokens[0]);
