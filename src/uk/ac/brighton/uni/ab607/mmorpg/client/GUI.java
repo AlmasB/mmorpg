@@ -24,11 +24,9 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
-import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.libs.search.*;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
@@ -89,7 +87,6 @@ public class GUI extends JFrame {
     private Cursor walkCursor = null;
 
     public GUI(String ip, String playerName) {
-        //super(1280, 720, "Game Client Window", true);
         setSize(1280, 720);
         setTitle("Game Client Window");
         this.setLayout(null);
@@ -144,9 +141,6 @@ public class GUI extends JFrame {
                 String chatText = e.getActionCommand();
                 actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
                 chat.setText("");
-
-                //Out.println(e.getActionCommand());
-
             }
         });
         chat.addKeyListener(new KeyListener() {

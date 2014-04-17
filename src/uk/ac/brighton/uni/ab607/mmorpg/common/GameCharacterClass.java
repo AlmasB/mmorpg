@@ -9,10 +9,12 @@ public enum GameCharacterClass {
 
     public final int hp;
     public final int sp;
+    public final Skill[] skills;
 
-    private GameCharacterClass(int hp, int sp) {
+    private GameCharacterClass(int hp, int sp, Skill... skills) {
         this.hp = hp;
         this.sp = sp;
+        this.skills = skills;
     }
 
     @Override

@@ -68,6 +68,8 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected float[] stats = new float[12];        // 12 stats
     protected float[] bStats = new float[12];       // bonus stats given by item
 
+    protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard
+
     // make protected
     public int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp
@@ -89,6 +91,7 @@ public abstract class GameCharacter implements java.io.Serializable {
         this.name = name;
         this.description = description;
         this.charClass = charClass;
+        this.skills = charClass.skills;
 
         for (int i = STR; i <= LUC; i++)    // set all attributes to 1, that's the minimum
             attributes[i] = 1;
@@ -113,6 +116,10 @@ public abstract class GameCharacter implements java.io.Serializable {
         return attributes[attr] + bAttributes[attr];
     }
 
+    public int getTotalAttribute(Attribute attr) {
+        return attributes[attr.ordinal()] + bAttributes[attr.ordinal()];
+    }
+
     /**
      *
      * @param stat
@@ -122,6 +129,10 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     public float getTotalStat(int stat) {
         return stats[stat] + bStats[stat];
+    }
+
+    public float getTotalStat(Stat stat) {
+        return stats[stat.ordinal()] + bStats[stat.ordinal()];
     }
 
     //TODO find a way to track changes and auto update

@@ -20,6 +20,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Skill;
+import uk.ac.brighton.uni.ab607.mmorpg.common.SkillFactory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.ArmorFactory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Essence;
@@ -35,7 +37,25 @@ import javax.swing.text.html.HTML;
 public class Main {
     public static void main(String[] args) {
 
+        Skill sk = SkillFactory.getSkillById("7001");
+        Out.println(sk.getLevel() + "");
 
+        sk.levelUp();
+
+        Out.println(sk.getLevel() + "");
+
+        Out.println(sk.id + " " + sk.name + " " + sk.description);
+
+        sk.levelUp();
+
+        sk = SkillFactory.getSkillById("7001");
+        Out.println(sk.getLevel() + "");
+
+        sk.levelUp();
+
+        Out.println(sk.getLevel() + "");
+
+        Out.println(sk.id + " " + sk.name + " " + sk.description);
 
         //        if (GameAccount.addAccount("Bara1ai", "3Sn5SdXen90G", "ashuran.sama@gmail.com")) {
         //            Out.println("Success");

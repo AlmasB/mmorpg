@@ -1,11 +1,14 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class SkillFactory {
 
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
-    // TODO: skills could kill target, check for that somewhere
+
+    // TODO: check with char's stats first like magic armor etc
     static {
         // HEAL
         add(new ActiveSkill("Heal", "Restores HP to target") {
@@ -90,6 +93,29 @@ public class SkillFactory {
             }
         });
 
+        // BULLSEYE
+        add(new ActiveSkill("BULLSEYE", "Deals armor ignoring damage to target."
+                + "Target's defense is not ignored. "
+                + "Damage is based on caster's DEX") {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 6923525936384357867L;
+
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void use(GameCharacter caster, GameCharacter target) {
+                float dmg = 100 + level * 85 - target.getTotalStat(GameCharacter.DEF);
+                target.hp -= dmg;
+            }
+        });
+
+
+
         /*
          * Soul Slash - 7 consecutive attacks.
          * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
@@ -109,10 +135,31 @@ public class SkillFactory {
          * */
     }
 
-    /*public static Skill getSkillById(String id) {
-        return defaultSkills.containsKey(id) ? new Armor(defaultArmor.get(id)) : null;
-    }*/
+    /**
+     *
+     * @param id
+     *              skill id
+     * @return
+     *          a complete NEW copy of a skill from database
+     */
+    public static Skill getSkillById(String id) {
+        if (defaultSkills.containsKey(id)) {
+            Skill sk = defaultSkills.get(id);
+            Constructor<? extends Skill> c;
+            try {
+                c = sk.getClass().getDeclaredConstructor(String.class, String.class);
+                sk = c.newInstance(sk.name, sk.description);
+                return sk;
+            }
+            catch (NoSuchMethodException | SecurityException | InstantiationException
+                    | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
 
+        return null;
+    }
 
     private static void add(Skill skill) {
         defaultSkills.put(skill.id, skill);
