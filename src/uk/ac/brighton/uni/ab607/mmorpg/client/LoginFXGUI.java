@@ -20,7 +20,7 @@ public class LoginFXGUI extends Application {
 
     /**
      * LoginFXGUI.main(args); for calling login gui
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -50,11 +50,11 @@ public class LoginFXGUI extends Application {
         primaryStage.setResizable(false);
         primaryStage.setTitle("Login GUI");
 
-        //InputStream in = getClass().getResourceAsStream("/res/UI/Login.fxml");
-
         InputStream in = ResourceManager.loadResourceAsStream("UI/Login.fxml");
         FXMLLoader loader = new FXMLLoader();
         loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+        // uncomment for running within jar and comment the other
         //loader.setLocation(getClass().getResource("/res/UI/Login.fxml"));
         loader.setLocation(ResourceManager.getLocalURL("UI/Login.fxml"));
 
@@ -79,10 +79,6 @@ public class LoginFXGUI extends Application {
         login = (LoginController) loader.getController();
         login.setApp(this);
         login.setProgress(p);
-
-        //InputStream in = Main.class.getResourceAsStream(fxml);
-        //InputStream in = ResourceManager.loadResourceAsStream(fxml);
-        //loader.setLocation(ResourceManager.getLocalURL(fxml));
 
         primaryStage.show();
     }

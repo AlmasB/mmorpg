@@ -86,13 +86,14 @@ public class LoginController extends AnchorPane implements Initializable {
 
     /**
      * Runs on UI thread
-     * 
+     *
      * Invoked when button is pressed
-     * 
+     *
      * @param event
      */
     public void processLogin(ActionEvent event) {
-        login.setDisable(true);
+        //login.setDisable(true);
+        enableButton(false);
         showProgressBar(true);
 
         new Thread(new LoginTask()).start();
@@ -115,7 +116,8 @@ public class LoginController extends AnchorPane implements Initializable {
                 catch (IOException e) {
                     setErrorMessage("Couldn't connect to server at: " + ip);
                     showProgressBar(false);
-                    login.setDisable(false);
+                    //login.setDisable(false);
+                    enableButton(true);
                     return;
                 }
 
@@ -139,7 +141,8 @@ public class LoginController extends AnchorPane implements Initializable {
             if (!serverFound) {
                 setErrorMessage("Couldn't connect to server at: " + ip);
                 showProgressBar(false);
-                login.setDisable(false);
+                //login.setDisable(false);
+                enableButton(true);
                 return;
             }
 
@@ -169,7 +172,8 @@ public class LoginController extends AnchorPane implements Initializable {
             } while (System.currentTimeMillis() - startTime < 2000);
 
             showProgressBar(false);
-            login.setDisable(false);
+            //login.setDisable(false);
+            enableButton(true);
         }
     }
 
@@ -187,6 +191,15 @@ public class LoginController extends AnchorPane implements Initializable {
             @Override
             public void run() {
                 progress.setVisible(b);
+            }
+        });
+    }
+
+    private void enableButton(final boolean b) {
+        runOnUI(new Runnable() {
+            @Override
+            public void run() {
+                login.setDisable(!b);
             }
         });
     }
