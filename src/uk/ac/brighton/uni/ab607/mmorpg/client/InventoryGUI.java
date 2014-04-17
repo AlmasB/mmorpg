@@ -49,15 +49,11 @@ public class InventoryGUI extends JFrame {
     public ArrayList<String> actions = new ArrayList<String>();
 
     public InventoryGUI(Player p) {
-        //super(640, 304, "Inventory Window", true);
         setSize(640, 304);
         setTitle("Inventory Window");
         setLayout(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-
-
-        ///////////////////////////////////////
         this.setLocation(640, 720);
 
         itemInfoLabel.setBounds(200, 0, 225, 304);
@@ -194,52 +190,6 @@ public class InventoryGUI extends JFrame {
     public void paint(Graphics g) {
         draw((Graphics2D) g);
     }
-
-
-    /*@Override
-    protected void createPicture(Graphics2D g) {
-        //g.setColor(DEFAULT_BG_COLOR);
-        //g.fillRect(0, 0, 200, 304);
-        //g.fillRect(433, 0, 640-433, 304);
-
-        ArrayList<GameItem> items = player.getInventory().getItems();
-
-        // display player inventory
-        int x = 0, y = 0;
-        for (int i = 0; i < items.size(); i++) {
-            drawItem(items.get(i), g, 438 + x*40, 29 + y*40);
-
-            if (++x == 6) {
-                x = 0;
-                y++;
-            }
-        }
-
-        // display what player is wearing
-        drawItem(player.getEquip(Player.RIGHT_HAND), g, 45, 130);
-        drawItem(player.getEquip(Player.LEFT_HAND), g, 135, 130);
-        drawItem(player.getEquip(Player.BODY), g, 90, 130);
-        drawItem(player.getEquip(Player.HELM), g, 90, 85);
-        drawItem(player.getEquip(Player.SHOES), g, 90, 180);
-
-        // display UI
-
-        g.drawImage(Resources.getImage("inv.png"), 2, 27, this);
-        g.drawImage(Resources.getImage("inventory2.png"), 436, 27, this);
-
-
-        runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedItem != null) {
-                    itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                            : selectedItem.toPseudoHTMLShort());
-                }
-                //itemInfoLabel.repaint();
-                //infoButton.repaint();
-            }
-        });
-    }*/
 
     private void drawItem(GameItem item, Graphics2D g, int x, int y) {
         g.drawImage(Resources.getImage("ss.png"), x, y, x + 34, y + 34,

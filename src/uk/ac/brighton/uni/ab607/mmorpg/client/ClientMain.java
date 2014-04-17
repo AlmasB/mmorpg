@@ -6,7 +6,7 @@ public class ClientMain {
 
     // TODO: pass "local" as argument to start server and autologin on same machine
     public static void main(String[] args) {
-        boolean local = false;
+        boolean local = true;
 
         if (local) {
             new GameServer();
@@ -14,7 +14,7 @@ public class ClientMain {
         }
         else {
             LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
-            // only be called after previous gui finishes
+            // will only be called after previous gui finishes
             new GUI(LoginFXGUI.getIP(), LoginFXGUI.getUserName());
         }
     }

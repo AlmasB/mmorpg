@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Point;
@@ -17,7 +18,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
@@ -32,7 +35,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 
 @SuppressWarnings("serial")
-public class GUI extends DoubleBufferWindow {
+public class GUI extends JFrame {
 
     private int mapWidth;
     private int mapHeight;
@@ -86,11 +89,17 @@ public class GUI extends DoubleBufferWindow {
     private Cursor walkCursor = null;
 
     public GUI(String ip, String playerName) {
-        super(1280, 720, "Game Client Window", true);
+        //super(1280, 720, "Game Client Window", true);
+        setSize(1280, 720);
+        setTitle("Game Client Window");
+        this.setLayout(null);
 
         name = playerName;
 
         this.setLocation(0, 0);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+
         this.addKeyListener(new Keyboard());
         this.addMouseListener(mouse);
         //this.addMouseMotionListener(mouse);
@@ -128,7 +137,7 @@ public class GUI extends DoubleBufferWindow {
         }
 
         chat.setLayout(null);
-        chat.setBounds(10, 720 - 60, 1280 - 30, 20);
+        chat.setBounds(5, 720 - 60, 1280 - 25, 20);
         chat.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -139,6 +148,18 @@ public class GUI extends DoubleBufferWindow {
                 //Out.println(e.getActionCommand());
 
             }
+        });
+        chat.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {}
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_UP) {
+                    GUI.this.requestFocusInWindow();
+                }
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {}
         });
         this.add(chat);
 
@@ -325,7 +346,7 @@ public class GUI extends DoubleBufferWindow {
         repaint();
     }
 
-    @Override
+    /*@Override
     protected void createPicture(Graphics2D g) {
 
         int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
@@ -377,6 +398,87 @@ public class GUI extends DoubleBufferWindow {
         }
 
         chat.repaint();
+    }*/
+
+    /**
+     * Double buffer (off-screen) Image
+     */
+    private BufferedImage doubleBufferImage;
+
+    /**
+     * Double buffer (off-screen) Graphics
+     */
+    private Graphics2D doubleBufferGraphics;
+
+    private void drawImage(Graphics2D g) {
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, 1280, 690);
+
+        int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
+        int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
+
+        int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
+        int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
+
+        if (player != null)
+            g.drawImage(Resources.getImage("map1.png"),
+                    dx, dy, dx1, dy1,
+                    sx, sy,
+                    sx1, sy1, this);
+
+        g.setColor(Color.YELLOW);
+
+        for (Chest ch : tmpChests) {
+            g.drawImage(Resources.getImage("chest.png"), 0 + ch.x - renderX, 0 + 10 + ch.y - renderY, this);
+        }
+
+        for (Enemy e : tmpEnemies) {
+            g.drawImage(Resources.getImage("enemy3.png"),
+                    e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
+                    e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
+
+            g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
+        }
+
+        for (Player p : tmpPlayers) {
+            FontMetrics fm = g.getFontMetrics(g.getFont());
+            int width = fm.stringWidth(p.name);
+
+            g.drawImage(Resources.getImage("player1.png"),
+                    p.getX() - renderX, p.getY() - renderY, p.getX() - renderX+40, p.getY() - renderY+40,
+                    p.place*40, p.getRow()*40, p.place*40+40, p.getRow()*40+40, this);
+
+            g.drawString(p.name, p.getX() - renderX + 20 - (width/2), p.getY() + 5 + 40 - renderY);
+        }
+
+        if (target != null) {
+            g.drawImage(Resources.getImage("target.png"), target.getX()*40 - renderX, target.getY()*40 - renderY, this);
+        }
+
+        for (Animation a : tmpAnims) {
+            g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
+                    a.ssX*34, a.ssY*34, a.ssX*34+34, a.ssY*34+34, this);
+
+            g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
+        }
+
+
+    }
+
+    private void draw(Graphics2D g) {
+        if (doubleBufferGraphics == null) {
+            doubleBufferImage = (BufferedImage) createImage(1280, 690);
+            doubleBufferGraphics = doubleBufferImage.createGraphics();
+        }
+
+        drawImage(doubleBufferGraphics);
+        g.drawImage(doubleBufferImage, 0, 0, this);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        draw((Graphics2D) g);
+        chat.repaint();
     }
 
     private boolean choosingTarget = false; // if player is choosing target for skill or smth
@@ -394,7 +496,11 @@ public class GUI extends DoubleBufferWindow {
 
         }
         @Override
-        public void keyPressed(KeyEvent e) {}
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                chat.requestFocusInWindow();
+            }
+        }
         @Override
         public void keyReleased(KeyEvent e) {}
     }
