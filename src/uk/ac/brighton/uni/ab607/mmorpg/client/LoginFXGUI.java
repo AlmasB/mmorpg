@@ -5,7 +5,6 @@ import java.io.InputStream;
 import uk.ac.brighton.uni.ab607.libs.io.ResourceManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
@@ -16,7 +15,7 @@ public class LoginFXGUI extends Application {
 
     private LoginController login;
 
-    public static String[] userData;
+    private static String IP = "", userName = "";
 
     /**
      * LoginFXGUI.main(args); for calling login gui
@@ -24,25 +23,25 @@ public class LoginFXGUI extends Application {
      * @param args
      */
     public static void main(String[] args) {
-        //new LoginFXGUI();
         launch(args);
     }
 
-    public LoginFXGUI() {
-        //Application.launch(LoginFXGUI.class, (String[]) null);
-        // at this point we have working ip and server accepted player name
+    public LoginFXGUI() {}
+
+    public static void setUserName(String name) {
+        userName = name;
     }
 
-    public void callFXApp() {
-        Application.launch(LoginFXGUI.class, (String[]) null);
+    public static void setIP(String ip) {
+        IP = ip;
     }
 
-    public String getUser() {
-        return login.getUserName();
+    public static String getUserName() {
+        return userName;
     }
 
-    public String getIP() {
-        return login.getIP();
+    public static String getIP() {
+        return IP;
     }
 
     @Override
@@ -55,6 +54,7 @@ public class LoginFXGUI extends Application {
         loader.setBuilderFactory(new JavaFXBuilderFactory());
 
         // uncomment for running within jar and comment the other
+        // TODO: implement global flag for running within jar
         //loader.setLocation(getClass().getResource("/res/UI/Login.fxml"));
         loader.setLocation(ResourceManager.getLocalURL("UI/Login.fxml"));
 

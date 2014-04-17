@@ -38,10 +38,10 @@ public class LoginController extends AnchorPane implements Initializable {
     @FXML
     ImageView img;
 
-    private LoginFXGUI application;
+    //private LoginFXGUI application;
 
     public void setApp(LoginFXGUI application){
-        this.application = application;
+        //this.application = application;
     }
 
     private ProgressIndicator progress;
@@ -92,7 +92,6 @@ public class LoginController extends AnchorPane implements Initializable {
      * @param event
      */
     public void processLogin(ActionEvent event) {
-        //login.setDisable(true);
         enableButton(false);
         showProgressBar(true);
 
@@ -116,7 +115,6 @@ public class LoginController extends AnchorPane implements Initializable {
                 catch (IOException e) {
                     setErrorMessage("Couldn't connect to server at: " + ip);
                     showProgressBar(false);
-                    //login.setDisable(false);
                     enableButton(true);
                     return;
                 }
@@ -141,7 +139,6 @@ public class LoginController extends AnchorPane implements Initializable {
             if (!serverFound) {
                 setErrorMessage("Couldn't connect to server at: " + ip);
                 showProgressBar(false);
-                //login.setDisable(false);
                 enableButton(true);
                 return;
             }
@@ -161,8 +158,8 @@ public class LoginController extends AnchorPane implements Initializable {
 
             do {
                 if (loginParser.playerAccepted) {
-                    //ClientMain.main(new String[] {getIP(), getUserName()});
-                    LoginFXGUI.userData = new String[] {getIP(), getUserName()};
+                    LoginFXGUI.setIP(getIP());
+                    LoginFXGUI.setUserName(getUserName());
                     Platform.exit();
                 }
                 else {
@@ -172,7 +169,6 @@ public class LoginController extends AnchorPane implements Initializable {
             } while (System.currentTimeMillis() - startTime < 2000);
 
             showProgressBar(false);
-            //login.setDisable(false);
             enableButton(true);
         }
     }
@@ -186,6 +182,14 @@ public class LoginController extends AnchorPane implements Initializable {
         });
     }
 
+    /**
+     * Enables or disables the circular progress bar
+     * to show to the user that the program is doing network stuff
+     *
+     * @param b
+     *          true to show
+     *          false to disable
+     */
     private void showProgressBar(final boolean b) {
         runOnUI(new Runnable() {
             @Override
@@ -195,6 +199,12 @@ public class LoginController extends AnchorPane implements Initializable {
         });
     }
 
+    /**
+     * Show or hide login button
+     * @param b
+     *          true to show
+     *          false to hide
+     */
     private void enableButton(final boolean b) {
         runOnUI(new Runnable() {
             @Override

@@ -4,23 +4,18 @@ import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
 public class ClientMain {
 
+    // TODO: pass "local" as argument to start server and autologin on same machine
     public static void main(String[] args) {
+        boolean local = false;
 
-        //String ip = args[0];
-        //String name = args[1];
-
-        new GameServer();
-
-        boolean local = true;
-
-        if (!local) {
-            //LoginGUI login = new LoginGUI();
-            //login.setVisible(false);
-            //new GUI(login.getIP(), login.getPlayerName());
-            //new GUI(ip, name);
+        if (local) {
+            new GameServer();
+            new GUI("127.0.0.1", "Almas");
         }
         else {
-            new GUI("127.0.0.1", "Almas");
+            LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
+            // only be called after previous gui finishes
+            new GUI(LoginFXGUI.getIP(), LoginFXGUI.getUserName());
         }
     }
 }

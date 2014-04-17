@@ -35,9 +35,6 @@ import javax.swing.text.html.HTML;
 public class Main {
     public static void main(String[] args) {
 
-        LoginFXGUI.main(args);
-
-        new GUI(LoginFXGUI.userData[0], LoginFXGUI.userData[1]);
 
 
         //        if (GameAccount.addAccount("Bara1ai", "3Sn5SdXen90G", "ashuran.sama@gmail.com")) {
