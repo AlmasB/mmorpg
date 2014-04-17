@@ -9,7 +9,7 @@ public abstract class Skill implements java.io.Serializable {
 
     protected static int uniqueSkillID = 7000;
 
-    public String id, name, description;    // TODO: final?
+    public final String id, name, description;
 
     protected static final int MAX_LEVEL = 10;
 

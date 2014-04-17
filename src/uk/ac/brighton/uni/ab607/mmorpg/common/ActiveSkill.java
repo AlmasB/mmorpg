@@ -9,6 +9,7 @@ public abstract class ActiveSkill extends Skill {
 
     // TODO: cooldown ?
     // TODO: reduce mana within use() ?
+    // TODO: onEffectEnd()  overridable
 
     public ActiveSkill(String name, String description) {
         super(""+uniqueSkillID++, name, description);

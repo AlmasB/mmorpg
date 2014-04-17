@@ -273,26 +273,16 @@ public abstract class GameCharacter implements java.io.Serializable {
     }
 
     public void useSkill(int skillCode, GameCharacter target) {
-        ActiveSkill sk = new ActiveSkill("Heal", "heal") {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 299880583047861121L;
+        if (skillCode >= skills.length)
+            return;
 
-            @Override
-            public void use(GameCharacter caster, GameCharacter target) {
-                caster.hp += 10;
+        Skill sk = skills[skillCode];
+        if (sk != null && sk instanceof ActiveSkill) {
+            ActiveSkill skill = (ActiveSkill) sk;
+            if (this.sp >= skill.getManaCost()) {
+                this.sp -= skill.getManaCost();
+                skill.use(this, target);
             }
-
-            @Override
-            public int getManaCost() {
-                return 0;
-            }
-        };
-
-        // TODO: implement array of skills from which code is used
-        if (skillCode < 5) {
-            sk.use(this, target);
         }
     }
 

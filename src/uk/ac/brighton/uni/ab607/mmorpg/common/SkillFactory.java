@@ -24,10 +24,7 @@ public class SkillFactory {
 
             @Override
             public void use(GameCharacter caster, GameCharacter target) {
-                target.hp += 30 + level*10;
-                if (target.hp > target.getTotalStat(GameCharacter.MAX_HP)) {
-                    target.hp = (int)target.getTotalStat(GameCharacter.MAX_HP);
-                }
+                target.hp = Math.min(target.hp + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP));
             }
         });
 
@@ -114,7 +111,27 @@ public class SkillFactory {
             }
         });
 
+        // CLAUDIUS
+        add(new ActiveSkill("Claudius", "Increases VIT, WIS, LUC."
+                + "Decreases INT.") {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5612472865672733186L;
 
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void use(GameCharacter caster, GameCharacter target) {
+                target.addBonusAttribute(Attribute.VITALITY, 2*level);
+                target.addBonusAttribute(Attribute.WISDOM, 2*level);
+                target.addBonusAttribute(Attribute.LUCK, 2*level);
+                target.addBonusAttribute(Attribute.INTELLECT, -3*level);
+            }
+        });
 
         /*
          * Soul Slash - 7 consecutive attacks.
