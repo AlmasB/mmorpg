@@ -10,37 +10,47 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 public class Weapon extends EquippableItem implements PseudoHTML {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2639185454495196264L;
 
     // TODO: do weapons have aspd reduction? or if 2 weapons are equipped ?
     public enum WeaponType {
-        ONE_H_SWORD, ONE_H_AXE, DAGGER, SPEAR, MACE, ROD, SHIELD,   // 1H, shield only left-hand
-        TWO_H_SWORD, TWO_H_AXE, KATAR, BOW    // 2H
+        ONE_H_SWORD(2), ONE_H_AXE(2), DAGGER(1), SPEAR(3), MACE(2), ROD(5), SHIELD(0),   // 1H, shield only left-hand
+        TWO_H_SWORD(2), TWO_H_AXE(2), KATAR(1), BOW(5);    // 2H
+
+        public final int range;
+
+        private WeaponType(int range) {
+            this.range = range;
+        }
     }
 
     private static int uniqueWeaponID = 4000;
 
     public final WeaponType type;
+    public final int range;
     public final int pureDamage;
 
     /*package-private*/ Weapon(String name, String description, int ssX, int ssY, String author,
             ItemLevel level, WeaponType type, int pureDamage, Element element, int runesMax, Rune... defaultRunes) {
         super(""+uniqueWeaponID++, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
         this.type = type;
+        this.range = type.range;    // TODO: if not necessary then get type and then range from type
         this.pureDamage = pureDamage;
     }
 
     /*package-private*/ Weapon(Weapon copy) {
         super(copy.id, copy.name, copy.description, copy.ssX, copy.ssY, copy.author, copy.level, copy.element, copy.runesMax, copy.defaultRunes);
         this.type = copy.type;
+        this.range = type.range;
         this.pureDamage = copy.pureDamage;
     }
 
     /*package-private*/ Weapon(String name, String description, int ssX, int ssY, WeaponType type, int pureDamage) {
         super(""+uniqueWeaponID++, name, description, ssX, ssY);
         this.type = type;
+        this.range = type.range;
         this.pureDamage = pureDamage;
     }
 

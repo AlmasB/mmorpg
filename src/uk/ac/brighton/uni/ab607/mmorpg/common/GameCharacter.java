@@ -22,6 +22,10 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     private int runtimeID = 0;
 
+    // TODO: private int x, y;
+    public abstract int getX();
+    public abstract int getY();
+
     /**
      * How attributes modify stats
      */

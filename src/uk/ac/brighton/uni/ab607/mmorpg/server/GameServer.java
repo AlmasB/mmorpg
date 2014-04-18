@@ -361,7 +361,9 @@ public class GameServer {
                 case ATTACK:
                     // we only have player enemy interaction atm so ID will be an enemy
                     Enemy target = (Enemy) getGameCharacterByRuntimeID(value);
-                    if (target != null && target.isAlive()) {
+                    if (target != null && target.isAlive()
+                            && distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
+
                         if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
                             int dmg = player.dealDamage(target);
                             animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
@@ -576,5 +578,18 @@ public class GameServer {
     private void spawnEnemy(Enemy e) {
         e.setRuntimeID(runtimeID++);
         enemies.add(e);
+    }
+
+    /**
+     *
+     * @param ch1
+     *              character 1
+     * @param ch2
+     *              character 2
+     * @return
+     *          distance between 2 characters in number of cells
+     */
+    private int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
+        return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
     }
 }

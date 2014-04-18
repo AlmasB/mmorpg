@@ -114,11 +114,11 @@ public class GUI extends JFrame {
             }
         }
 
-        player = new Player("0001", name, GameCharacterClass.NOVICE, 0*40, 0*40);
+        player = new Player("0001", name, GameCharacterClass.NOVICE, 25*40, 15*40);
         st = new StatsGUI(player);
         inv = new InventoryGUI(player);
 
-        playerParent = map[0][0];
+        playerParent = map[25][15];
 
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
