@@ -95,6 +95,8 @@ public class GameServer {
             e.printStackTrace();
         }
 
+        //SkillFactory.load();
+
         // TODO how to send maps to players i.e. where players are, map specs?
 
         chests.add(new Chest(80, 80, 1000, WeaponFactory.getWeaponById("4003"), WeaponFactory.getWeaponById("4001")));
@@ -460,7 +462,7 @@ public class GameServer {
                     }
                 }
 
-                // move players
+                // move players, also reduce their active skill cooldowns
                 for (Player p : tmpPlayers) {
                     if (locationFacts.size() == 0) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 0.1f);
@@ -469,6 +471,17 @@ public class GameServer {
                     p.move();
                     p.xSpeed = 0;
                     p.ySpeed = 0;
+
+                    Skill[] skills = p.getSkills();
+                    for (Skill sk : skills) {
+                        if (sk.active) {
+                            if (sk.getCurrentCooldown() > 0) {
+                                sk.reduceCurrentCooldown(0.05f);
+                            }
+                        }
+                    }
+
+                    // TODO: optimize
                     for (Enemy e : enemies) {
                         if (e.AI.currentGoal == AgentGoal.GUARD_CHEST
                                 && p.getX() == e.AI.currentTarget.getX()

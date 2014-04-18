@@ -18,6 +18,7 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Skill;
 
 public class StatsGUI extends DoubleBufferWindow {
 
@@ -32,6 +33,8 @@ public class StatsGUI extends DoubleBufferWindow {
     private JLabel stats = new JLabel();
 
     private JButton[] buttons = new JButton[9];
+
+    private JButton btn = new JButton();    // skill icon test
 
     //make it private
     public ArrayList<String> actions = new ArrayList<String>();
@@ -76,8 +79,8 @@ public class StatsGUI extends DoubleBufferWindow {
         // test
         ToolTipManager.sharedInstance().setInitialDelay(0);
 
-        JButton btn = new JButton();
-        btn.setLocation(150, 150);
+
+        btn.setLocation(200, 150);
         btn.setSize(40, 40);
         btn.setIcon(new ImageIcon(Resources.getImage("enemy.png")));
         btn.setToolTipText("Heal. Restores HP to target");

@@ -236,6 +236,15 @@ public abstract class GameCharacter implements java.io.Serializable {
         return sp;
     }
 
+    /**
+     *
+     * @return
+     *          a skill array for this character
+     */
+    public Skill[] getSkills() {
+        return skills;
+    }
+
     public void setRuntimeID(int id) {
         runtimeID = id;
     }
@@ -282,11 +291,10 @@ public abstract class GameCharacter implements java.io.Serializable {
             return;
 
         Skill sk = skills[skillCode];
-        if (sk != null && sk instanceof ActiveSkill) {
-            ActiveSkill skill = (ActiveSkill) sk;
-            if (this.sp >= skill.getManaCost()) {
-                this.sp -= skill.getManaCost();
-                skill.use(this, target);
+        if (sk != null && sk.active && sk.getCurrentCooldown() == 0) {
+            if (this.sp >= sk.getManaCost()) {
+                this.sp -= sk.getManaCost();
+                sk.use(this, target);
             }
         }
     }
