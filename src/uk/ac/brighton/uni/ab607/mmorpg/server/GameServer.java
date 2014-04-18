@@ -399,7 +399,7 @@ public class GameServer {
                     }
                     break;
                 case CHAT:
-                    animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, player.name + ":" + tokens[4]));
+                    animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, tokens[4]));
                     break;
                 default:
                     throw new BadActionRequestException("No such command: " + tokens[0]);
@@ -407,6 +407,13 @@ public class GameServer {
         }
     }
 
+    /**
+     *
+     * @param name
+     *              player name
+     * @return
+     *          player if name exists on the server, if not then null
+     */
     private Player getPlayerByName(String name) {
         for (Player p : players)
             if (p.name.equals(name))

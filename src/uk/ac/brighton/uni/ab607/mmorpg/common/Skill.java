@@ -13,7 +13,7 @@ public abstract class Skill implements java.io.Serializable {
 
     protected static final int MAX_LEVEL = 10;
 
-    protected int level;
+    protected int level = 0;
 
     public Skill(String id, String name, String description) {
         this.id = id;

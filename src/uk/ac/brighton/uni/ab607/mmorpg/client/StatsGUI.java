@@ -6,11 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -69,6 +72,19 @@ public class StatsGUI extends DoubleBufferWindow {
         //player = p;
 
         // only keep buttons enabled when there is at least 1 attribute point
+
+        // test
+        ToolTipManager.sharedInstance().setInitialDelay(0);
+
+        JButton btn = new JButton();
+        btn.setLocation(150, 150);
+        btn.setSize(40, 40);
+        btn.setIcon(new ImageIcon(Resources.getImage("enemy.png")));
+        btn.setToolTipText("Heal. Restores HP to target");
+
+        this.add(btn);
+
+        // end of test
 
         setVisible(true);
     }

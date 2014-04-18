@@ -70,6 +70,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard
 
+    // TODO: add hp/sp regen maybe as stat?
     // make protected
     public int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp

@@ -19,7 +19,7 @@ public class SkillFactory {
 
             @Override
             public int getManaCost() {
-                return 15 + level * 10;
+                return level * 10;
             }
 
             @Override

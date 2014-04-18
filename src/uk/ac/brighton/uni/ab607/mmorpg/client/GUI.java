@@ -96,7 +96,6 @@ public class GUI extends JFrame {
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-
         this.addKeyListener(new Keyboard());
         this.addMouseListener(mouse);
         //this.addMouseMotionListener(mouse);
@@ -159,7 +158,6 @@ public class GUI extends JFrame {
 
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
-
 
         setVisible(true);
     }
