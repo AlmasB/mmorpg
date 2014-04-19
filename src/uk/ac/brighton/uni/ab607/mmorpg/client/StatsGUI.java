@@ -33,8 +33,7 @@ public class StatsGUI extends DoubleBufferWindow {
     private JLabel stats = new JLabel();
 
     private JButton[] buttons = new JButton[9];
-
-    private JButton btn = new JButton();    // skill icon test
+    private JButton[] skillButtons = new JButton[10];
 
     //make it private
     public ArrayList<String> actions = new ArrayList<String>();
@@ -76,18 +75,16 @@ public class StatsGUI extends DoubleBufferWindow {
 
         // only keep buttons enabled when there is at least 1 attribute point
 
-        // test
         ToolTipManager.sharedInstance().setInitialDelay(0);
 
-
-        btn.setLocation(200, 150);
-        btn.setSize(40, 40);
-        btn.setIcon(new ImageIcon(Resources.getImage("enemy.png")));
-        btn.setToolTipText("Heal. Restores HP to target");
-
-        this.add(btn);
-
-        // end of test
+        for (int i = 0; i < 10; i++) {
+            skillButtons[i] = new JButton("");
+            skillButtons[i].setLocation(180 + 50 * (i % 3), 25 + 50 * (i / 3));
+            skillButtons[i].setSize(40, 40);
+            skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
+            //skillButtons[i].setEnabled(false);
+            this.add(skillButtons[i]);
+        }
 
         setVisible(true);
     }
@@ -97,6 +94,14 @@ public class StatsGUI extends DoubleBufferWindow {
     }
 
     public void update(final Player p) {
+        if (p != null) {
+            Skill[] skills = p.getSkills();
+            for (int i = 0; i < skills.length; i++) {
+                skillButtons[i].setToolTipText(skills[i].description);
+            }
+        }
+
+
         if (p == null || equal(p))
             return;
 

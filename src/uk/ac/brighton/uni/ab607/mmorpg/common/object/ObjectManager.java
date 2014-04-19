@@ -207,6 +207,27 @@ public class ObjectManager {
             }
         });
 
+        // Five finger death punch
+        addSkill(new Skill("Five Finger Death Punch", "Deals devastating damage to unarmoured targets",
+                true, 30.0f) {
+
+            /**
+             *
+             */
+            private static final long serialVersionUID = 168758926959802026L;
+
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
+                target.hp -= dmg;
+            }
+        });
+
         /*
          * Soul Slash - 7 consecutive attacks.
          * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.

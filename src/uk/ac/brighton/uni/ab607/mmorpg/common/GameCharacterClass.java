@@ -5,7 +5,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public enum GameCharacterClass {
     MONSTER(50, 50),
-    NOVICE(10, 10, "7000"),
+    NOVICE(10, 10, "7000", "7004"),
     WARRIOR(100, 20),
     SCOUT(75, 55),
     MAGE(55, 100);
