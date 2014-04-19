@@ -24,10 +24,10 @@ import javax.swing.SwingUtilities;
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 public class InventoryGUI extends JFrame {
 

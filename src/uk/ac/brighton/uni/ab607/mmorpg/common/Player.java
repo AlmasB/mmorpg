@@ -4,12 +4,11 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Armor;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.ArmorFactory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon.WeaponType;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.WeaponFactory;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
 public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget {
 
@@ -135,7 +134,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         this.x = x;
         this.y = y;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
-            equip[i] = i >= RIGHT_HAND ? WeaponFactory.getWeaponById("4000") : ArmorFactory.getArmorById("500" + i);
+            equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID("4000") : ObjectManager.getArmorByID("500" + i);
         }
     }
 
@@ -252,7 +251,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
-        equip[itemPlace] = itemPlace >= RIGHT_HAND ? WeaponFactory.getWeaponById("4000") : ArmorFactory.getArmorById("500" + itemPlace);    // replace with default
+        equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID("4000") : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
         calculateStats();
     }
 

@@ -21,14 +21,14 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.EnemyAgent;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Armor;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.ArmorFactory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.WeaponFactory;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 class Point implements java.io.Serializable, AgentGoalTarget {
     /**
@@ -97,12 +97,10 @@ public class GameServer {
             e.printStackTrace();
         }
 
-        //SkillFactory.load();
-
         // TODO how to send maps to players i.e. where players are, map specs?
 
-        chests.add(new Chest(80, 80, 1000, WeaponFactory.getWeaponById("4003"), WeaponFactory.getWeaponById("4001")));
-        chests.add(new Chest(0, 80, 2033, ArmorFactory.getArmorById("5004"), ArmorFactory.getArmorById("5003")));
+        chests.add(new Chest(80, 80, 1000, ObjectManager.getWeaponByID("4003"), ObjectManager.getWeaponByID("4001")));
+        chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID("5004"), ObjectManager.getArmorByID("5003")));
 
         spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
         spawnEnemy(new Enemy("Orc Scout", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 640, 640));

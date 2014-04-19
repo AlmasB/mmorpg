@@ -1,4 +1,6 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common;
+package uk.ac.brighton.uni.ab607.mmorpg.common.object;
+
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 
 public abstract class Skill implements java.io.Serializable {
 

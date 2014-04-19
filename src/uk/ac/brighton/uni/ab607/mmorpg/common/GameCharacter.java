@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public abstract class GameCharacter implements java.io.Serializable {
 

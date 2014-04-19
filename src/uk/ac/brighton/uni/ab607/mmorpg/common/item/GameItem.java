@@ -3,11 +3,11 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 public abstract class GameItem implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 924533834152552568L;
 
-    public final String id, name, description;
+    public String id, name, description;
 
     public final int ssX, ssY;
 

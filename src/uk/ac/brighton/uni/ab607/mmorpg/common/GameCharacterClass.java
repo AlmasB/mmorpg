@@ -1,5 +1,8 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
+
 public enum GameCharacterClass {
     MONSTER(50, 50),
     NOVICE(10, 10, "7000"),
@@ -16,7 +19,7 @@ public enum GameCharacterClass {
         this.sp = sp;
         this.skills = new Skill[IDs.length];
         for (int i = 0; i < skills.length; i++)
-            skills[i] = SkillFactory.getSkillById(IDs[i]);
+            skills[i] = ObjectManager.getSkillByID(IDs[i]);
     }
 
     @Override

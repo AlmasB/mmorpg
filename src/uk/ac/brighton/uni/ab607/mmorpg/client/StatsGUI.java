@@ -18,7 +18,7 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Skill;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public class StatsGUI extends DoubleBufferWindow {
 

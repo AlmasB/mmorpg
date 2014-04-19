@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common.item;
+package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import java.util.Arrays;
 
@@ -6,6 +6,9 @@ import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.ItemLevel;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 
 public class Weapon extends EquippableItem implements PseudoHTML {
 

@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
 public class ClientMain {
@@ -8,6 +9,8 @@ public class ClientMain {
     // TODO: when done with 1.7, rewrite parts to use lambda expressions
     public static void main(String[] args) {
         boolean local = true;
+
+        ObjectManager.load();
 
         if (local) {
             new GameServer();
