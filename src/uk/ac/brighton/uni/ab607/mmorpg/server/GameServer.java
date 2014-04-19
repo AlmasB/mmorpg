@@ -26,6 +26,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.ArmorFactory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.WeaponFactory;
 
@@ -65,6 +66,7 @@ public class GameServer {
             EQUIP = "EQUIP",
             UNEQUIP = "UNEQUIP",
             REFINE = "REFINE",
+            USE_ITEM = "USE_ITEM",
             ATTACK = "ATTACK",
             SKILL_USE = "SKILL_USE",
             CHAT = "CHAT";
@@ -293,12 +295,21 @@ public class GameServer {
         }
     }
 
-    // TODO: do we process skill usage here ?
+    /**
+     * Parses any actions requested by game client
+     *
+     * General format for "action" string
+     * TODO: to be reconsidered, check length? or ifs?
+     *
+     * "ACTION_NAME,PLAYER_NAME,VALUES..."
+     *
+     * @param actions
+     *                  an array containing all actions from 1 client
+     * @throws BadActionRequestException
+     */
     private void parseActions(String[] actions) throws BadActionRequestException {
         for (String action : actions) {
             String[] tokens = action.split(",");
-            // [0] - cmd, [1] - player name, [2] - cmd associated value
-            // TODO: do we specify command length? or simply check with ifs and choose appropriate cmd
 
             String cmd = tokens[0];
             Player player = getPlayerByName(tokens[1]);
@@ -402,6 +413,10 @@ public class GameServer {
                         }
                     }
                     break;
+                case USE_ITEM:
+                    UsableItem itemToUse = (UsableItem) player.getInventory().getItem(value);
+                    itemToUse.onUse(player);
+                    break;
                 case CHAT:
                     animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, tokens[4]));
                     break;
@@ -427,6 +442,14 @@ public class GameServer {
     }
 
     // TODO: add players
+    /**
+     *
+     * @param id
+     *           runtime ID of the character
+     * @return
+     *          character (player, enemy or NPC) associated with this ID
+     *          or null if ID doesn't exist
+     */
     private GameCharacter getGameCharacterByRuntimeID(int id) {
         for (Enemy e : enemies)
             if (e.getRuntimeID() == id)
@@ -512,21 +535,17 @@ public class GameServer {
                 }
 
                 // process player - chest interaction
-                for (Player p : tmpPlayers) {   // make chests unavailable if picked and check for it (alive ? )
+                for (Player p : tmpPlayers) {
                     for (Chest c : chests) {
                         if (!c.isOpened() && p.getX() == c.x && p.getY() == c.y) {
                             c.open();
                             for (GameItem item : c.getItems())
                                 p.getInventory().addItem(item);
-                            p.getInventory().setChanged();
+                            //p.getInventory().setChanged();
                             p.incMoney(c.money);
                         }
                     }
                 }
-
-                Player[] toSend = new Player[tmpPlayers.size()];
-                for (int i = 0; i < tmpPlayers.size(); i++)
-                    toSend[i] = tmpPlayers.get(i);
 
                 // clean chests
                 for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
@@ -541,6 +560,11 @@ public class GameServer {
                         it.remove();
                     }
                 }
+
+                // all objects to send
+                Player[] toSend = new Player[tmpPlayers.size()];
+                for (int i = 0; i < tmpPlayers.size(); i++)
+                    toSend[i] = tmpPlayers.get(i);
 
                 Chest[] chestsToSend = new Chest[chests.size()];
                 for (int i = 0; i < chests.size(); i++)

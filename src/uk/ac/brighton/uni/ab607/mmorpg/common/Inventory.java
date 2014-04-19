@@ -9,7 +9,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 public class Inventory implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7187464078429433554L;
 
@@ -34,7 +34,7 @@ public class Inventory implements java.io.Serializable {
         return false;
     }
 
-    public void setChanged() {
+    /*public void setChanged() {
         hasChanged = true;
     }
 
@@ -44,7 +44,7 @@ public class Inventory implements java.io.Serializable {
             return true;
         }
         return false;
-    }
+    }*/
 
     // TODO: clean
     public GameItem getItem(int index) {

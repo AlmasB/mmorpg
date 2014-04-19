@@ -26,6 +26,7 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Weapon;
 
 public class InventoryGUI extends JFrame {
@@ -183,7 +184,7 @@ public class InventoryGUI extends JFrame {
 
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Courier", Font.PLAIN, 20));
-        g.drawString(player.getMoney() + "", 100, 285);
+        g.drawString(player.getMoney() + " G", 90, 287);
     }
 
     @Override
@@ -247,11 +248,15 @@ public class InventoryGUI extends JFrame {
             if (itemIndex < player.getInventory().getMaxSize()) {
                 GameItem item = player.getInventory().getItem(itemIndex);
                 if (item != null) {
+                    // if weapon or armor
                     if (item instanceof Weapon || item instanceof Armor) {
                         if (e.getButton() == 3)
                             actions.add("REFINE," + player.name + "," + itemIndex);
                         else
                             actions.add("EQUIP," + player.name + "," + itemIndex);
+                    }
+                    else if (item instanceof UsableItem) {
+                        actions.add("USE_ITEM," + player.name + "," + itemIndex);
                     }
                 }
             }

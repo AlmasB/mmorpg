@@ -1,9 +1,11 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 
-public class UsableItem extends GameItem {
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+
+public abstract class UsableItem extends GameItem {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 9082052313919069522L;
 
@@ -11,4 +13,5 @@ public class UsableItem extends GameItem {
         super(id, name, description);
     }
 
+    public abstract void onUse(GameCharacter target);
 }

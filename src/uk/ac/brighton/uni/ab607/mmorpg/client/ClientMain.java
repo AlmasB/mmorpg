@@ -5,6 +5,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 public class ClientMain {
 
     // TODO: pass "local" as argument to start server and autologin on same machine
+    // TODO: when done with 1.7, rewrite parts to use lambda expressions
     public static void main(String[] args) {
         boolean local = true;
 
