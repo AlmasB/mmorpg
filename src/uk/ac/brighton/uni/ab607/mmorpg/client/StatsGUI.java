@@ -94,6 +94,7 @@ public class StatsGUI extends DoubleBufferWindow {
     }
 
     public void update(final Player p) {
+        // TODO: refactor when player is no longer created on client side
         if (p != null) {
             Skill[] skills = p.getSkills();
             for (int i = 0; i < skills.length; i++) {

@@ -1,5 +1,12 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+/**
+ * Handles everything to do with math and calculations
+ *
+ * @author Almas Baimagambetov (ab607@uni.brighton.ac.uk)
+ * @version 1.0
+ *
+ */
 public class GameMath {
 
     /**
