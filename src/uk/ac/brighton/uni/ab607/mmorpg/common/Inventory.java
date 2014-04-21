@@ -5,7 +5,13 @@ import java.util.ArrayList;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 
-// make it abstract and use droppable items to extend for monsters ?
+/**
+ * Represents a "bag" of items of a player
+ *
+ * @author Almas Baimagambetov (ab607@uni.brighton.ac.uk)
+ * @version 1.0
+ *
+ */
 public class Inventory implements java.io.Serializable {
 
     /**
