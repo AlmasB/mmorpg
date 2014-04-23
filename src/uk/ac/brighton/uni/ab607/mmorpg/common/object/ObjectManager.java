@@ -11,8 +11,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
@@ -24,6 +24,8 @@ public class ObjectManager {
     private static HashMap<String, Armor> defaultArmor = new HashMap<String, Armor>();
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
     private static HashMap<String, Enemy> defaultEnemies = new HashMap<String, Enemy>();
+
+    // TODO: possibly replace all ids with static ones, i.e. class ID.ITEM_KNIFE or something similar for much easier access and code
 
     private static int uniqueArmorID = 5000;
     private static int uniqueWeaponID = 4000;
@@ -237,6 +239,7 @@ public class ObjectManager {
 
 
         // ENEMIES
+        // TODO: different AI assignment
 
         addEnemy(new Enemy("Minor Fire Spirit", "Minor Fire Spirit DESC", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null),
                 Element.FIRE, 1, 5, new DroppableItem("4007", 50)));

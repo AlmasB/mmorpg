@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -22,7 +21,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;

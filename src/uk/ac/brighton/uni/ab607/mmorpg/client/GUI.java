@@ -33,6 +33,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 
+// TODO: create abstract GUI
+// TODO: separate logic and GUI
 @SuppressWarnings("serial")
 public class GUI extends JFrame {
 
@@ -65,7 +67,6 @@ public class GUI extends JFrame {
 
     private ArrayList<Animation> anims = new ArrayList<Animation>();
     private ArrayList<Animation> tmpAnims = new ArrayList<Animation>();
-    //private ArrayList<Animation> animsToDraw = new ArrayList<Animation>();
 
     private ArrayList<String> actionsUI = new ArrayList<String>();
 
