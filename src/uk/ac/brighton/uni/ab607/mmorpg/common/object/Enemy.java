@@ -1,8 +1,11 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common;
+package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player.Dir;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoal;
@@ -12,6 +15,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.EnemyAgent;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 
 public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget {
@@ -25,10 +29,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
         NORMAL, MINIBOSS, BOSS
     }
 
-    private static int uniqueEnemyID = 2000;
-
     public final EnemyType type;
-    //public final AgentType aiType;
 
     private static final int ENEMY_SIGHT = 240;
 
@@ -40,27 +41,31 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     private int x, y;
 
-    private HashMap<GameItem, Integer> drops = new HashMap<GameItem, Integer>();    // TODO: add droppable items as ctor args
+    private DroppableItem[] drops;
 
-    // TODO where do we spawn mobs
     // TODO deal with mob attributes ?
-    public Enemy(String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int x, int y) {
-        super(""+uniqueEnemyID++, name, description, GameCharacterClass.MONSTER);
+
+    /*package-private*/ Enemy(String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, DroppableItem... drops) {
+        super(name, description, GameCharacterClass.MONSTER);
         this.type = type;
         this.AI = AI;
-        this.baseLevel = level;
         this.element = element;
-        this.x = x;
-        this.y = y;
-        this.experience = 15;
+        this.baseLevel = level;
+        this.experience = baseXP;
+        this.drops = drops;
+    }
+
+    /*package-private*/ Enemy(Enemy copy) {
+        this(copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.drops);
+        this.id = copy.id;
     }
 
     public Chest onDeath() {
         alive = false;
         Chest drop = new Chest(x, y, GameMath.random(this.baseLevel * 100));
-        for (GameItem item : drops.keySet()) {
-            if (GameMath.checkChance(drops.get(item))) {
-                drop.addItem(item);
+        for (DroppableItem item : drops) {
+            if (GameMath.checkChance(item.dropChance)) {
+                drop.addItem(ObjectManager.getItemByID(item.itemID));
             }
         }
         return drop;

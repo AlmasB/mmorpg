@@ -31,6 +31,7 @@ import uk.ac.brighton.uni.ab607.libs.search.*;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame {
@@ -114,7 +115,7 @@ public class GUI extends JFrame {
             }
         }
 
-        player = new Player("0001", name, GameCharacterClass.NOVICE, 25*40, 15*40);
+        player = new Player(name, GameCharacterClass.NOVICE, 25*40, 15*40);
         st = new StatsGUI(player);
         inv = new InventoryGUI(player);
 

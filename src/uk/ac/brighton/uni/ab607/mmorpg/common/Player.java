@@ -129,8 +129,8 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     /* UP TO HERE */
 
-    public Player(String id, String name, GameCharacterClass charClass, int x, int y) {
-        super(id, name, "Player: #" + id, charClass);
+    public Player(String name, GameCharacterClass charClass, int x, int y) {
+        super(name, "Player", charClass);
         this.x = x;
         this.y = y;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002

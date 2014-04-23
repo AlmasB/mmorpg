@@ -13,7 +13,6 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoal;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
@@ -26,9 +25,11 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 
 class Point implements java.io.Serializable, AgentGoalTarget {
     /**
@@ -102,10 +103,13 @@ public class GameServer {
         chests.add(new Chest(80, 80, 1000, ObjectManager.getWeaponByID("4003"), ObjectManager.getWeaponByID("4001")));
         chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID("5004"), ObjectManager.getArmorByID("5003")));
 
-        spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
+        /*spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
         spawnEnemy(new Enemy("Orc Scout", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 640, 640));
         spawnEnemy(new Enemy("Orc Scout2", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 1280, 1200));
-        spawnEnemy(new Enemy("Elven Mercenary", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null), Element.NEUTRAL, 5, 720, 720));
+        spawnEnemy(new Enemy("Elven Mercenary", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null), Element.NEUTRAL, 5, 720, 720));*/
+
+        spawnEnemy("2001", 640, 160);
+        spawnEnemy("2000", 720, 720);
 
         // AI RULES
 
@@ -610,8 +614,11 @@ public class GameServer {
     }
 
 
-    private void spawnEnemy(Enemy e) {
+    private void spawnEnemy(String id, int x, int y) {
+        Enemy e = ObjectManager.getEnemyByID(id);
         e.setRuntimeID(runtimeID++);
+        e.setX(x);
+        e.setY(y);
         enemies.add(e);
     }
 

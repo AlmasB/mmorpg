@@ -7,10 +7,15 @@ import java.util.HashMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
 public class ObjectManager {
@@ -18,10 +23,12 @@ public class ObjectManager {
     private static HashMap<String, Weapon> defaultWeapons = new HashMap<String, Weapon>();
     private static HashMap<String, Armor> defaultArmor = new HashMap<String, Armor>();
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
+    private static HashMap<String, Enemy> defaultEnemies = new HashMap<String, Enemy>();
 
     private static int uniqueArmorID = 5000;
     private static int uniqueWeaponID = 4000;
     private static int uniqueSkillID = 7000;
+    private static int uniqueEnemyID = 2000;
 
     private ObjectManager() {}
 
@@ -228,6 +235,15 @@ public class ObjectManager {
             }
         });
 
+
+        // ENEMIES
+
+        addEnemy(new Enemy("Minor Fire Spirit", "Minor Fire Spirit DESC", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null),
+                Element.FIRE, 1, 5, new DroppableItem("4007", 50)));
+
+        addEnemy(new Enemy("Minor Earth Spirit", "Minor Earth Spirit DESC", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null),
+                Element.EARTH, 1, 5, new DroppableItem("4006", 15)));
+
         /*
          * Soul Slash - 7 consecutive attacks.
          * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
@@ -263,6 +279,11 @@ public class ObjectManager {
         defaultSkills.put(skill.id, skill);
     }
 
+    private static void addEnemy(Enemy enemy) {
+        enemy.id = ""+uniqueEnemyID++;
+        defaultEnemies.put(enemy.id, enemy);
+    }
+
     public static Skill getSkillByID(String id) {
         if (defaultSkills.containsKey(id)) {
             Skill sk = defaultSkills.get(id);
@@ -289,5 +310,18 @@ public class ObjectManager {
 
     public static Weapon getWeaponByID(String id) {
         return defaultWeapons.containsKey(id) ? new Weapon(defaultWeapons.get(id)) : null;
+    }
+
+    public static Enemy getEnemyByID(String id) {
+        return defaultEnemies.containsKey(id) ? new Enemy(defaultEnemies.get(id)) : null;
+    }
+
+    public static GameItem getItemByID(String id) {
+        if (id.startsWith("5"))
+            return getArmorByID(id);
+        if (id.startsWith("4"))
+            return getWeaponByID(id);
+
+        return null;
     }
 }

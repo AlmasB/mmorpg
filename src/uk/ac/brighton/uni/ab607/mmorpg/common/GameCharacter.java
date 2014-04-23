@@ -16,7 +16,7 @@ public abstract class GameCharacter implements java.io.Serializable {
      * name - in game name
      * description - info about object
      */
-    public final String id, name, description;
+    public String id, name, description;
 
     /**
      * ID of the object in 1 instance of the game
@@ -92,8 +92,8 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     protected GameCharacterClass charClass;
 
-    public GameCharacter(String id, String name, String description, GameCharacterClass charClass) {
-        this.id = id;
+    public GameCharacter(String name, String description, GameCharacterClass charClass) {
+        //this.id = id;
         this.name = name;
         this.description = description;
         this.charClass = charClass;
