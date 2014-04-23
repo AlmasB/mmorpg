@@ -1,20 +1,19 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common.item;
+package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 
 public class Essence implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4396825140388400662L;
 
-    public final String name, id;
+    public String name, id;
     public final Stat stat;
     public final int bonus;
 
-    /*package-private*/ Essence(String id, String name, Stat stat, int bonus) {
-        this.id = id;
+    /*package-private*/ Essence(String name, Stat stat, int bonus) {
         this.name = name;
         this.stat = stat;
         this.bonus = bonus;

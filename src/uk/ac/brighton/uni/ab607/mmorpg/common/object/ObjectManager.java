@@ -24,6 +24,7 @@ public class ObjectManager {
     private static HashMap<String, Armor> defaultArmor = new HashMap<String, Armor>();
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
     private static HashMap<String, Enemy> defaultEnemies = new HashMap<String, Enemy>();
+    private static HashMap<String, Essence> defaultEssences = new HashMap<String, Essence>();
 
     // TODO: possibly replace all ids with static ones, i.e. class ID.ITEM_KNIFE or something similar for much easier access and code
 
@@ -31,6 +32,7 @@ public class ObjectManager {
     private static int uniqueWeaponID = 4000;
     private static int uniqueSkillID = 7000;
     private static int uniqueEnemyID = 2000;
+    private static int uniqueEssenceID = 9000;
 
     private ObjectManager() {}
 
@@ -247,6 +249,11 @@ public class ObjectManager {
         addEnemy(new Enemy("Minor Earth Spirit", "Minor Earth Spirit DESC", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null),
                 Element.EARTH, 1, 5, new DroppableItem("4006", 15)));
 
+
+        // ESSENCES
+
+        addEssence(new Essence("Minor Fire Spirit Essence", Stat.ATK, 5));
+
         /*
          * Soul Slash - 7 consecutive attacks.
          * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
@@ -285,6 +292,11 @@ public class ObjectManager {
     private static void addEnemy(Enemy enemy) {
         enemy.id = ""+uniqueEnemyID++;
         defaultEnemies.put(enemy.id, enemy);
+    }
+
+    private static void addEssence(Essence e) {
+        e.id = ""+uniqueEssenceID++;
+        defaultEssences.put(e.id, e);
     }
 
     public static Skill getSkillByID(String id) {
@@ -326,5 +338,9 @@ public class ObjectManager {
             return getWeaponByID(id);
 
         return null;
+    }
+
+    public static Essence getEssenceByID(String id) {
+        return defaultEssences.containsKey(id) ? new Essence(defaultEssences.get(id)) : null;
     }
 }
