@@ -78,11 +78,18 @@ public class StatsGUI extends DoubleBufferWindow {
         ToolTipManager.sharedInstance().setInitialDelay(0);
 
         for (int i = 0; i < 10; i++) {
+            final int skillValue = i;
             skillButtons[i] = new JButton("");
             skillButtons[i].setLocation(180 + 50 * (i % 3), 25 + 50 * (i / 3));
             skillButtons[i].setSize(40, 40);
             skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
-            //skillButtons[i].setEnabled(false);
+            skillButtons[i].setEnabled(false);
+            skillButtons[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    actions.add("SKILL_UP," + p.name + "," + skillValue);
+                }
+            });
             this.add(skillButtons[i]);
         }
 
@@ -98,7 +105,10 @@ public class StatsGUI extends DoubleBufferWindow {
         if (p != null) {
             Skill[] skills = p.getSkills();
             for (int i = 0; i < skills.length; i++) {
-                skillButtons[i].setToolTipText(skills[i].description);
+                skillButtons[i].setToolTipText(skills[i].name + " " + "Level: " + skills[i].getLevel() + " " + skills[i].description);
+                if (skills[i].getLevel() < Skill.MAX_LEVEL) {
+                    skillButtons[i].setEnabled(p.hasSkillPoints());
+                }
             }
         }
 

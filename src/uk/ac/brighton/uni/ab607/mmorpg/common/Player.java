@@ -174,6 +174,8 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     public void baseLevelUp() {
         baseLevel++;
         calculateStats();
+        this.hp = (int)this.getTotalStat(Stat.MAX_HP);
+        this.sp = (int)this.getTotalStat(Stat.MAX_SP);
     }
 
     public void statLevelUp() {
@@ -200,6 +202,14 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             attributePoints--;
             calculateStats();
         }
+    }
+
+    public void increaseSkillLevel(int skillCode) {
+        if (skillCode >= skills.length)
+            return;
+
+        if (skills[skillCode].levelUp())
+            skillPoints--;
     }
 
     public int getMoney() {

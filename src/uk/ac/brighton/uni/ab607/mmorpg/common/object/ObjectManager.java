@@ -186,7 +186,7 @@ public class ObjectManager {
 
             @Override
             public int getManaCost() {
-                return 25 + level * 30;
+                return 5 + level * 10;
             }
 
             @Override

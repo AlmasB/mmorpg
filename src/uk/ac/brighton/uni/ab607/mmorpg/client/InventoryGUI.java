@@ -172,7 +172,7 @@ public class InventoryGUI extends JFrame {
         for (int i = 0; i < items.size(); i++) {
             drawItem(items.get(i), g, 2 + x*40, 29 + y*40);
 
-            if (++x == 6) {
+            if (++x == 5) {
                 x = 0;
                 y++;
             }

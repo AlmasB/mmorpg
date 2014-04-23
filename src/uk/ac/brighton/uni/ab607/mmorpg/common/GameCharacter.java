@@ -73,7 +73,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected float[] stats = new float[12];        // 12 stats
     protected float[] bStats = new float[12];       // bonus stats given by item
 
-    protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard
+    protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard, TODO: maybe from 1 to 9 makes more sense
 
     // TODO: add hp/sp regen maybe as stat?
     // make protected

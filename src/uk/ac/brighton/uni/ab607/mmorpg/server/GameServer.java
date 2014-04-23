@@ -64,6 +64,7 @@ public class GameServer {
     }*/
 
     public static final String ATTR_UP = "ATTR_UP",
+            SKILL_UP = "SKILL_UP",
             EQUIP = "EQUIP",
             UNEQUIP = "UNEQUIP",
             REFINE = "REFINE",
@@ -110,6 +111,12 @@ public class GameServer {
 
         spawnEnemy("2001", 640, 160);
         spawnEnemy("2000", 720, 720);
+        spawnEnemy("2000", 40, 40);
+        spawnEnemy("2001", 40, 120);
+        spawnEnemy("2001", 400, 120);
+        spawnEnemy("2001", 320, 160);
+        spawnEnemy("2001", 40, 360);
+        spawnEnemy("2001", 600, 120);
 
         // AI RULES
 
@@ -341,6 +348,9 @@ public class GameServer {
             switch (cmd) {
                 case ATTR_UP:
                     player.increaseAttr(value);
+                    break;
+                case SKILL_UP:
+                    player.increaseSkillLevel(value);
                     break;
                 case EQUIP:
                     GameItem item = player.getInventory().getItem(value);

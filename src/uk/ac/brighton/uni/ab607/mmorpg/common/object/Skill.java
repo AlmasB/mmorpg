@@ -9,8 +9,6 @@ public abstract class Skill implements java.io.Serializable {
      */
     private static final long serialVersionUID = 442371944346845569L;
 
-    //protected static int uniqueSkillID = 7000;
-
     public String id;   // TODO: final?
     public final String name, description;
 
@@ -25,7 +23,7 @@ public abstract class Skill implements java.io.Serializable {
      */
     protected float skillCooldown, currentCooldown = 0.0f;
 
-    protected static final int MAX_LEVEL = 10;
+    public static final int MAX_LEVEL = 10;
 
     protected int level = 0;
 
@@ -56,7 +54,6 @@ public abstract class Skill implements java.io.Serializable {
      */
     protected abstract void useImpl(GameCharacter caster, GameCharacter target);
 
-    // TODO: extra check by GUI
     public boolean levelUp() {
         if (level < MAX_LEVEL) {
             level++;
