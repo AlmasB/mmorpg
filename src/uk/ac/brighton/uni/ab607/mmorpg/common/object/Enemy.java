@@ -45,8 +45,9 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     // TODO deal with mob attributes ?
 
-    /*package-private*/ Enemy(String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, DroppableItem... drops) {
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
+        this.id = id;
         this.type = type;
         this.AI = AI;
         this.element = element;
@@ -56,8 +57,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
     }
 
     /*package-private*/ Enemy(Enemy copy) {
-        this(copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.drops);
-        this.id = copy.id;
+        this(copy.id, copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.drops);
     }
 
     public Chest onDeath() {

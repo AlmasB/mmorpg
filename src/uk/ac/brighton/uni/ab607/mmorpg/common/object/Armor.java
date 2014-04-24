@@ -20,29 +20,25 @@ public class Armor extends EquippableItem {
         HELM, BODY, SHOES
     }
 
-    private static int uniqueArmorID = 5000;
-
     public final ArmorType type;
 
     private int armor, marmor;
 
-    /*package-private*/ Armor(String name, String description, int ssX, int ssY, String author, ItemLevel level, ArmorType type,
+    /*package-private*/ Armor(String id, String name, String description, int ssX, int ssY, String author, ItemLevel level, ArmorType type,
             int armor, int marmor, Element element, int runesMax, Rune... defaultRunes) {
-        super(""+uniqueArmorID++, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
+        super(id, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
         this.type = type;
         this.armor = armor;
         this.marmor = marmor;
     }
 
     /*package-private*/ Armor(Armor copy) {
-        super(copy.id, copy.name, copy.description, copy.ssX, copy.ssY, copy.author, copy.level, copy.element, copy.runesMax, copy.defaultRunes);
-        this.type = copy.type;
-        this.armor = copy.armor;
-        this.marmor = copy.marmor;
+        this(copy.id, copy.name, copy.description, copy.ssX, copy.ssY, copy.author, copy.level, copy.type,
+                copy.armor, copy.marmor, copy.element, copy.runesMax, copy.defaultRunes);
     }
 
-    /*package-private*/ Armor(String name, String description, int ssX, int ssY, ArmorType type, int armor, int marmor) {
-        super(""+uniqueArmorID++, name, description, ssX, ssY);
+    /*package-private*/ Armor(String id, String name, String description, int ssX, int ssY, ArmorType type, int armor, int marmor) {
+        super(id, name, description, ssX, ssY);
         this.type = type;
         this.armor = armor;
         this.marmor = marmor;

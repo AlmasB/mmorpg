@@ -28,29 +28,24 @@ public class Weapon extends EquippableItem implements PseudoHTML {
         }
     }
 
-    private static int uniqueWeaponID = 4000;
-
     public final WeaponType type;
     public final int range;
     public final int pureDamage;
 
-    /*package-private*/ Weapon(String name, String description, int ssX, int ssY, String author,
+    /*package-private*/ Weapon(String id, String name, String description, int ssX, int ssY, String author,
             ItemLevel level, WeaponType type, int pureDamage, Element element, int runesMax, Rune... defaultRunes) {
-        super(""+uniqueWeaponID++, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
+        super(id, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
         this.type = type;
         this.range = type.range;    // TODO: if not necessary then get type and then range from type
         this.pureDamage = pureDamage;
     }
 
     /*package-private*/ Weapon(Weapon copy) {
-        super(copy.id, copy.name, copy.description, copy.ssX, copy.ssY, copy.author, copy.level, copy.element, copy.runesMax, copy.defaultRunes);
-        this.type = copy.type;
-        this.range = type.range;
-        this.pureDamage = copy.pureDamage;
+        this(copy.id, copy.name, copy.description, copy.ssX, copy.ssY, copy.author, copy.level, copy.type, copy.pureDamage, copy.element, copy.runesMax, copy.defaultRunes);
     }
 
-    /*package-private*/ Weapon(String name, String description, int ssX, int ssY, WeaponType type, int pureDamage) {
-        super(""+uniqueWeaponID++, name, description, ssX, ssY);
+    /*package-private*/ Weapon(String id, String name, String description, int ssX, int ssY, WeaponType type, int pureDamage) {
+        super(id, name, description, ssX, ssY);
         this.type = type;
         this.range = type.range;
         this.pureDamage = pureDamage;

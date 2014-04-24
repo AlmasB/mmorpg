@@ -18,8 +18,7 @@ public abstract class Skill implements java.io.Serializable {
      */
     private static final long serialVersionUID = 442371944346845569L;
 
-    public String id;   // TODO: final?
-    public final String name, description;
+    public final String id, name, description;
 
     /**
      * Active skills need to be cast, have mana cost and cooldown
@@ -36,7 +35,8 @@ public abstract class Skill implements java.io.Serializable {
 
     protected int level = 0;
 
-    public Skill(String name, String description, Boolean active, Float cooldown) {
+    public Skill(String id, String name, String description, Boolean active, Float cooldown) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.active = active;
