@@ -123,9 +123,6 @@ public class GameServer {
         AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_CHEST) {
             @Override
             public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                //Out.debug("Called within execute");
-
-
                 if (target != null)
                     agent.patrol(target);
             }
@@ -150,15 +147,7 @@ public class GameServer {
         AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_PLAYER) {
             @Override
             public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                /*if (facts.size() > 0) {
-                    List<Player> tmpPlayers = new ArrayList<Player>(players);
-                    agent.search(tmpPlayers.get(0));
-                }
-                else {*/
                 agent.search(getLastKnownLocation());
-                // }
-
-                //agent.search(null);
             }
         };
 
@@ -186,7 +175,6 @@ public class GameServer {
             }
         };
 
-        // TODO: add more rules
 
         aiRules.add(rule);
         aiRules.add(rule2);
@@ -477,11 +465,11 @@ public class GameServer {
             while (true) {
                 tmpPlayers = new ArrayList<Player>(players);
 
-                for (Iterator<Animation> itA = animations.iterator(); itA.hasNext(); ) {
-                    Animation a = itA.next();
+                for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
+                    Animation a = it.next();
                     a.duration -= 20.0f / 1000.0f;
                     if (a.duration <= 0)
-                        itA.remove();
+                        it.remove();
                 }
 
                 // process AI
@@ -490,7 +478,6 @@ public class GameServer {
                     for (AgentRule rule : aiRules) {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
-                            //Out.debug("Called execute");
                             // disable AI
                             //rule.execute(e, ai.currentTarget);
                         }
@@ -623,7 +610,17 @@ public class GameServer {
         return targ;
     }
 
-
+    /**
+     * Spawns an enemy with given ID at x, y
+     * Also assigns runtimeID to that enemy
+     *
+     * @param id
+     *           ID of enemy to spawn
+     * @param x
+     *          x coord
+     * @param y
+     *          y coord
+     */
     private void spawnEnemy(String id, int x, int y) {
         Enemy e = ObjectManager.getEnemyByID(id);
         e.setRuntimeID(runtimeID++);

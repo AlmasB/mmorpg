@@ -176,7 +176,7 @@ public class ObjectManager {
         });
 
         // BULLSEYE
-        addSkill(new Skill("BULLSEYE", "Deals armor ignoring damage to target."
+        addSkill(new Skill("Bullseye", "Deals armor ignoring damage to target."
                 + "Target's defense is not ignored. "
                 + "Damage is based on caster's DEX", true, 60.0f) {
             /**

@@ -279,10 +279,9 @@ public abstract class GameCharacter implements java.io.Serializable {
         // TODO: calculate magical damage when added
 
         totalDamage = totalPhysicalDamage + totalMagicalDamage;
+        totalDamage = Math.max(totalDamage, 0);
 
-        if (totalDamage > 0) {
-            target.hp -= totalDamage;
-        }
+        target.hp -= totalDamage;
 
         return totalDamage;
     }

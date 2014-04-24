@@ -2,6 +2,15 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 
+/**
+ * Skill that can be learnt/used by game characters
+ * There is almost no limit to what skills can do
+ * Damage, restore, buff, etc
+ *
+ * @author Almas Baimagambetov (ab607@uni.brighton.ac.uk)
+ * @version 1.0
+ *
+ */
 public abstract class Skill implements java.io.Serializable {
 
     /**
