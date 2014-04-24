@@ -27,4 +27,8 @@ public class GameMath {
     public static boolean checkChance(int chance) {
         return (int) (Math.random()*100) + 1 <= chance;
     }
+
+    public static boolean checkChance(float chance) {
+        return Math.random() * 100 + 1 <= chance;
+    }
 }

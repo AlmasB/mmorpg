@@ -65,13 +65,15 @@ public abstract class GameCharacter implements java.io.Serializable {
             MARM = 7,
             ASPD = 8,   // attack speed
             MSPD = 9,
-            CRIT = 10,  // chance
-            MCRIT = 11;
+            CRIT_CHANCE = 10,
+            MCRIT_CHANCE = 11,
+            CRIT_DMG = 12,
+            MCRIT_DMG = 13;
 
     protected int[] attributes = new int[9];    // we have 9 attributes
     protected int[] bAttributes = new int[9];   // on top of native attributes, bonuses can be given we items
-    protected float[] stats = new float[12];        // 12 stats
-    protected float[] bStats = new float[12];       // bonus stats given by item
+    protected float[] stats = new float[14];        // 14 stats
+    protected float[] bStats = new float[14];       // bonus stats given by item
 
     protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard, TODO: maybe from 1 to 9 makes more sense
 
@@ -88,7 +90,7 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     protected boolean alive = true;
 
-    protected float atkCritDmg = 0.0f, matkCritDmg = 0.0f; // these are % modifiers for ex 2.0 = 200%
+    //protected float atkCritDmg = 0.0f, matkCritDmg = 0.0f; // these are % modifiers for ex 2.0 = 200%
 
     protected GameCharacterClass charClass;
 
@@ -162,37 +164,38 @@ public abstract class GameCharacter implements java.io.Serializable {
         // None of these formulae are finalised yet and need to be checked for game balance
         // only calculate "native" stats
 
-        stats[MAX_HP] = (int) ( (vitality*MODIFIER_VERY_HIGH + strength*MODIFIER_MEDIUM)*charClass.hp + MODIFIER_LEVEL*baseLevel*charClass.hp
-                + (int) (vitality/10)*charClass.hp);
+        stats[MAX_HP] = (vitality*MODIFIER_VERY_HIGH + strength*MODIFIER_MEDIUM + MODIFIER_LEVEL*baseLevel + (vitality/10))
+                * charClass.hp;
 
-        stats[MAX_SP] = (int) ( (wisdom*MODIFIER_VERY_HIGH + intellect*MODIFIER_MEDIUM + willpower*MODIFIER_VERY_LOW)*charClass.sp
-                + MODIFIER_LEVEL*baseLevel*charClass.sp + (int) (wisdom/10)*charClass.sp );
+        stats[MAX_SP] = (wisdom*MODIFIER_VERY_HIGH + intellect*MODIFIER_MEDIUM + willpower*MODIFIER_VERY_LOW + MODIFIER_LEVEL*baseLevel + (wisdom/10))
+                * charClass.sp;
 
-        stats[ATK] = (int) ( (strength*MODIFIER_VERY_HIGH + dexterity*MODIFIER_MEDIUM + perception*MODIFIER_LOW + luck*MODIFIER_VERY_LOW)
-                + baseLevel + (int) (strength/10)*((int) (strength/10)+1) );
+        stats[ATK] = strength*MODIFIER_VERY_HIGH + dexterity*MODIFIER_MEDIUM + perception*MODIFIER_LOW + luck*MODIFIER_VERY_LOW
+                + baseLevel + (strength/10)*( (strength/10)+1);
 
-        stats[MATK] = (int) ( (intellect*MODIFIER_VERY_HIGH + wisdom*MODIFIER_HIGH + willpower*MODIFIER_HIGH + dexterity*MODIFIER_MEDIUM
-                + perception*MODIFIER_LOW + luck*MODIFIER_VERY_LOW ) + baseLevel + (int) (intellect/10)*((int) (intellect/10)+1) );
+        stats[MATK] = intellect*MODIFIER_VERY_HIGH + wisdom*MODIFIER_HIGH + willpower*MODIFIER_HIGH + dexterity*MODIFIER_MEDIUM
+                + perception*MODIFIER_LOW + luck*MODIFIER_VERY_LOW + baseLevel + (intellect/10)*( (intellect/10)+1);
 
-        stats[DEF] = (int) ( (vitality*MODIFIER_MEDIUM + perception*MODIFIER_LOW + strength*MODIFIER_VERY_LOW )
-                + MODIFIER_LEVEL*baseLevel + (int) (vitality/20)*(charClass.hp/10) );
+        stats[DEF] = vitality*MODIFIER_MEDIUM + perception*MODIFIER_LOW + strength*MODIFIER_VERY_LOW
+                + MODIFIER_LEVEL*baseLevel + (vitality/20)*(charClass.hp/10);
 
-        stats[MDEF] = (int) ( (willpower*MODIFIER_HIGH + wisdom*MODIFIER_MEDIUM + perception*MODIFIER_LOW + intellect*MODIFIER_VERY_LOW )
-                + MODIFIER_LEVEL*baseLevel + (int) (willpower/20)*(intellect/10) );
+        stats[MDEF] = willpower*MODIFIER_HIGH + wisdom*MODIFIER_MEDIUM + perception*MODIFIER_LOW + intellect*MODIFIER_VERY_LOW
+                + MODIFIER_LEVEL*baseLevel + (willpower/20)*(intellect/10);
 
         stats[ASPD] = agility*MODIFIER_VERY_HIGH + dexterity*MODIFIER_LOW;
 
-        stats[MSPD] = (int) ( (dexterity*MODIFIER_MEDIUM + willpower*MODIFIER_VERY_LOW + wisdom*MODIFIER_VERY_LOW
-                + intellect*MODIFIER_VERY_LOW + perception*MODIFIER_VERY_LOW + luck*MODIFIER_VERY_LOW) );
+        stats[MSPD] = dexterity*MODIFIER_MEDIUM + willpower*MODIFIER_VERY_LOW + wisdom*MODIFIER_VERY_LOW
+                + intellect*MODIFIER_VERY_LOW + perception*MODIFIER_VERY_LOW + luck*MODIFIER_VERY_LOW;
 
-        stats[CRIT] = (int) ( (luck*MODIFIER_VERY_HIGH + dexterity*MODIFIER_VERY_LOW + perception*MODIFIER_VERY_LOW
-                + wisdom*MODIFIER_VERY_LOW) );
+        stats[CRIT_CHANCE] = luck*MODIFIER_VERY_HIGH + dexterity*MODIFIER_VERY_LOW + perception*MODIFIER_VERY_LOW
+                + wisdom*MODIFIER_VERY_LOW;
 
-        stats[MCRIT] = (int) ( (luck*MODIFIER_HIGH + willpower*MODIFIER_LOW + perception*MODIFIER_VERY_LOW) );
+        stats[MCRIT_CHANCE] = luck*MODIFIER_HIGH + willpower*MODIFIER_LOW + perception*MODIFIER_VERY_LOW;
 
-        atkCritDmg  = 2 + luck*0.01f;
+        stats[CRIT_DMG] = 2 + luck*0.01f;
+        stats[MCRIT_DMG] = 2 + luck*0.01f;
 
-        matkCritDmg = 2 + luck*0.01f;
+        // TODO: possibly here reapply effects from passive abilities
     }
 
     /**
@@ -262,28 +265,27 @@ public abstract class GameCharacter implements java.io.Serializable {
     public abstract Element getArmorElement();
 
     public int dealDamage(GameCharacter target) {
-        int totalDamage = 0, totalPhysicalDamage = 0, totalMagicalDamage = 0;   // there's no magical dmg yet
-        double elementalDamageModifier = getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
+        float totalDamage = 0.0f, totalPhysicalDamage = 0.0f, totalMagicalDamage = 0.0f;   // there's no magical dmg yet
+        float elementalDamageModifier = (float) getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
 
-        int basePhysicalDamage = (int)getTotalStat(ATK);
+        float basePhysicalDamage = getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel);
 
-        if (GameMath.checkChance((int)getTotalStat(CRIT))) {
-            basePhysicalDamage *= atkCritDmg;
+        if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
+            basePhysicalDamage *= getTotalStat(CRIT_DMG);
         }
 
-        int physicalDamageAfterReduction = (int) (((100 - target.getTotalStat(ARM)) * basePhysicalDamage) / 100.0
-                - target.getTotalStat(DEF) + GameMath.random(baseLevel));
+        float physicalDamageAfterReduction =  (100 - target.getTotalStat(ARM)) * basePhysicalDamage / 100.0f - target.getTotalStat(DEF);
 
-        totalPhysicalDamage = (int) (elementalDamageModifier * physicalDamageAfterReduction);
+        totalPhysicalDamage = elementalDamageModifier * physicalDamageAfterReduction;
 
         // TODO: calculate magical damage when added
 
         totalDamage = totalPhysicalDamage + totalMagicalDamage;
         totalDamage = Math.max(totalDamage, 0);
 
-        target.hp -= totalDamage;
+        target.hp -= Math.round(totalDamage);
 
-        return totalDamage;
+        return Math.round(totalDamage);
     }
 
     public void useSkill(int skillCode, GameCharacter target) {

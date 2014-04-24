@@ -141,6 +141,7 @@ public class GameServer {
 
                 if (target != null && agent.canSee(target)) {
                     agent.attack(target);
+                    // onAttack(agent, target)
                 }
 
             }
@@ -481,7 +482,7 @@ public class GameServer {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             // disable AI
-                            rule.execute(e, ai.currentTarget);
+                            //rule.execute(e, ai.currentTarget);
                         }
                     }
                 }

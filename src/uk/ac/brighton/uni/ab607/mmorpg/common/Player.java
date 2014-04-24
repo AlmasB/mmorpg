@@ -6,6 +6,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
@@ -134,7 +135,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         this.x = x;
         this.y = y;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
-            equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID("4000") : ObjectManager.getArmorByID("500" + i);
+            equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
     }
 
@@ -261,13 +262,13 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
-        equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID("4000") : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
+        equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
         calculateStats();
     }
 
     public boolean isFree(int itemPlace) {
-        return equip[itemPlace].id.equals("4000") || equip[itemPlace].id.equals("5000")
-                || equip[itemPlace].id.equals("5001") || equip[itemPlace].id.equals("5002");
+        return equip[itemPlace].id.equals(ID.Weapon.HANDS) || equip[itemPlace].id.equals(ID.Armor.HAT)
+                || equip[itemPlace].id.equals(ID.Armor.CLOTHES) || equip[itemPlace].id.equals(ID.Armor.SHOES);
     }
 
     public EquippableItem getEquip(int place) {
@@ -288,19 +289,6 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         return getEquip(BODY).getElement();
     }
 
-    @Override
-    public int dealDamage(GameCharacter target) {
-        int dmg = super.dealDamage(target);
-        /*if (target.hp <= 0 && target instanceof Enemy) {
-            Enemy mob = (Enemy) target;
-            gainBaseExperience(mob.experience);
-            gainStatExperience(mob.experience);
-            gainJobExperience(mob.experience);
-            // TODO: possibly move onDeath of mob here to add drops straight to player inventory
-        }*/
-        return dmg;
-    }
-
     /*
     @Override
     public boolean equals(Object o) {
@@ -318,10 +306,10 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
                 + "Class: " + BLUE + charClass.toString() + FBR
                 + "Base/Stat/Job <b>" + BLUE + baseLevel + FONT_END + "/" + PURPLE + statLevel + FONT_END + "/" + MAGENTA + jobLevel + "</b>" + FBR
                 + "HP: <b>" + RED + hp + "/" + (int)getTotalStat(MAX_HP) + FONT_END + "</b> SP: <b>" + DARK_BLUE + sp + "/" + (int)getTotalStat(MAX_SP) + "</b>" + FBR
-                + "ATK: " + BLUE + stats[ATK] + "+" + bStats[ATK] + FONT_END + " MATK: " + BLUE + stats[MATK] + "+" + bStats[MATK] + FBR
-                + "DEF: " + BLUE + stats[DEF] + "+" + bStats[DEF] + FONT_END + " MDEF: " + BLUE + stats[MDEF] + "+" + bStats[MDEF] + FBR
-                + "ARM: " + BLUE + (stats[ARM] + bStats[ARM]) + "%" + FONT_END + " MARM: " + BLUE + (stats[MARM] + bStats[MARM]) + "%" + FBR
-                + "ASPD: " + BLUE + getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + getTotalStat(MSPD) + "%" + FBR
-                + "CRIT: " + BLUE + getTotalStat(CRIT) + "%" + FONT_END + " MCRIT: " + BLUE + getTotalStat(MCRIT) + "%" + FONT_END;
+                + "ATK: " + BLUE + (int)getTotalStat(ATK) + FONT_END + " MATK: " + BLUE + (int)getTotalStat(MATK) + FBR
+                + "DEF: " + BLUE + (int)getTotalStat(DEF) + FONT_END + " MDEF: " + BLUE + (int)getTotalStat(MDEF) + FBR
+                + "ARM: " + BLUE + (int)getTotalStat(ARM) + "%" + FONT_END + " MARM: " + BLUE + (int)getTotalStat(MARM) + "%" + FBR
+                + "ASPD: " + BLUE + (int)getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
+                + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
     }
 }
