@@ -1,19 +1,19 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.combat;
 
 public enum Element {
-    NEUTRAL(1.00, 0.75, 0.75, 0.75, 0.75),
-    FIRE   (1.25, 0.00, 0.25, 0.50, 2.00),
-    WATER  (1.25, 2.00, 0.00, 0.25, 0.50),
-    AIR    (1.25, 0.50, 2.00, 0.00, 0.25),
-    EARTH  (1.25, 0.25, 0.5, 2, 0);
+    NEUTRAL(1.00f, 0.75f, 0.75f, 0.75f, 0.75f),
+    FIRE   (1.25f, 0.00f, 0.25f, 0.50f, 2.00f),
+    WATER  (1.25f, 2.00f, 0.00f, 0.25f, 0.50f),
+    AIR    (1.25f, 0.50f, 2.00f, 0.00f, 0.25f),
+    EARTH  (1.25f, 0.25f, 0.50f, 2.00f, 0.00f);
 
-    private double[] modifiers;
+    private float[] modifiers;
 
-    public double getDamageModifierAgainst(Element ele) {
+    public float getDamageModifierAgainst(Element ele) {
         return this.modifiers[ele.ordinal()];
     }
 
-    private Element(double... modifiers) {
+    private Element(float... modifiers) {
         this.modifiers = modifiers;
     }
 }

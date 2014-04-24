@@ -262,7 +262,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public int dealDamage(GameCharacter target) {
         float totalDamage = 0.0f, totalPhysicalDamage = 0.0f, totalMagicalDamage = 0.0f;   // there's no magical dmg yet
-        float elementalDamageModifier = (float) getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
+        float elementalDamageModifier = getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
 
         float basePhysicalDamage = getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel);
 
