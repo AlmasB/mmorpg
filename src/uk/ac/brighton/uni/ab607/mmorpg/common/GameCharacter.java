@@ -291,7 +291,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             return;
 
         Skill sk = skills[skillCode];
-        if (sk != null && sk.active && sk.getCurrentCooldown() == 0) {
+        if (sk != null && sk.active && sk.getLevel() > 0 && sk.getCurrentCooldown() == 0) {
             if (this.sp >= sk.getManaCost()) {
                 this.sp -= sk.getManaCost();
                 sk.use(this, target);

@@ -1,22 +1,16 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.util.HashMap;
-
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Player.Dir;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoal;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentMode;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.EnemyAgent;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 
 public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget {
 
@@ -117,7 +111,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
     public int frame = 0;
     public int place = 0;
 
-    public int sprite = 0;  // TODO: implement
+    public int sprite = 0;
 
     public enum Dir {
         UP, DOWN, LEFT, RIGHT
@@ -189,15 +183,12 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
         move();
     }
 
-    // TODO: add some kind of search algorithm, target is @Nullable
     @Override
     public void search(AgentGoalTarget target) {
         if (target != null) {
             if (canSee(target)) {
                 return;
             }
-
-
 
             for (int i = 0; i < 2; i++) {
                 if (x > target.getX())
@@ -215,20 +206,16 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
                 ySpeed = 0;
             }
         }
-        else {
-            // TODO: fuzzy logic should be here
-            //Out.debug("NULL");
-
-            xSpeed = -5;
-            ySpeed = -5;
-            move();
-        }
     }
 
     // TODO: something cleaner
     @Override
     public void attack(AgentGoalTarget target) {
-        for (int i = 0; i < 5; i++) {
+
+        if (target instanceof GameCharacter)
+            this.dealDamage((GameCharacter)target);
+
+        /*for (int i = 0; i < 5; i++) {
             if (x > target.getX())
                 xSpeed = -1;
             if (x < target.getX())
@@ -246,7 +233,7 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
             move();
             xSpeed = 0;
             ySpeed = 0;
-        }
+        }*/
     }
 
     @Override

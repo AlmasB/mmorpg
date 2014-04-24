@@ -228,7 +228,7 @@ public class ObjectManager {
                 Element.FIRE, 1, 5, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
-                EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null),
+                EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null),
                 Element.EARTH, 1, 5, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
 

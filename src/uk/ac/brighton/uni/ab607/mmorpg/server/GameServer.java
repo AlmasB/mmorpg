@@ -139,8 +139,10 @@ public class GameServer {
                     }
                 }
 
-                if (target != null)
+                if (target != null && agent.canSee(target)) {
                     agent.attack(target);
+                }
+
             }
         };
 
@@ -479,7 +481,7 @@ public class GameServer {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                            rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -609,6 +611,8 @@ public class GameServer {
         }
         return targ;
     }
+
+
 
     /**
      * Spawns an enemy with given ID at x, y
