@@ -35,6 +35,10 @@ public class Desc {
         public static final String CLAUDIUS = "Increases VIT, WIS, LUC."
                 + "Decreases INT.";
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
+
+
+
+        public static final String BLOODLUST = "Increases ATK based on the missing % HP";
     }
 
     public class Weapon {

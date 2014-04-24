@@ -488,6 +488,7 @@ public class GameServer {
                 }
 
                 // move players, also reduce their active skill cooldowns
+                // and re apply passive skill bonuses
                 for (Player p : tmpPlayers) {
                     if (locationFacts.size() == 0) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 0.1f);
@@ -503,6 +504,10 @@ public class GameServer {
                             if (sk.getCurrentCooldown() > 0) {
                                 sk.reduceCurrentCooldown(0.05f);
                             }
+                        }
+                        else {  // reapply passive skills
+                            if (sk.getLevel() > 0)
+                                sk.use(p, null);
                         }
                     }
 

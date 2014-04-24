@@ -219,6 +219,27 @@ public class ObjectManager {
             }
         });
 
+        addSkill(new Skill(ID.Skill.BLOODLUST, "Bloodlust", Desc.Skill.BLOODLUST, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5844145407908548491L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.ATK, -value);
+                value = (int) (10*level * caster.getTotalStat(Stat.MAX_HP) / (caster.getHP() + 1)); // TODO: check for div 0
+                caster.addBonusStat(Stat.ATK, value);
+            }
+        });
+
 
         // ENEMIES
         // TODO: different AI assignment

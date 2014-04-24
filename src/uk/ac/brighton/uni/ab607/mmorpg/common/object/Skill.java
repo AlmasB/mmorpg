@@ -53,7 +53,7 @@ public abstract class Skill implements java.io.Serializable {
     // TODO: on skill begin/end
 
     /**
-     * Do not use this method directly
+     * Do not use this method directly (it is now hidden anyway)
      * It is needed to provide overridability to new skills
      *
      * use public method - {@link use()}

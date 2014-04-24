@@ -1,11 +1,12 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public enum GameCharacterClass {
     MONSTER(50, 50),
-    NOVICE(10, 10, "7000", "7004"),
+    NOVICE(10, 10, ID.Skill.BLOODLUST, ID.Skill.BULLSEYE),
     WARRIOR(100, 20),
     SCOUT(75, 55),
     MAGE(55, 100);

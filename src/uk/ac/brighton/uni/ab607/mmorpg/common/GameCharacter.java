@@ -90,8 +90,6 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     protected boolean alive = true;
 
-    //protected float atkCritDmg = 0.0f, matkCritDmg = 0.0f; // these are % modifiers for ex 2.0 = 200%
-
     protected GameCharacterClass charClass;
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
@@ -192,10 +190,8 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         stats[MCRIT_CHANCE] = luck*MODIFIER_HIGH + willpower*MODIFIER_LOW + perception*MODIFIER_VERY_LOW;
 
-        stats[CRIT_DMG] = 2 + luck*0.01f;
+        stats[CRIT_DMG]  = 2 + luck*0.01f;
         stats[MCRIT_DMG] = 2 + luck*0.01f;
-
-        // TODO: possibly here reapply effects from passive abilities
     }
 
     /**
@@ -274,7 +270,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             basePhysicalDamage *= getTotalStat(CRIT_DMG);
         }
 
-        float physicalDamageAfterReduction =  (100 - target.getTotalStat(ARM)) * basePhysicalDamage / 100.0f - target.getTotalStat(DEF);
+        float physicalDamageAfterReduction = (100 - target.getTotalStat(ARM)) * basePhysicalDamage / 100.0f - target.getTotalStat(DEF);
 
         totalPhysicalDamage = elementalDamageModifier * physicalDamageAfterReduction;
 
