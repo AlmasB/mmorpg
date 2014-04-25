@@ -52,6 +52,7 @@ class Point implements java.io.Serializable, AgentGoalTarget {
     }
 }
 
+// TODO: add effect onStart onEnd etc duration, also consider concurrency
 public class GameServer {
 
     /*public enum Command {
@@ -404,6 +405,7 @@ public class GameServer {
                     }
                     break;
                 case SKILL_USE:
+                    // TODO: check range of skill or weapon
                     Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
                     if (skTarget != null) {
                         player.useSkill(value, skTarget);
@@ -510,6 +512,9 @@ public class GameServer {
                                 sk.use(p, null);
                         }
                     }
+
+                    // effects
+                    p.updateEffects();
 
                     // TODO: optimize
                     for (Enemy e : enemies) {

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
@@ -284,11 +285,14 @@ public class ObjectManager {
 
             @Override
             public int getManaCost() {
-                return 5 + level * 4;
+                return 0;
             }
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // test
+                caster.addEffect(new Effect(5.0f));
+
                 float dmg = (0.1f + 0.02f * level) * caster.getHP();
                 caster.setHP(Math.round(caster.getHP() - dmg));
                 caster.dealPureDamage(target, 2*dmg);

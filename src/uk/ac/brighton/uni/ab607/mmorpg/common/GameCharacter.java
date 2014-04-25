@@ -1,6 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
@@ -77,6 +81,8 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected float[] bStats = new float[14];       // bonus stats given by item
 
     protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard, TODO: maybe from 1 to 9 makes more sense
+
+    protected ArrayList<Effect> effects = new ArrayList<Effect>();
 
     // TODO: add hp/sp regen maybe as stat?
     protected int baseLevel = 1,
@@ -271,6 +277,24 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public abstract Element getWeaponElement();
     public abstract Element getArmorElement();
+
+    public void addEffect(Effect e) {
+        // we should do synchronized
+        synchronized (effects) {
+            effects.add(e);
+        }
+    }
+
+    public void updateEffects() {
+        for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
+            Effect e = it.next();
+            e.reduceDuration(0.05f);
+            if (e.getDuration() <= 0)
+                it.remove();
+        }
+
+        //System.out.println(effects.size() + "");
+    }
 
     /**
      * Performs basic attack with equipped weapon
