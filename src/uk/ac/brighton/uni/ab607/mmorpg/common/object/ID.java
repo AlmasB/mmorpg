@@ -34,7 +34,11 @@ public class ID {
         public static final String CLAUDIUS = "7005";
         public static final String FIVE_FINGER_DEATH_PUNCH = "7006";
 
+        // WARRIOR CLASS
         public static final String BASH = "7010";
+
+        public static final String WARRIOR_HEART = "7016";
+        public static final String ARMOR_MASTERY = "7017";
         public static final String BLOODLUST = "7018";
     }
 

@@ -38,6 +38,9 @@ public class Desc {
 
 
         public static final String BASH = "A powerful physical attack";
+
+        public static final String WARRIOR_HEART = "Passively increases max HP";
+        public static final String ARMOR_MASTERY = "Increases armor rating";
         public static final String BLOODLUST = "Increases ATK based on the missing % HP";
     }
 

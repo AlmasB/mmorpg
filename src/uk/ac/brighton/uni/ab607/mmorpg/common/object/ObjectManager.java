@@ -257,6 +257,48 @@ public class ObjectManager {
             }
         });
 
+        addSkill(new Skill(ID.Skill.ARMOR_MASTERY, "Armor Mastery", Desc.Skill.ARMOR_MASTERY, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 8019137126608309704L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.ARM, -value);
+                value = 2 * level;
+                caster.addBonusStat(Stat.ARM, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.WARRIOR_HEART, "Heart of a warrior", Desc.Skill.WARRIOR_HEART, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -9161209014480342120L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.MAX_HP, -value);
+                value = Math.round(0.025f * level * caster.getBaseStat(Stat.MAX_HP));
+                caster.addBonusStat(Stat.MAX_HP, value);
+            }
+        });
+
 
         // ENEMIES
         // TODO: different AI assignment

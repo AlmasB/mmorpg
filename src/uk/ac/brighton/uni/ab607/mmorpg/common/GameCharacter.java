@@ -111,6 +111,10 @@ public abstract class GameCharacter implements java.io.Serializable {
         return attributes[attr];
     }
 
+    public float getBaseStat(Stat stat) {
+        return stats[stat.ordinal()];
+    }
+
     /**
      *
      * @param attr
@@ -160,7 +164,7 @@ public abstract class GameCharacter implements java.io.Serializable {
         int luck        = attributes[LUC] + bAttributes[LUC];
 
         // None of these formulae are finalised yet and need to be checked for game balance
-        // only calculate "native" stats
+        // only calculate "native" base stats
 
         stats[MAX_HP] = (vitality*MODIFIER_VERY_HIGH + strength*MODIFIER_MEDIUM + MODIFIER_LEVEL*baseLevel + (vitality/10))
                 * charClass.hp;
@@ -282,6 +286,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     /**
      * Deals physical damage to target. The damage is reduced by armor and defense
+     * The damage is affected by attacker's weapon element and by target's armor element
      *
      * @param target
      * @param baseDamage
