@@ -140,8 +140,10 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String chatText = e.getActionCommand();
-                actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
-                chat.setText("");
+                if (!chatText.isEmpty()) {
+                    actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
+                    chat.setText("");
+                }
             }
         });
         chat.addKeyListener(new KeyListener() {

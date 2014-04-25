@@ -36,6 +36,9 @@ public class ID {
 
         // WARRIOR CLASS
         public static final String BASH = "7010";
+        public static final String MIGHTY_SWING = "7011";
+        public static final String DOUBLE_EDGE = "7012";
+
 
         public static final String WARRIOR_HEART = "7016";
         public static final String ARMOR_MASTERY = "7017";

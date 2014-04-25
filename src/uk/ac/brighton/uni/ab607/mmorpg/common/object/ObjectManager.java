@@ -257,6 +257,44 @@ public class ObjectManager {
             }
         });
 
+        addSkill(new Skill(ID.Skill.MIGHTY_SWING, "Mighty Swing", Desc.Skill.MIGHTY_SWING, true, 15.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 8019137126608309704L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
+                float dmg = (Math.max(diff, 0) + 10*level) * 5;
+                caster.dealPhysicalDamage(target, dmg);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.DOUBLE_EDGE, "Double Edge", Desc.Skill.DOUBLE_EDGE, true, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -5670132035647752285L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = (0.1f + 0.02f * level) * caster.getHP();
+                caster.setHP(Math.round(caster.getHP() - dmg));
+                caster.dealPureDamage(target, 2*dmg);
+            }
+        });
+
         addSkill(new Skill(ID.Skill.ARMOR_MASTERY, "Armor Mastery", Desc.Skill.ARMOR_MASTERY, false, 0.0f) {
             /**
              *

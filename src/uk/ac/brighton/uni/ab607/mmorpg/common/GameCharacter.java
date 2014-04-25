@@ -330,7 +330,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     }
 
     public void dealPureDamage(GameCharacter target, float dmg) {
-        this.hp -= dmg;
+        target.hp -= dmg;
     }
 
     /*public int dealDamage(GameCharacter target) {

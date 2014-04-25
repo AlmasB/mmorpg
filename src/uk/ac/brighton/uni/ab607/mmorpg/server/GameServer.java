@@ -101,7 +101,7 @@ public class GameServer {
 
         // TODO how to send maps to players i.e. where players are, map specs?
 
-        chests.add(new Chest(80, 80, 1000, ObjectManager.getWeaponByID("4003"), ObjectManager.getWeaponByID("4001")));
+        chests.add(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID("4003"), ObjectManager.getWeaponByID("4001")));
         chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID("5004"), ObjectManager.getArmorByID("5003")));
 
         /*spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
