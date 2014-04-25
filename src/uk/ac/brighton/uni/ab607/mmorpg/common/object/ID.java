@@ -34,6 +34,7 @@ public class ID {
         public static final String CLAUDIUS = "7005";
         public static final String FIVE_FINGER_DEATH_PUNCH = "7006";
 
+        public static final String BASH = "7010";
         public static final String BLOODLUST = "7018";
     }
 

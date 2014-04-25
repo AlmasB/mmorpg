@@ -8,6 +8,6 @@ public interface EnemyAgent {
 
     public void patrol(AgentGoalTarget target);
     public void search(AgentGoalTarget target);
-    public void attack(AgentGoalTarget target);
+    public void attackAI(AgentGoalTarget target);
     public boolean canSee(AgentGoalTarget target);
 }

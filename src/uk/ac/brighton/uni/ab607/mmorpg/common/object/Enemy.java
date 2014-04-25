@@ -210,10 +210,10 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     // TODO: something cleaner
     @Override
-    public void attack(AgentGoalTarget target) {
+    public void attackAI(AgentGoalTarget target) {
 
         if (target instanceof GameCharacter)
-            this.dealDamage((GameCharacter)target);
+            this.attack((GameCharacter)target);
 
         /*for (int i = 0; i < 5; i++) {
             if (x > target.getX())

@@ -140,7 +140,7 @@ public class GameServer {
                 }
 
                 if (target != null && agent.canSee(target)) {
-                    agent.attack(target);
+                    agent.attackAI(target);
                     // onAttack(agent, target)
                 }
 
@@ -158,7 +158,7 @@ public class GameServer {
             @Override
             public void execute(EnemyAgent agent, AgentGoalTarget target) {
                 if (target != null)
-                    agent.attack(target);
+                    agent.attackAI(target);
             }
         };
 
@@ -174,7 +174,7 @@ public class GameServer {
                 }
 
                 if (target != null)
-                    agent.attack(target);
+                    agent.attackAI(target);
             }
         };
 
@@ -381,7 +381,7 @@ public class GameServer {
                             && distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
                         if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                            int dmg = player.dealDamage(target);
+                            int dmg = player.attack(target);
                             animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
                             player.atkTime = 0;
                             if (target.getHP() <= 0) {
@@ -394,7 +394,7 @@ public class GameServer {
                         }
 
                         if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                            int dmg = target.dealDamage(player);
+                            int dmg = target.attack(player);
                             animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                             target.atkTime = 0;
                             if (player.getHP() <= 0) {

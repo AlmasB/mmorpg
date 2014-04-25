@@ -80,7 +80,6 @@ public class ObjectManager {
 
         // SKILLS
 
-        // HEAL
         addSkill(new Skill(ID.Skill.HEAL, "Heal", Desc.Skill.HEAL, true, 10.0f) {
             /**
              *
@@ -94,11 +93,10 @@ public class ObjectManager {
 
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
-                target.hp = Math.min(target.hp + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP));
+                target.setHP(Math.min(target.getHP() + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP)));
             }
         });
 
-        // MANA BURN
         addSkill(new Skill(ID.Skill.MANA_BURN, "Mana Burn", Desc.Skill.MANA_BURN, true, 10.0f) {
             /**
              *
@@ -112,13 +110,12 @@ public class ObjectManager {
 
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
-                int oldSP = target.sp;
-                target.sp = Math.max(oldSP - 50 * level, 0);
-                target.hp -= (oldSP - target.sp);
+                int oldSP = target.getSP();
+                target.setSP(Math.max(oldSP - 50 * level, 0));
+                caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
             }
         });
 
-        // FINAL STRIKE
         addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
             /**
              *
@@ -132,10 +129,12 @@ public class ObjectManager {
 
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
-                int total = caster.hp - 1 + caster.sp;
-                caster.hp = 1;
-                caster.sp = 0;
-                target.hp -= 500 * level + total * 0.003f;
+                float phys = (caster.getHP() - 1) * 0.003f + 250*level;
+                float mag  = caster.getSP() * 0.003f + 250*level;
+                caster.setHP(1);
+                caster.setSP(0);
+                caster.dealMagicalDamage(target, mag, Element.NEUTRAL);
+                caster.dealPhysicalDamage(target, phys, Element.NEUTRAL);
             }
         });
 
@@ -154,7 +153,7 @@ public class ObjectManager {
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
-                target.hp -= dmg;
+                caster.dealPhysicalDamage(target, dmg);
             }
         });
 
@@ -173,7 +172,7 @@ public class ObjectManager {
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = 100 + level * 85 - target.getTotalStat(GameCharacter.DEF);
-                target.hp -= dmg;
+                caster.dealPureDamage(target, dmg);
             }
         });
 
@@ -215,7 +214,7 @@ public class ObjectManager {
             @Override
             public void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
-                target.hp -= dmg;
+                caster.dealPhysicalDamage(target, dmg);
             }
         });
 
@@ -237,6 +236,24 @@ public class ObjectManager {
                 caster.addBonusStat(Stat.ATK, -value);
                 value = (int) (10*level * caster.getTotalStat(Stat.MAX_HP) / (caster.getHP() + 1)); // TODO: check for div 0
                 caster.addBonusStat(Stat.ATK, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.BASH, "Bash", Desc.Skill.BASH, true, 15.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 2177640389884854474L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 3;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = (1 + (15 + 5*level) / 100.0f) * caster.getTotalStat(Stat.ATK);
+                caster.dealPhysicalDamage(target, dmg);
             }
         });
 
@@ -274,7 +291,6 @@ public class ObjectManager {
          * Increases cost of all skills by that % for 30s
          *
          * */
-        // TODO: check with char's stats first like magic armor etc
     }
 
     private static void addArmor(Armor armor) {

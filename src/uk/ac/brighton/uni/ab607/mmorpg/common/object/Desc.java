@@ -37,7 +37,7 @@ public class Desc {
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
 
 
-
+        public static final String BASH = "A powerful physical attack";
         public static final String BLOODLUST = "Increases ATK based on the missing % HP";
     }
 

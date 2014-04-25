@@ -23,6 +23,7 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     private int runtimeID = 0;
 
+    // TODO: add statuses
     // TODO: private int x, y;
     public abstract int getX();
     public abstract int getY();
@@ -78,8 +79,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard, TODO: maybe from 1 to 9 makes more sense
 
     // TODO: add hp/sp regen maybe as stat?
-    // make protected
-    public int baseLevel = 1,
+    protected int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp
 
     public int atkTime = 0;
@@ -103,8 +103,8 @@ public abstract class GameCharacter implements java.io.Serializable {
             attributes[i] = 1;
 
         calculateStats();
-        this.hp = (int)(stats[MAX_HP] + bStats[MAX_HP]);   // set current hp/sp to max
-        this.sp = (int)(stats[MAX_SP] + bStats[MAX_SP]);
+        setHP((int)(stats[MAX_HP] + bStats[MAX_HP]));   // set current hp/sp to max
+        setSP((int)(stats[MAX_SP] + bStats[MAX_SP]));
     }
 
     public int getBaseAttribute(int attr) {
@@ -218,6 +218,14 @@ public abstract class GameCharacter implements java.io.Serializable {
         bStats[stat.ordinal()] += bonus;
     }
 
+    public void setHP(int hp) {
+        this.hp = hp;
+    }
+
+    public void setSP(int sp) {
+        this.sp = sp;
+    }
+
     /**
      *
      * @return
@@ -260,7 +268,67 @@ public abstract class GameCharacter implements java.io.Serializable {
     public abstract Element getWeaponElement();
     public abstract Element getArmorElement();
 
-    public int dealDamage(GameCharacter target) {
+    /**
+     * Performs basic attack with equipped weapon
+     *
+     * @param target
+     *               target being attacked
+     * @return
+     *          damage dealt
+     */
+    public int attack(GameCharacter target) {
+        return dealPhysicalDamage(target, this.getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel), this.getWeaponElement());
+    }
+
+    /**
+     * Deals physical damage to target. The damage is reduced by armor and defense
+     *
+     * @param target
+     * @param baseDamage
+     * @param element
+     * @return
+     */
+    public int dealPhysicalDamage(GameCharacter target, float baseDamage, Element element) {
+        if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
+            baseDamage *= getTotalStat(CRIT_DMG);
+        }
+
+        float elementalDamageModifier = element.getDamageModifierAgainst(target.getArmorElement());
+        float damageAfterReduction = (100 - target.getTotalStat(ARM)) * baseDamage / 100.0f - target.getTotalStat(DEF);
+
+        int totalDamage = Math.max(Math.round(elementalDamageModifier * damageAfterReduction), 0);
+        target.hp -= totalDamage;
+
+        return totalDamage;
+    }
+
+    public int dealPhysicalDamage(GameCharacter target, float baseDamage) {
+        return dealPhysicalDamage(target, baseDamage, Element.NEUTRAL);
+    }
+
+    public int dealMagicalDamage(GameCharacter target, float baseDamage, Element element) {
+        if (GameMath.checkChance(getTotalStat(MCRIT_CHANCE))) {
+            baseDamage *= getTotalStat(MCRIT_DMG);
+        }
+
+        float elementalDamageModifier = element.getDamageModifierAgainst(target.getArmorElement());
+        float damageAfterReduction = (100 - target.getTotalStat(MARM)) * baseDamage / 100.0f - target.getTotalStat(MDEF);
+
+        int totalDamage = Math.max(Math.round(elementalDamageModifier * damageAfterReduction), 0);
+        target.hp -= totalDamage;
+
+        return totalDamage;
+    }
+
+    public int dealMagicalDamage(GameCharacter target, float baseDamage) {
+        return dealMagicalDamage(target, baseDamage, Element.NEUTRAL);
+    }
+
+    public void dealPureDamage(GameCharacter target, float dmg) {
+        this.hp -= dmg;
+    }
+
+    /*public int dealDamage(GameCharacter target) {
         float totalDamage = 0.0f, totalPhysicalDamage = 0.0f, totalMagicalDamage = 0.0f;   // there's no magical dmg yet
         float elementalDamageModifier = getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
 
@@ -282,11 +350,19 @@ public abstract class GameCharacter implements java.io.Serializable {
         target.hp -= Math.round(totalDamage);
 
         return Math.round(totalDamage);
-    }
+    }*/
 
-    public void useSkill(int skillCode, GameCharacter target) {
+    /**
+     * TODO: implement return value, which is mainly damage
+     *
+     *
+     * @param skillCode
+     * @param target
+     * @return
+     */
+    public int useSkill(int skillCode, GameCharacter target) {
         if (skillCode >= skills.length)
-            return;
+            return -1;
 
         Skill sk = skills[skillCode];
         if (sk != null && sk.active && sk.getLevel() > 0 && sk.getCurrentCooldown() == 0) {
@@ -295,6 +371,8 @@ public abstract class GameCharacter implements java.io.Serializable {
                 sk.use(this, target);
             }
         }
+
+        return 0;
     }
 
     /**
