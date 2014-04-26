@@ -33,7 +33,7 @@ public class StatsGUI extends DoubleBufferWindow {
     private JLabel stats = new JLabel();
 
     private JButton[] buttons = new JButton[9];
-    private JButton[] skillButtons = new JButton[10];
+    private JButton[] skillButtons = new JButton[9];
 
     //make it private
     public ArrayList<String> actions = new ArrayList<String>();
@@ -77,7 +77,7 @@ public class StatsGUI extends DoubleBufferWindow {
 
         ToolTipManager.sharedInstance().setInitialDelay(0);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             final int skillValue = i;
             skillButtons[i] = new JButton("");
             skillButtons[i].setLocation(180 + 50 * (i % 3), 25 + 50 * (i / 3));

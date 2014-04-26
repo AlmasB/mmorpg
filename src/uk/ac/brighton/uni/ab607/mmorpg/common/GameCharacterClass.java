@@ -6,10 +6,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public enum GameCharacterClass {
     MONSTER(50, 50),
-    NOVICE(10, 10, ID.Skill.MIGHTY_SWING, ID.Skill.DOUBLE_EDGE, ID.Skill.ROAR, ID.Skill.WARRIOR_HEART, ID.Skill.ARMOR_MASTERY, ID.Skill.BLOODLUST, ID.Skill.BULLSEYE, ID.Skill.BASH),
+    NOVICE(10, 10, ID.Skill.MIGHTY_SWING, ID.Skill.DOUBLE_EDGE, ID.Skill.LAST_STAND, ID.Skill.ROAR, ID.Skill.SHATTER_ARMOR, ID.Skill.WARRIOR_HEART, ID.Skill.ARMOR_MASTERY, ID.Skill.BLOODLUST, ID.Skill.BASH),
     WARRIOR(100, 20),
     SCOUT(75, 55),
-    MAGE(55, 100);
+    MAGE(55, 100, ID.Skill.HEAL);
 
     public final int hp;
     public final int sp;

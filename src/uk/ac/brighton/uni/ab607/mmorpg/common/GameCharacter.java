@@ -80,9 +80,12 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected float[] stats = new float[14];        // 14 stats
     protected float[] bStats = new float[14];       // bonus stats given by item
 
-    protected Skill[] skills = new Skill[10];   // from 1 to 0 on keyboard, TODO: maybe from 1 to 9 makes more sense
+    protected Skill[] skills;
 
     protected ArrayList<Effect> effects = new ArrayList<Effect>();
+
+    // TODO: redesign how bonuses added
+    // maybe hp += flat + % + something else for example and added to a list
 
     // TODO: add hp/sp regen maybe as stat?
     protected int baseLevel = 1,
@@ -280,6 +283,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public void addEffect(Effect e) {
         // we should do synchronized
+        //TODO: if same effect applied maybe go thru list and rebuff the effect
         synchronized (effects) {
             e.onBegin(this);
             effects.add(e);

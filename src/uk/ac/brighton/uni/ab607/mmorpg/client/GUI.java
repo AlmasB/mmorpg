@@ -484,7 +484,8 @@ public class GUI extends JFrame {
         @Override
         public void keyTyped(KeyEvent e) {
             input = e.getKeyChar();
-            choosingTarget = true;
+            if (input >= '1' && input <= '9')
+                choosingTarget = true;
 
 
             // once skill is clicked cursor changes

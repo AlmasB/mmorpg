@@ -51,6 +51,7 @@ public abstract class Skill implements java.io.Serializable {
     public abstract int getManaCost();
 
     // TODO: on skill begin/end
+    // TODO: self cast skills like ROAR
 
     /**
      * Do not use this method directly (it is now hidden anyway)

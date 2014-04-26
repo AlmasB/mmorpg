@@ -319,6 +319,50 @@ public class ObjectManager {
             }
         });
 
+        addSkill(new Skill(ID.Skill.LAST_STAND, "Last Stand", Desc.Skill.LAST_STAND, true, 60.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -8176078084748576113L;
+
+            @Override
+            public int getManaCost() {
+                return 2 + level*5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect((20.0f),
+                        new Rune[] {
+                }, new Essence[] {
+                        new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
+                }
+                        ));
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.SHATTER_ARMOR, true, 30.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -4834599835655165707L;
+
+            @Override
+            public int getManaCost() {
+                return 2 + level*5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                target.addEffect(new Effect((20.0f),
+                        new Rune[] {
+                }, new Essence[] {
+                        new Essence(Stat.ARM, -2*level)
+                }
+                        ));
+            }
+        });
+
         addSkill(new Skill(ID.Skill.ARMOR_MASTERY, "Armor Mastery", Desc.Skill.ARMOR_MASTERY, false, 0.0f) {
             /**
              *

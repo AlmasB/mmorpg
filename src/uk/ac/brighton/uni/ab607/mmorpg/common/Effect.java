@@ -4,7 +4,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Essence;
 
 public class Effect implements java.io.Serializable {
-
     /**
      *
      */

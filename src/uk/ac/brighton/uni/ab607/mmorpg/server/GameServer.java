@@ -408,6 +408,7 @@ public class GameServer {
                     // TODO: check range of skill or weapon
                     Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
                     if (skTarget != null) {
+                        value--;    // bring 1..9 to 0..8
                         player.useSkill(value, skTarget);
 
                         if (skTarget.getHP() <= 0) {
@@ -550,7 +551,7 @@ public class GameServer {
                 // process player - chest interaction
                 for (Player p : tmpPlayers) {
                     for (Chest c : chests) {
-                        if (!c.isOpened() && p.getX() == c.x && p.getY() == c.y) {
+                        if (distanceBetween(p, c) < 1) {
                             c.open();
                             for (GameItem item : c.getItems())
                                 p.getInventory().addItem(item);
@@ -680,5 +681,10 @@ public class GameServer {
      */
     private int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
+    }
+
+    // TODO: remove when super class GameObject added
+    private int distanceBetween(GameCharacter ch, Chest c) {
+        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

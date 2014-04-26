@@ -32,17 +32,16 @@ public class Desc {
         public static final String BULLSEYE = "Deals armor ignoring damage to target."
                 + "Target's defense is not ignored. "
                 + "Damage is based on caster's DEX";
-        public static final String CLAUDIUS = "Increases VIT, WIS, LUC."
-                + "Decreases INT.";
+        public static final String CLAUDIUS = "Increases VIT, WIS, LUC. Decreases INT";
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
 
-
+        // WARRIOR SKILL SET
         public static final String BASH = "A powerful physical attack";
         public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
         public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
-        public static final String ROAR = "Increases STR and VIT for some time";
-
-
+        public static final String ROAR = "Increases STR and VIT for the duration";
+        public static final String SHATTER_ARMOR = "Decreases target's armor for the duration";
+        public static final String LAST_STAND = "Deals double base damage for the duration";
         public static final String WARRIOR_HEART = "Passively increases max HP";
         public static final String ARMOR_MASTERY = "Increases armor rating";
         public static final String BLOODLUST = "Increases ATK based on the missing % HP";
