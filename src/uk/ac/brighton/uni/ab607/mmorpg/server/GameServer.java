@@ -141,7 +141,7 @@ public class GameServer {
                 }
 
                 if (target != null && agent.canSee(target)) {
-                    agent.attackAI(target);
+                    //agent.attackAI(target);
                     // onAttack(agent, target)
                 }
 
@@ -158,8 +158,8 @@ public class GameServer {
         AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_PLAYER) {
             @Override
             public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                if (target != null)
-                    agent.attackAI(target);
+                //if (target != null)
+                //agent.attackAI(target);
             }
         };
 
@@ -175,7 +175,7 @@ public class GameServer {
                 }
 
                 if (target != null)
-                    agent.attackAI(target);
+                    processBasicAttack(agent, target);
             }
         };
 
@@ -394,14 +394,14 @@ public class GameServer {
                             }
                         }
 
-                        if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                        /*if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
                             int dmg = target.attack(player);
                             animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                             target.atkTime = 0;
                             if (player.getHP() <= 0) {
                                 // TODO: implement player death
                             }
-                        }
+                        }*/
                     }
                     break;
                 case SKILL_USE:
@@ -484,7 +484,7 @@ public class GameServer {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                            rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -623,7 +623,31 @@ public class GameServer {
         return targ;
     }
 
+    private void processBasicAttack(EnemyAgent agent, AgentGoalTarget target) {
+        if (agent != null && target != null && agent instanceof GameCharacter && target instanceof GameCharacter) {
+            GameCharacter chAgent = (GameCharacter)agent;
+            GameCharacter chTarget = (GameCharacter)target;
+            if (distanceBetween(chAgent, chTarget) > 2)
+                agent.attackAI(target);
+            else
+                processBasicAttack((GameCharacter)agent, (GameCharacter)target);
+        }
+        else {
+            agent.attackAI(target);
+        }
+    }
 
+    private void processBasicAttack(GameCharacter attacker, GameCharacter target) {
+        if (distanceBetween(attacker, target) > 2)
+            return;
+
+
+        if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
+            int dmg = attacker.attack(target);
+            animations.add(new Animation(attacker.getX(), attacker.getY() + 80, 0.5f, 0, 25, dmg+""));
+            attacker.atkTime = 0;
+        }
+    }
 
     /**
      * Spawns an enemy with given ID at x, y

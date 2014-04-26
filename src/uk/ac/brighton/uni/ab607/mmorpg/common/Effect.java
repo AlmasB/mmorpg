@@ -20,4 +20,12 @@ public class Effect implements java.io.Serializable {
     public float getDuration() {
         return duration;
     }
+
+    public void onBegin(GameCharacter ch) {
+
+    }
+
+    public void onEnd(GameCharacter ch) {
+
+    }
 }

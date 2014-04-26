@@ -281,6 +281,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     public void addEffect(Effect e) {
         // we should do synchronized
         synchronized (effects) {
+            e.onBegin(this);
             effects.add(e);
         }
     }
@@ -289,8 +290,10 @@ public abstract class GameCharacter implements java.io.Serializable {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
             e.reduceDuration(0.05f);
-            if (e.getDuration() <= 0)
+            if (e.getDuration() <= 0) {
+                e.onEnd(this);
                 it.remove();
+            }
         }
 
         //System.out.println(effects.size() + "");

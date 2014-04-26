@@ -208,14 +208,10 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
         }
     }
 
-    // TODO: something cleaner
     @Override
     public void attackAI(AgentGoalTarget target) {
 
-        if (target instanceof GameCharacter)
-            this.attack((GameCharacter)target);
-
-        /*for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             if (x > target.getX())
                 xSpeed = -1;
             if (x < target.getX())
@@ -226,14 +222,14 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
             if (y < target.getY())
                 ySpeed = 1;
 
-
-            if (xSpeed == 0 && ySpeed == 0) // if reached just drop the target
+            if (x == target.getX() && y == target.getY())   // if reached means not the target so drop it and continue search
                 AI.currentTarget = null;
+
 
             move();
             xSpeed = 0;
             ySpeed = 0;
-        }*/
+        }
     }
 
     @Override
