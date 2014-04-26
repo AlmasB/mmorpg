@@ -290,12 +290,32 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                // test
-                caster.addEffect(new Effect(5.0f));
-
                 float dmg = (0.1f + 0.02f * level) * caster.getHP();
                 caster.setHP(Math.round(caster.getHP() - dmg));
                 caster.dealPureDamage(target, 2*dmg);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.ROAR, "Roar", Desc.Skill.ROAR, true, 5.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5098091102433780519L;
+
+            @Override
+            public int getManaCost() {
+                return 2 + level*2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect((5.0f),
+                        new Rune[] {
+                        new Rune(Attribute.STRENGTH, level*2),
+                        new Rune(Attribute.VITALITY, level*2)
+                },
+                new Essence[] {}
+                        ));
             }
         });
 

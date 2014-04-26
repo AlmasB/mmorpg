@@ -283,6 +283,7 @@ public abstract class GameCharacter implements java.io.Serializable {
         synchronized (effects) {
             e.onBegin(this);
             effects.add(e);
+            calculateStats();
         }
     }
 
@@ -293,6 +294,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             if (e.getDuration() <= 0) {
                 e.onEnd(this);
                 it.remove();
+                calculateStats();
             }
         }
 

@@ -13,6 +13,17 @@ public class Essence implements java.io.Serializable {
     public final Stat stat;
     public final int bonus;
 
+    /**
+     * Anonymous ctor
+     *
+     * @param stat
+     * @param bonus
+     */
+    /*package-private*/ Essence(Stat stat, int bonus) {
+        this.stat = stat;
+        this.bonus = bonus;
+    }
+
     /*package-private*/ Essence(String name, Stat stat, int bonus) {
         this.name = name;
         this.stat = stat;
