@@ -16,9 +16,94 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+      
+      <!-- Create a Jar with a Manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <index>true</index>
+	    	<manifest>
+              <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
+              <packageName>uk.ac.brighton.uni.ab607.mmorpg.client</packageName>
+	    	</manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>https://github.com/AlmasB/mmorpg</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-shade-plugin</artifactId>
+	<version>2.0</version>
+	<executions>
+	  <execution>
+	    <phase>package</phase>
+	    <goals>
+	      <goal>shade</goal>
+	    </goals>
+	  </execution>
+	</executions>
+	<configuration>
+	  <finalName>${project.artifactId}-${project.version}</finalName>
+	  <artifactSet>
+	  </artifactSet>
+	</configuration>
+      </plugin>
+      
+      
+      <!-- Allow mvn exec:java to execute the project -->
+     <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>exec-maven-plugin</artifactId>
+		<version>1.2.1</version>
+		<executions>
+		<execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+		</execution>
+		</executions>
+		<configuration>
+		          <executable>java</executable>
+		          <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
+		</configuration>
+     </plugin>
+      
     </plugins>
+    
+    
+      
+    
+    <resources>
+      <resource>
+        <directory>res/</directory>
+        <targetPath>res/</targetPath>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
   <scm>
   	<url>https://github.com/AlmasB/mmorpg</url>
   </scm>
+  <dependencies>
+  	<dependency>
+		<groupId>com.java</groupId>
+		<artifactId>jfxrt</artifactId>
+		<version>1.8</version>
+		<scope>system</scope>
+		<systemPath>${basedir}/lib/jfxrt.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>com.almasb.libs</groupId>
+		<artifactId>almas_libs</artifactId>
+		<version>1.0</version>
+		<scope>system</scope>
+		<systemPath>${basedir}/lib/almas_libs.jar</systemPath>
+	</dependency>
+  </dependencies>
 </project>
