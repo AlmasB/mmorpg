@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
+import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
+import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
@@ -55,6 +58,21 @@ class Point implements java.io.Serializable, AgentGoalTarget {
 // TODO: add effect onStart onEnd etc duration, also consider concurrency
 public class GameServer {
 
+    private int mapWidth;
+    private int mapHeight;
+
+    private AStarLogic logic = new AStarLogic();
+    private AStarNode[][] map;
+    private List<AStarNode> closed = new ArrayList<AStarNode>();
+
+
+    private int index = 0;
+    private AStarNode n = null;
+    private AStarNode parent = null;
+
+    private AStarNode targetNode;
+    private AStarNode playerParent;
+
     /*public enum Command {
         ATTR_UP, EQUIP, UNEQUIP, REFINE;
 
@@ -93,6 +111,25 @@ public class GameServer {
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
     public GameServer() {
+
+        List<String> lines = Resources.getText("map1.txt");
+
+        mapHeight = lines.size();
+        mapWidth = lines.get(0).length();
+
+        map = new AStarNode[mapWidth][mapHeight];
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            for (int j = 0; j < line.length(); j++) {
+                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
+            }
+        }
+
+
+
+
+
         try {
             server = new UDPServer(55555, new ClientQueryParser());
         }
@@ -394,14 +431,14 @@ public class GameServer {
                             }
                         }
 
-                        /*if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                        if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
                             int dmg = target.attack(player);
                             animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                             target.atkTime = 0;
                             if (player.getHP() <= 0) {
                                 // TODO: implement player death
                             }
-                        }*/
+                        }
                     }
                     break;
                 case SKILL_USE:
@@ -485,7 +522,7 @@ public class GameServer {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                            rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -547,7 +584,6 @@ public class GameServer {
                         iter.remove();
                 }
 
-                // TODO: fix how collision works, use distanceBetween
                 // process player - chest interaction
                 for (Player p : tmpPlayers) {
                     for (Chest c : chests) {
@@ -630,12 +666,10 @@ public class GameServer {
             GameCharacter chAgent = (GameCharacter)agent;
             GameCharacter chTarget = (GameCharacter)target;
             if (distanceBetween(chAgent, chTarget) > 2)
-                agent.attackAI(target);
+                //agent.attackAI(target);
+                moveObject(chAgent, chTarget.getX(), chTarget.getY());
             else
                 processBasicAttack((GameCharacter)agent, (GameCharacter)target);
-        }
-        else {
-            agent.attackAI(target);
         }
     }
 
@@ -648,6 +682,61 @@ public class GameServer {
             int dmg = attacker.attack(target);
             animations.add(new Animation(attacker.getX(), attacker.getY() + 80, 0.5f, 0, 25, dmg+""));
             attacker.atkTime = 0;
+        }
+    }
+
+    public AStarNode getNext() {
+        if (closed.size() == 0) return playerParent;
+
+        if (index >= closed.size())
+            index = closed.size() - 1;
+
+        return closed.get(index++);
+    }
+
+    private void moveObject(GameCharacter ch, int x, int y) {
+        x /= 40; y /= 40;
+
+        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
+            return;
+
+        targetNode = map[x][y];
+        AStarNode startN = map[ch.getX()/40][ch.getY() / 40];
+
+        for (int i = 0; i < mapWidth; i++)
+            for (int j = 0; j < mapHeight; j++)
+                map[i][j].setHCost(Math.abs(x - i) + Math.abs(y - j));
+
+
+        ArrayList<AStarNode> busyNodes = new ArrayList<AStarNode>();
+        // find "busy" nodes
+        for (Enemy e : enemies) {
+            busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
+        }
+
+        AStarNode[] busy = new AStarNode[busyNodes.size()];
+        for (int i = 0; i < busyNodes.size(); i++)
+            busy[i] = busyNodes.get(i);
+
+        closed = logic.getPath(map, startN, targetNode, busy);
+        index = 0;
+
+        if (closed.size() > 0) {
+            n = closed.get(0);
+
+            if (ch.getX() > n.getX() * 40)
+                ch.xSpeed = -5;
+            if (ch.getX() < n.getX() * 40)
+                ch.xSpeed = 5;
+            if (ch.getY() > n.getY() * 40)
+                ch.ySpeed = -5;
+            if (ch.getY() < n.getY() * 40)
+                ch.ySpeed = 5;
+
+            ch.move();
+
+            ch.xSpeed = 0;
+            ch.ySpeed = 0;
         }
     }
 

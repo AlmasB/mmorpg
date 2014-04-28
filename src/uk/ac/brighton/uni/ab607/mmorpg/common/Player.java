@@ -64,7 +64,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     /* EXPERIMENTAL ADDITIONS */
 
-    private int x, y;
+    /* private int x, y;
     public int xSpeed, ySpeed;
 
     public int frame = 0;
@@ -108,7 +108,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     public int getRow() {
         return direction.ordinal();
-    }
+    }*/
 
     @Override
     public int getX() {

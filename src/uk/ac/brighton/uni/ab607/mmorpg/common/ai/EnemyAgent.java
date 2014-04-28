@@ -10,4 +10,7 @@ public interface EnemyAgent {
     public void search(AgentGoalTarget target);
     public void attackAI(AgentGoalTarget target);
     public boolean canSee(AgentGoalTarget target);
+
+    public int getX();
+    public int getY();
 }

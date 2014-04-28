@@ -33,8 +33,6 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     private Element element;
 
-    private int x, y;
-
     private DroppableItem[] drops;
 
     // TODO deal with mob attributes ?
@@ -106,50 +104,9 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
 
     /* EXPERIMENTAL ADDITIONS */
 
-    public int xSpeed, ySpeed;
+    //public int xSpeed, ySpeed;
 
-    public int frame = 0;
-    public int place = 0;
 
-    public int sprite = 0;
-
-    public enum Dir {
-        UP, DOWN, LEFT, RIGHT
-    }
-
-    public Dir direction = Dir.DOWN;
-
-    private int factor = 3;
-
-    public void move() {
-        x += xSpeed;
-        y += ySpeed;
-
-        if (xSpeed > 0)
-            direction = Dir.RIGHT;
-        if (xSpeed < 0)
-            direction = Dir.LEFT;
-        if (ySpeed > 0)
-            direction = Dir.DOWN;
-        if (ySpeed < 0)
-            direction = Dir.UP;
-
-        frame++;
-
-        if (frame == 4 * factor)
-            frame = 0;
-
-        if (frame /factor == 0 || frame/factor == 2)
-            place = 0;
-        if (frame/factor == 1)
-            place = 1;
-        if (frame/factor == 3)
-            place = 2;
-    }
-
-    public int getRow() {
-        return direction.ordinal();
-    }
 
     public void setX(int x) {
         this.x = x;

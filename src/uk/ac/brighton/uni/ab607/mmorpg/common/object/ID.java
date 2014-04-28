@@ -53,8 +53,23 @@ public class ID {
         public static final String GUT_RIPPER = "4003";
         public static final String DRAGON_CLAW = "4004";
         public static final String FROSTMOURN = "4005";
+
+
         public static final String IRON_SWORD = "4006";
         public static final String KNIFE = "4007";
+
+        public static final String PRACTICE_SWORD = "4010";
+        public static final String CLAYMORE = "4011";
+        public static final String BROADSWORD = "4012";
+        public static final String HALLSTATT_SWORD = "4013";
+        public static final String KAMPILAN_SWORD = "4014";
+        public static final String MACHETE = "4015";
+        public static final String TEGA_SWORD = "4016";
+        public static final String BATTLESWORD = "4017";
+        public static final String LONGSWORD = "4018";
+        public static final String SCHIAVONA_SWORD = "4019";
+        public static final String COLICHERMARDE_SWORD = "4020";
+
     }
 
     // TODO: do we distinguish between different types of items?

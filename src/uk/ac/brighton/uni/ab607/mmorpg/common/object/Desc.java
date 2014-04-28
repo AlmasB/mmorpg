@@ -56,5 +56,17 @@ public class Desc {
         public static final String FROSTMOURN = "The legendary sword of the Ice Dungeon's King. Can turn enemies into frozen rocks with 5% chance. Has water element";
         public static final String IRON_SWORD = "A standard warrior's sword with decent attack damage";
         public static final String KNIFE = "A simple knife with poor blade";
+
+        public static final String PRACTICE_SWORD = "4010";
+        public static final String CLAYMORE = "4011";
+        public static final String BROADSWORD = "4012";
+        public static final String HALLSTATT_SWORD = "4013";
+        public static final String KAMPILAN_SWORD = "4014";
+        public static final String MACHETE = "4015";
+        public static final String TEGA_SWORD = "4016";
+        public static final String BATTLESWORD = "4017";
+        public static final String LONGSWORD = "A two-handed sword with straight double-edged blade";
+        public static final String SCHIAVONA_SWORD = "A popular sword among mercenary soldiers";
+        public static final String COLICHERMARDE_SWORD = "Small sword with good parrying characteristics";
     }
 }
