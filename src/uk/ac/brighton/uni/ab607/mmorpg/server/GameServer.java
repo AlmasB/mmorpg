@@ -235,7 +235,7 @@ public class GameServer {
     class ClientQueryParser extends ClientPacketParser {
         @Override
         public void parseClientPacket(DataPacket packet) {
-            if (packet.objectData instanceof Player) {
+            /*if (packet.objectData instanceof Player) {
                 Player clientPlayer = (Player) packet.objectData;
 
                 boolean newPlayer = true;
@@ -252,6 +252,13 @@ public class GameServer {
                     players.add(clientPlayer);
                     Out.println(clientPlayer.name + " joined the game");
                 }
+            }*/
+
+            if (packet.stringData.startsWith("CREATE_PLAYER")) {
+                String name = packet.stringData.split(",")[1];    // TODO: exc check
+                Player p = new Player(name, GameCharacterClass.NOVICE, 25*40, 15*40);
+                players.add(p);
+                Out.println(name + " has joined the game");
             }
 
             if (packet.stringData.startsWith("CHECK_PLAYER")) {
@@ -750,6 +757,38 @@ public class GameServer {
             ch.xSpeed = 0;
             ch.ySpeed = 0;
         }
+
+        /*if (move) {
+        n = getNext();
+        parent = playerParent;
+        }
+
+        if (n != parent) {
+            move = false;
+
+            if (player.getX() > n.getX() * 40)
+                player.xSpeed = -10;
+            if (player.getX() < n.getX() * 40)
+                player.xSpeed = 10;
+            if (player.getY() > n.getY() * 40)
+                player.ySpeed = -10;
+            if (player.getY() < n.getY() * 40)
+                player.ySpeed = 10;
+
+            // determine whether parent has changed
+
+            if (player.getX() == n.getX()*40 && player.getY() == n.getY() *40) {
+                playerParent = n;
+                move = true;
+
+                if (target != null && target == playerParent) {
+                    target = null;
+                }
+            }
+
+            renderX = player.getX() - 640;  // half of width
+            renderY = player.getY() - 360;  // half of height
+        }*/
     }
 
     /**

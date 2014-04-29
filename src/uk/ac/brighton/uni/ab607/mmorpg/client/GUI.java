@@ -41,15 +41,10 @@ public class GUI extends JFrame {
     private int mapWidth;
     private int mapHeight;
 
-    private AStarLogic logic = new AStarLogic();
     private AStarNode[][] map;
-    private List<AStarNode> closed = new ArrayList<AStarNode>();
     private Mouse mouse = new Mouse();
 
     private AStarNode target;
-    private AStarNode playerParent;
-
-    private int index = 0;
 
     private int renderX = 0, renderY = 0;
     private String name = "";
@@ -82,14 +77,9 @@ public class GUI extends JFrame {
     private InventoryGUI inv = null;
     private StatsGUI st = null;
 
-    private AStarNode n = null;
-    private AStarNode parent = null;
-    private boolean move = true;
-
     private Cursor walkCursor = null;
 
-
-    private int selX = 0, selY = 0;
+    private int selX = 0, selY = 0; // selected point
 
     public GUI(String ip, String playerName) {
         setSize(1280, 720);
@@ -119,22 +109,9 @@ public class GUI extends JFrame {
             }
         }
 
-        player = new Player(name, GameCharacterClass.NOVICE, 25*40, 15*40);
-        st = new StatsGUI(player);
-        inv = new InventoryGUI(player);
-
-        playerParent = map[25][15];
-
-        renderX = player.getX() - 640;  // half of width
-        renderY = player.getY() - 360;  // half of height
-
-        selX = player.getX();
-        selY = player.getY();
-
         try {
             client = new UDPClient(ip, 55555, new ServerResponseParser());
-            client.send(new DataPacket(System.getProperty("user.name")));
-            client.send(new DataPacket(player));
+            client.send(new DataPacket("CREATE_PLAYER," + name));
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -211,7 +188,7 @@ public class GUI extends JFrame {
             for (Player p : sPlayers) {
                 if (p != null) {
                     players.add(p);
-                    if (p.name.equals(player.name)) {   // find "this client's" player
+                    if (p.name.equals(name)) {   // find "this client's" player
                         currentPlayer = p;
                     }
                 }
@@ -219,6 +196,16 @@ public class GUI extends JFrame {
 
             if (currentPlayer != null) {
                 player = currentPlayer; // synch from server
+
+
+                if (inv == null) {  // running for first time
+                    inv = new InventoryGUI(player);
+                    selX = player.getX();
+                    selY = player.getY();
+                }
+                if (st == null)
+                    st = new StatsGUI(player);
+
                 updateGameClient();
 
                 // update other windows
@@ -270,48 +257,7 @@ public class GUI extends JFrame {
         }
     }
 
-    public AStarNode getNext() {
-        if (closed.size() == 0) return playerParent;
-
-        if (index >= closed.size())
-            index = closed.size() - 1;
-
-        return closed.get(index++);
-    }
-
     public void updateGameClient() {
-        /*if (move) {
-            n = getNext();
-            parent = playerParent;
-        }
-
-        if (n != parent) {
-            move = false;
-
-            if (player.getX() > n.getX() * 40)
-                player.xSpeed = -10;
-            if (player.getX() < n.getX() * 40)
-                player.xSpeed = 10;
-            if (player.getY() > n.getY() * 40)
-                player.ySpeed = -10;
-            if (player.getY() < n.getY() * 40)
-                player.ySpeed = 10;
-
-            // determine whether parent has changed
-
-            if (player.getX() == n.getX()*40 && player.getY() == n.getY() *40) {
-                playerParent = n;
-                move = true;
-
-                if (target != null && target == playerParent) {
-                    target = null;
-                }
-            }
-
-            renderX = player.getX() - 640;  // half of width
-            renderY = player.getY() - 360;  // half of height
-        }*/
-
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
 
@@ -346,7 +292,6 @@ public class GUI extends JFrame {
                 tmp3.toArray(actions3);
                 actionsUI.clear();
 
-                client.send(new DataPacket(player));
                 client.send(new DataPacket(actions));
                 client.send(new DataPacket(actions2));
                 client.send(new DataPacket(actions3));  // main ui actions
@@ -373,17 +318,16 @@ public class GUI extends JFrame {
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
 
-        int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
-        int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
+        if (player != null) {
+            int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
+            int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
 
-        int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
-        int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-
-        if (player != null)
+            int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
+            int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
             g.drawImage(Resources.getImage("map1.png"),
                     dx, dy, dx1, dy1,
-                    sx, sy,
-                    sx1, sy1, this);
+                    sx, sy, sx1, sy1, this);
+        }
 
         g.setColor(Color.YELLOW);
 
@@ -513,7 +457,6 @@ public class GUI extends JFrame {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
                         targetRuntimeID = enemy.getRuntimeID();
-                        //actionsUI.add("ATTACK," + player.name + "," + enemy.getRuntimeID());
                         return;
                     }
                 }
@@ -522,8 +465,6 @@ public class GUI extends JFrame {
 
                 // if no enemy in that selection then move player to that cell
 
-                //movePlayer(mouseX, mouseY);
-                //actionsUI.add("MOVE," + player.name + "," + (mouseX+renderX) + "," + (mouseY+renderY));
                 selX = mouseX + renderX;
                 selY = mouseY + renderY;
                 isPressed = true;
@@ -561,25 +502,6 @@ public class GUI extends JFrame {
             mouseX = e.getX();
             mouseY = e.getY();
         }
-    }
-
-    public void movePlayer(int x, int y) {
-        x = x - 0 + renderX;
-        y = y - 0 + renderY;
-
-        x /= 40; y /= 40;
-
-        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
-            return;
-
-        target = map[x][y];
-
-        for (int i = 0; i < mapWidth; i++)
-            for (int j = 0; j < mapHeight; j++)
-                map[i][j].setHCost(Math.abs(x - i) + Math.abs(y - j));
-
-        closed = logic.getPath(map, playerParent, target);
-        index = 0;
     }
 
     public Player getPlayer() {
