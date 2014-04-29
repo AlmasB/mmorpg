@@ -54,6 +54,8 @@ public class ObjectManager {
         addWeapon(new Weapon(ID.Weapon.HANDS, "Hands", Desc.Weapon.HANDS, 0, 7, WeaponType.MACE, 0));
         addWeapon(new Weapon(ID.Weapon.IRON_SWORD, "Iron Sword", Desc.Weapon.IRON_SWORD, 0, 5, WeaponType.ONE_H_SWORD, 15));
         addWeapon(new Weapon(ID.Weapon.KNIFE, "Knife", Desc.Weapon.KNIFE, 0, 6, WeaponType.DAGGER, 5));
+        addWeapon(new Weapon(ID.Weapon.CLAYMORE, "Claymore", Desc.Weapon.CLAYMORE, 10, 5, WeaponType.TWO_H_SWORD, 35));
+        addWeapon(new Weapon(ID.Weapon.BROADSWORD, "Broadsword", Desc.Weapon.BROADSWORD, 11, 5, WeaponType.TWO_H_SWORD, 28));
 
         addWeapon(new Weapon(ID.Weapon.GETSUGA_TENSHO,
                 "Getsuga Tensho", Desc.Weapon.GETSUGA_TENSHO, 4, 6,
