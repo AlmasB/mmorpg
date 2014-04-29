@@ -196,4 +196,9 @@ public class Enemy extends GameCharacter implements EnemyAgent, AgentGoalTarget 
                 && ch.getY() >= getY() - ENEMY_SIGHT
                 && ch.getY() <= getY() + ENEMY_SIGHT;
     }
+
+    @Override
+    public void dropTarget() {
+        AI.currentTarget = null;
+    }
 }

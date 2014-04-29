@@ -88,6 +88,9 @@ public class GUI extends JFrame {
 
     private Cursor walkCursor = null;
 
+
+    private int selX = 0, selY = 0;
+
     public GUI(String ip, String playerName) {
         setSize(1280, 720);
         setTitle("Game Client Window");
@@ -124,6 +127,9 @@ public class GUI extends JFrame {
 
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
+
+        selX = player.getX();
+        selY = player.getY();
 
         try {
             client = new UDPClient(ip, 55555, new ServerResponseParser());
@@ -274,7 +280,7 @@ public class GUI extends JFrame {
     }
 
     public void updateGameClient() {
-        if (move) {
+        /*if (move) {
             n = getNext();
             parent = playerParent;
         }
@@ -304,6 +310,17 @@ public class GUI extends JFrame {
 
             renderX = player.getX() - 640;  // half of width
             renderY = player.getY() - 360;  // half of height
+        }*/
+
+        renderX = player.getX() - 640;  // half of width
+        renderY = player.getY() - 360;  // half of height
+
+        if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
+            target = map[selX/40][selY/40];
+            actionsUI.add("MOVE," + player.name + "," + (selX) + "," + (selY));
+        }
+        else {
+            target = null;
         }
 
         checkRuntimeID();
@@ -505,7 +522,10 @@ public class GUI extends JFrame {
 
                 // if no enemy in that selection then move player to that cell
 
-                movePlayer(mouseX, mouseY);
+                //movePlayer(mouseX, mouseY);
+                //actionsUI.add("MOVE," + player.name + "," + (mouseX+renderX) + "," + (mouseY+renderY));
+                selX = mouseX + renderX;
+                selY = mouseY + renderY;
                 isPressed = true;
             }
             else {

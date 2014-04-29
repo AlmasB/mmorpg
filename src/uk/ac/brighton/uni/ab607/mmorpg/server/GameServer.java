@@ -29,6 +29,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
@@ -55,7 +56,6 @@ class Point implements java.io.Serializable, AgentGoalTarget {
     }
 }
 
-// TODO: add effect onStart onEnd etc duration, also consider concurrency
 public class GameServer {
 
     private int mapWidth;
@@ -90,7 +90,8 @@ public class GameServer {
             USE_ITEM = "USE_ITEM",
             ATTACK = "ATTACK",
             SKILL_USE = "SKILL_USE",
-            CHAT = "CHAT";
+            CHAT = "CHAT",
+            MOVE = "MOVE";
 
     private static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;
@@ -139,13 +140,8 @@ public class GameServer {
 
         // TODO how to send maps to players i.e. where players are, map specs?
 
-        chests.add(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID("4003"), ObjectManager.getWeaponByID("4001")));
-        chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID("5004"), ObjectManager.getArmorByID("5003")));
-
-        /*spawnEnemy(new Enemy("Orc Warrior", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, chests.get(0)), Element.NEUTRAL, 5, 640, 160));
-        spawnEnemy(new Enemy("Orc Scout", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 640, 640));
-        spawnEnemy(new Enemy("Orc Scout2", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, null), Element.NEUTRAL, 5, 1280, 1200));
-        spawnEnemy(new Enemy("Elven Mercenary", "Test Mob", EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, null), Element.NEUTRAL, 5, 720, 720));*/
+        chests.add(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
+        chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
 
         spawnEnemy("2001", 640, 160);
         spawnEnemy("2000", 720, 720);
@@ -188,7 +184,10 @@ public class GameServer {
         AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_PLAYER) {
             @Override
             public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                agent.search(getLastKnownLocation());
+                //agent.search(getLastKnownLocation());
+                AgentGoalTarget t = getLastKnownLocation();
+                if (t != null && !agent.canSee(t))
+                    moveObject((GameCharacter)agent, t.getX(), t.getY());
             }
         };
 
@@ -210,6 +209,9 @@ public class GameServer {
                         break;
                     }
                 }
+
+                if (agent != null && target != null && agent.getX() == target.getX() && agent.getY() == target.getY())
+                    agent.dropTarget();
 
                 if (target != null)
                     processBasicAttack(agent, target);
@@ -363,6 +365,7 @@ public class GameServer {
             }
 
             int value2 = 0; // for skill use, specifies runtimeID of the target
+            // also for movement value is x, value2 is y
             if (tokens.length == 4) {
                 try {
                     value2 = Integer.parseInt(tokens[3]);
@@ -411,6 +414,9 @@ public class GameServer {
                     }
                     else
                         throw new BadActionRequestException("Item not found: " + value);
+                    break;
+                case MOVE:
+                    moveObject(player, value, value2);
                     break;
                 case ATTACK:
                     // we only have player enemy interaction atm so ID will be an enemy
@@ -522,7 +528,7 @@ public class GameServer {
                         // TODO add to list
                         if (rule.matches(ai.type, ai.currentGoal)) {
                             // disable AI
-                            rule.execute(e, ai.currentTarget);
+                            //rule.execute(e, ai.currentTarget);
                         }
                     }
                 }
@@ -670,6 +676,12 @@ public class GameServer {
                 moveObject(chAgent, chTarget.getX(), chTarget.getY());
             else
                 processBasicAttack((GameCharacter)agent, (GameCharacter)target);
+        }
+        else {
+            if (agent != null && agent instanceof GameCharacter && target != null && target instanceof Point) {
+                GameCharacter chAgent = (GameCharacter)agent;
+                moveObject(chAgent, target.getX(), target.getY());  // use that maybe for all?
+            }
         }
     }
 

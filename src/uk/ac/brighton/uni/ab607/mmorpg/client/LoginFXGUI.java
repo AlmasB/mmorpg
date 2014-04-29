@@ -55,8 +55,8 @@ public class LoginFXGUI extends Application {
 
         // uncomment for running within jar and comment the other
         // TODO: implement global flag for running within jar
-        //loader.setLocation(getClass().getResource("/res/UI/Login.fxml"));
-        loader.setLocation(ResourceManager.getLocalURL("UI/Login.fxml"));
+        loader.setLocation(getClass().getResource("/res/UI/Login.fxml"));
+        //loader.setLocation(ResourceManager.getLocalURL("UI/Login.fxml"));
 
         AnchorPane page;
         try {
