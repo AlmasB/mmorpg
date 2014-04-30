@@ -96,7 +96,9 @@ public class GameServer {
     private static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;
 
-    // TODO: for players not implemented yet
+    private static final int STARTING_X = 25*40;
+    private static final int STARTING_Y = 15*40;
+
     private int runtimeID = 1;
 
     private UDPServer server = null;
@@ -235,30 +237,9 @@ public class GameServer {
     class ClientQueryParser extends ClientPacketParser {
         @Override
         public void parseClientPacket(DataPacket packet) {
-            /*if (packet.objectData instanceof Player) {
-                Player clientPlayer = (Player) packet.objectData;
-
-                boolean newPlayer = true;
-                // do we need this?
-                for (int i = 0; i < players.size(); i++) {
-                    if (players.get(i).name.equals(clientPlayer.name)) {
-                        newPlayer = false;
-                        players.set(i, clientPlayer);
-                        break;
-                    }
-                }
-
-                if (newPlayer) {
-                    players.add(clientPlayer);
-                    Out.println(clientPlayer.name + " joined the game");
-                }
-            }*/
-
             if (packet.stringData.startsWith("CREATE_PLAYER")) {
                 String name = packet.stringData.split(",")[1];    // TODO: exc check
-                Player p = new Player(name, GameCharacterClass.NOVICE, 25*40, 15*40);
-                players.add(p);
-                Out.println(name + " has joined the game");
+                addNewPlayer(name, STARTING_X, STARTING_Y);
             }
 
             if (packet.stringData.startsWith("CHECK_PLAYER")) {
@@ -497,7 +478,6 @@ public class GameServer {
         return null;
     }
 
-    // TODO: add players
     /**
      *
      * @param id
@@ -789,6 +769,13 @@ public class GameServer {
             renderX = player.getX() - 640;  // half of width
             renderY = player.getY() - 360;  // half of height
         }*/
+    }
+
+    private void addNewPlayer(String name, int x, int y) {
+        Player p = new Player(name, GameCharacterClass.NOVICE, x, y);
+        p.setRuntimeID(runtimeID++);
+        players.add(p);
+        Out.println(name + " has joined the game");
     }
 
     /**
