@@ -407,30 +407,34 @@ public class GameServer {
                     moveObject(player, value, value2);
                     break;
                 case ATTACK:
-                    // we only have player enemy interaction atm so ID will be an enemy
-                    Enemy target = (Enemy) getGameCharacterByRuntimeID(value);
-                    if (target != null && target.isAlive()
-                            && distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
+                    // at this stage client can only target enemies
+                    // when players are added this check will go
+                    GameCharacter tmpChar = getGameCharacterByRuntimeID(value);
+                    if (tmpChar instanceof Enemy) {
+                        Enemy target = (Enemy) tmpChar;
+                        if (target != null && target.isAlive()
+                                && distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
-                        if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                            int dmg = player.attack(target);
-                            animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
-                            player.atkTime = 0;
-                            if (target.getHP() <= 0) {
-                                player.gainBaseExperience(target.experience);
-                                player.gainJobExperience(target.experience);
-                                player.gainStatExperience(target.experience);
-                                chests.add(target.onDeath());
-                                //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+                            if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                                int dmg = player.attack(target);
+                                animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
+                                player.atkTime = 0;
+                                if (target.getHP() <= 0) {
+                                    player.gainBaseExperience(target.experience);
+                                    player.gainJobExperience(target.experience);
+                                    player.gainStatExperience(target.experience);
+                                    chests.add(target.onDeath());
+                                    //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+                                }
                             }
-                        }
 
-                        if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                            int dmg = target.attack(player);
-                            animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
-                            target.atkTime = 0;
-                            if (player.getHP() <= 0) {
-                                // TODO: implement player death
+                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                                int dmg = target.attack(player);
+                                animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
+                                target.atkTime = 0;
+                                if (player.getHP() <= 0) {
+                                    // TODO: implement player death
+                                }
                             }
                         }
                     }
@@ -684,14 +688,14 @@ public class GameServer {
         }
     }
 
-    public AStarNode getNext() {
+    /*public AStarNode getNext() {
         if (closed.size() == 0) return playerParent;
 
         if (index >= closed.size())
             index = closed.size() - 1;
 
         return closed.get(index++);
-    }
+    }*/
 
     private void moveObject(GameCharacter ch, int x, int y) {
         x /= 40; y /= 40;
