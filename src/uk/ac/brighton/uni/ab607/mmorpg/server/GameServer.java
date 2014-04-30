@@ -22,7 +22,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.EnemyAgent;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -33,7 +32,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 
 class Point implements java.io.Serializable, AgentGoalTarget {
     /**
@@ -110,7 +108,6 @@ public class GameServer {
     private ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
-    //private ArrayList<Player> facts = new ArrayList<Player>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
     public GameServer() {
@@ -129,10 +126,6 @@ public class GameServer {
             }
         }
 
-
-
-
-
         try {
             server = new UDPServer(55555, new ClientQueryParser());
         }
@@ -142,8 +135,8 @@ public class GameServer {
 
         // TODO how to send maps to players i.e. where players are, map specs?
 
-        chests.add(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
-        chests.add(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
+        spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
+        spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
 
         spawnEnemy("2001", 640, 160);
         spawnEnemy("2000", 720, 720);
@@ -423,7 +416,7 @@ public class GameServer {
                                     player.gainBaseExperience(target.experience);
                                     player.gainJobExperience(target.experience);
                                     player.gainStatExperience(target.experience);
-                                    chests.add(target.onDeath());
+                                    spawnChest(target.onDeath());
                                     //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
                                 }
                             }
@@ -799,6 +792,10 @@ public class GameServer {
         e.setX(x);
         e.setY(y);
         enemies.add(e);
+    }
+
+    private void spawnChest(Chest chest) {
+        chests.add(chest);
     }
 
     /**
