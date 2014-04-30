@@ -209,7 +209,7 @@ public class GUI extends JFrame {
                 updateGameClient();
 
                 // update other windows
-                inv.repaint(currentPlayer);
+                inv.update(currentPlayer);
                 st.update(currentPlayer);
             }
 

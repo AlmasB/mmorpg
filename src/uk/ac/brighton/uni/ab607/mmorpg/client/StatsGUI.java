@@ -14,20 +14,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public class StatsGUI extends DoubleBufferWindow {
-
     /**
      *
      */
     private static final long serialVersionUID = 4879390243081905006L;
-
-    //private Player player;
 
     private JLabel attributes = new JLabel();
     private JLabel stats = new JLabel();
@@ -71,10 +67,6 @@ public class StatsGUI extends DoubleBufferWindow {
             add(buttons[i]);
         }
 
-        //player = p;
-
-        // only keep buttons enabled when there is at least 1 attribute point
-
         ToolTipManager.sharedInstance().setInitialDelay(0);
 
         for (int i = 0; i < 9; i++) {
@@ -111,7 +103,6 @@ public class StatsGUI extends DoubleBufferWindow {
                 }
             }
         }
-
 
         if (p == null || equal(p))
             return;

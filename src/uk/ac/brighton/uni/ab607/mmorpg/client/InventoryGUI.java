@@ -94,7 +94,7 @@ public class InventoryGUI extends JFrame {
 
     // also check if items themselves have changed ie rune or essence added maybe use PseudoHTML for checking ?
     // TODO: check the exact items in inventory and perhaps player equip and then repaint if needed
-    public void repaint(Player p) {
+    public void update(Player p) {
         if (!player.getInventory().toString().equals(p.getInventory().toString()) || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
             player = p;
             repaint();
