@@ -111,117 +111,18 @@ public class GameServer {
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
     public GameServer() {
+        // TODO how to send maps to players i.e. where players are, map specs?
+        initGameMap();
+        initGameObjects();
+        initAI();
 
-        List<String> lines = Resources.getText("map1.txt");
-
-        mapHeight = lines.size();
-        mapWidth = lines.get(0).length();
-
-        map = new AStarNode[mapWidth][mapHeight];
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (int j = 0; j < line.length(); j++) {
-                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
-            }
-        }
-
+        // init server connection
         try {
             server = new UDPServer(55555, new ClientQueryParser());
         }
         catch (SocketException e) {
             e.printStackTrace();
         }
-
-        // TODO how to send maps to players i.e. where players are, map specs?
-
-        spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
-        spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
-
-        spawnEnemy("2001", 640, 160);
-        spawnEnemy("2000", 720, 720);
-        spawnEnemy("2000", 40, 40);
-        spawnEnemy("2001", 40, 120);
-        spawnEnemy("2001", 400, 120);
-        spawnEnemy("2001", 320, 160);
-        spawnEnemy("2001", 40, 360);
-        spawnEnemy("2001", 600, 120);
-
-        // AI RULES
-
-        AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_CHEST) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                if (target != null)
-                    agent.patrol(target);
-            }
-        };
-
-        AgentRule rule2 = new AgentRule(AgentType.GUARD, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                List<Player> tmpPlayers = new ArrayList<Player>(players);
-                for (Player p : tmpPlayers) {
-                    if (agent.canSee(p)) {
-                        target = p;
-                        break;
-                    }
-                }
-
-                if (target != null && agent.canSee(target)) {
-                    //agent.attackAI(target);
-                    // onAttack(agent, target)
-                }
-
-            }
-        };
-
-        AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                //agent.search(getLastKnownLocation());
-                AgentGoalTarget t = getLastKnownLocation();
-                if (t != null && !agent.canSee(t))
-                    moveObject((GameCharacter)agent, t.getX(), t.getY());
-            }
-        };
-
-        AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                //if (target != null)
-                //agent.attackAI(target);
-            }
-        };
-
-        AgentRule rule5 = new AgentRule(AgentType.ASSASSIN, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                List<Player> tmpPlayers = new ArrayList<Player>(players);
-                for (Player p : tmpPlayers) {
-                    if (agent.canSee(p)) {
-                        target = p;
-                        break;
-                    }
-                }
-
-                if (agent != null && target != null && agent.getX() == target.getX() && agent.getY() == target.getY())
-                    agent.dropTarget();
-
-                if (target != null)
-                    processBasicAttack(agent, target);
-            }
-        };
-
-
-        aiRules.add(rule);
-        aiRules.add(rule2);
-        aiRules.add(rule3);
-        aiRules.add(rule4);
-        aiRules.add(rule5);
-
-
-
 
         // start main server loop
         new Thread(new ServerLoop()).start();
@@ -796,6 +697,108 @@ public class GameServer {
 
     private void spawnChest(Chest chest) {
         chests.add(chest);
+    }
+
+    private void initGameMap() {
+        List<String> lines = Resources.getText("map1.txt");
+
+        mapHeight = lines.size();
+        mapWidth = lines.get(0).length();
+
+        map = new AStarNode[mapWidth][mapHeight];
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            for (int j = 0; j < line.length(); j++) {
+                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
+            }
+        }
+    }
+
+    private void initGameObjects() {
+        spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
+        spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
+
+        spawnEnemy("2001", 640, 160);
+        spawnEnemy("2000", 720, 720);
+        spawnEnemy("2000", 40, 40);
+        spawnEnemy("2001", 40, 120);
+        spawnEnemy("2001", 400, 120);
+        spawnEnemy("2001", 320, 160);
+        spawnEnemy("2001", 40, 360);
+        spawnEnemy("2001", 600, 120);
+    }
+
+    private void initAI() {
+        AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_CHEST) {
+            @Override
+            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                if (target != null)
+                    agent.patrol(target);
+            }
+        };
+
+        AgentRule rule2 = new AgentRule(AgentType.GUARD, AgentGoal.KILL_PLAYER) {
+            @Override
+            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                for (Player p : tmpPlayers) {
+                    if (agent.canSee(p)) {
+                        target = p;
+                        break;
+                    }
+                }
+
+                if (target != null && agent.canSee(target)) {
+                    //agent.attackAI(target);
+                    // onAttack(agent, target)
+                }
+
+            }
+        };
+
+        AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_PLAYER) {
+            @Override
+            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                //agent.search(getLastKnownLocation());
+                AgentGoalTarget t = getLastKnownLocation();
+                if (t != null && !agent.canSee(t))
+                    moveObject((GameCharacter)agent, t.getX(), t.getY());
+            }
+        };
+
+        AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_PLAYER) {
+            @Override
+            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                //if (target != null)
+                //agent.attackAI(target);
+            }
+        };
+
+        AgentRule rule5 = new AgentRule(AgentType.ASSASSIN, AgentGoal.KILL_PLAYER) {
+            @Override
+            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                for (Player p : tmpPlayers) {
+                    if (agent.canSee(p)) {
+                        target = p;
+                        break;
+                    }
+                }
+
+                if (agent != null && target != null && agent.getX() == target.getX() && agent.getY() == target.getY())
+                    agent.dropTarget();
+
+                if (target != null)
+                    processBasicAttack(agent, target);
+            }
+        };
+
+        aiRules.add(rule);
+        aiRules.add(rule2);
+        aiRules.add(rule3);
+        aiRules.add(rule4);
+        aiRules.add(rule5);
     }
 
     /**
