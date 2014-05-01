@@ -1,5 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 
 public abstract class GUI extends JFrame {
@@ -7,7 +12,71 @@ public abstract class GUI extends JFrame {
      *
      */
     private static final long serialVersionUID = -2472437923536886979L;
+    
+    private int W, H;
 
+    private ArrayList<String> actionRequests = new ArrayList<String>();
+    
+    public GUI(int w, int h, String title) {
+        super(title);
+        this.setSize(w, h);
+        this.setResizable(false);
+        this.setLayout(null);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+    
+    public void addActionRequest(String action) {
+        actionRequests.add(action);
+    }
 
+    public String[] clearPendingActionRequests() {
+        String[] res = (String[]) actionRequests.toArray();
+        actionRequests.clear();
+        return res;
+    }
+    
+    /**
+     * Called by repaint()
+     * 
+     * @param g
+     *            Graphics context to use
+     */
+    @Override
+    public void update(Graphics g) {
+        showPicture((Graphics2D) g);
+    }
 
+    /**
+     * Called when the window is shown for the first time or after being
+     * 'damaged'
+     * 
+     * @param g
+     *            Graphics context to use
+     */
+    @Override
+    public void paint(Graphics g) {
+        showPicture((Graphics2D) g);
+    }
+    
+    /**
+     * Double buffer (off-screen) Image
+     */
+    protected BufferedImage doubleBufferImage;
+
+    /**
+     * Double buffer (off-screen) Graphics
+     */
+    protected Graphics2D doubleBufferGraphics;
+
+    protected void showPicture(Graphics2D g) {
+        if (doubleBufferGraphics == null) {
+            doubleBufferImage = (BufferedImage) createImage(W, H);
+            doubleBufferGraphics = doubleBufferImage.createGraphics();
+        }
+
+        createPicture(doubleBufferGraphics);
+        g.drawImage(doubleBufferImage, 0, 0, this);
+    }
+    
+    protected abstract void createPicture(Graphics2D g);
 }
