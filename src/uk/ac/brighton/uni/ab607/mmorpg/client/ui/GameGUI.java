@@ -1,16 +1,13 @@
-package uk.ac.brighton.uni.ab607.mmorpg.client;
+package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -19,25 +16,27 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
-import uk.ac.brighton.uni.ab607.libs.search.*;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.common.*;
+import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 
-// TODO: create abstract GUI
-// TODO: separate logic and GUI
-@SuppressWarnings("serial")
-public class GUI extends JFrame {
-
+public class GameGUI extends GUI {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3086068923466302200L;
+    
     private int mapWidth;
     private int mapHeight;
 
@@ -63,8 +62,6 @@ public class GUI extends JFrame {
     private ArrayList<Animation> anims = new ArrayList<Animation>();
     private ArrayList<Animation> tmpAnims = new ArrayList<Animation>();
 
-    private ArrayList<String> actionsUI = new ArrayList<String>();
-
     private int targetRuntimeID = 0;    // this is for attacking
 
     private boolean stop = false;
@@ -74,19 +71,20 @@ public class GUI extends JFrame {
 
     private JTextField chat = new JTextField();
 
-    private InventoryGUI inv = null;
-    private StatsGUI st = null;
+    private InventoryGUI inv;
+    private StatsGUI st;
 
     private Cursor walkCursor = null;
 
     private int selX = 0, selY = 0; // selected point
 
-    public GUI(String ip, String playerName) {
-        setSize(1280, 720);
-        setTitle("Game Client Window");
-        this.setLayout(null);
+    public GameGUI(String ip, String playerName) {
+        super(1280, 720, "Main Window");
 
         name = playerName;
+        
+        inv = new InventoryGUI();
+        st = new StatsGUI(name);
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -124,7 +122,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String chatText = e.getActionCommand();
                 if (!chatText.isEmpty()) {
-                    actionsUI.add("CHAT," + player.name + ",0,0," + chatText);
+                    addActionRequest("CHAT," + player.name + ",0,0," + chatText);
                     chat.setText("");
                 }
             }
@@ -135,7 +133,7 @@ public class GUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    GUI.this.requestFocusInWindow();
+                    GameGUI.this.requestFocusInWindow();
                 }
             }
             @Override
@@ -148,7 +146,7 @@ public class GUI extends JFrame {
 
         setVisible(true);
     }
-
+    
     /**
      * Parses and updates the game client, including all windows
      * with the information taken from server packets
@@ -177,6 +175,8 @@ public class GUI extends JFrame {
             }
         }
 
+        boolean once = true;
+        
         /**
          * Update info about players
          *
@@ -197,14 +197,13 @@ public class GUI extends JFrame {
             if (currentPlayer != null) {
                 player = currentPlayer; // synch from server
 
-
-                if (inv == null) {  // running for first time
-                    inv = new InventoryGUI(player);
+                // TODO: consider something better
+                if (once) {
                     selX = player.getX();
                     selY = player.getY();
+                    once = false;
                 }
-                if (st == null)
-                    st = new StatsGUI(player);
+                
 
                 updateGameClient();
 
@@ -256,14 +255,14 @@ public class GUI extends JFrame {
             tmpAnims = new ArrayList<Animation>(anims);
         }
     }
-
+    
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
 
         if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
             target = map[selX/40][selY/40];
-            actionsUI.add("MOVE," + player.name + "," + (selX) + "," + (selY));
+            addActionRequest("MOVE," + player.name + "," + (selX) + "," + (selY));
         }
         else {
             target = null;
@@ -272,29 +271,14 @@ public class GUI extends JFrame {
         checkRuntimeID();
 
         if (targetRuntimeID != 0) {
-            actionsUI.add("ATTACK," + player.name + "," + targetRuntimeID);
+            addActionRequest("ATTACK," + player.name + "," + targetRuntimeID);
         }
 
         if (!stop) {
             try {
-                String[] actions = new String[st.actions.size()];
-                ArrayList<String> tmp = new ArrayList<String>(st.actions);
-                tmp.toArray(actions);
-                st.actions.clear();
-
-                String[] actions2 = new String[inv.actions.size()];
-                ArrayList<String> tmp2 = new ArrayList<String>(inv.actions);
-                tmp2.toArray(actions2);
-                inv.actions.clear();
-
-                String[] actions3 = new String[actionsUI.size()];
-                ArrayList<String> tmp3 = new ArrayList<String>(actionsUI);
-                tmp3.toArray(actions3);
-                actionsUI.clear();
-
-                client.send(new DataPacket(actions));
-                client.send(new DataPacket(actions2));
-                client.send(new DataPacket(actions3));  // main ui actions
+                client.send(new DataPacket(inv.clearPendingActionRequests()));
+                client.send(new DataPacket(st.clearPendingActionRequests()));
+                client.send(new DataPacket(this.clearPendingActionRequests()));  // main ui actions
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -303,18 +287,9 @@ public class GUI extends JFrame {
 
         repaint();
     }
-
-    /**
-     * Double buffer (off-screen) Image
-     */
-    private BufferedImage doubleBufferImage;
-
-    /**
-     * Double buffer (off-screen) Graphics
-     */
-    private Graphics2D doubleBufferGraphics;
-
-    private void drawImage(Graphics2D g) {
+    
+    @Override
+    protected void createPicture(Graphics2D g) {
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
 
@@ -364,26 +339,25 @@ public class GUI extends JFrame {
 
             g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
         }
-
-
     }
 
-    private void draw(Graphics2D g) {
+    @Override
+    protected void showPicture(Graphics2D g) {
         if (doubleBufferGraphics == null) {
             doubleBufferImage = (BufferedImage) createImage(1280, 690);
             doubleBufferGraphics = doubleBufferImage.createGraphics();
         }
 
-        drawImage(doubleBufferGraphics);
+        createPicture(doubleBufferGraphics);
         g.drawImage(doubleBufferImage, 0, 0, this);
     }
 
     @Override
     public void paint(Graphics g) {
-        draw((Graphics2D) g);
-        chat.repaint();
+        showPicture((Graphics2D) g);
+        //chat.repaint();
     }
-
+    
     private boolean choosingTarget = false; // if player is choosing target for skill or smth
     private char input = ' ';
 
@@ -474,7 +448,7 @@ public class GUI extends JFrame {
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        actionsUI.add("SKILL_USE," + player.name + "," + input + "," + enemy.getRuntimeID());
+                        addActionRequest("SKILL_USE," + player.name + "," + input + "," + enemy.getRuntimeID());
                         return;
                     }
                 }

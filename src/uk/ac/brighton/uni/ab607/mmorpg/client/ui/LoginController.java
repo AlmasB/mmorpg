@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.client;
+package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.io.IOException;
 import java.net.URL;

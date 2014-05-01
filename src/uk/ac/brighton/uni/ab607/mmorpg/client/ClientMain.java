@@ -1,5 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
@@ -14,12 +16,12 @@ public class ClientMain {
 
         if (local) {
             new GameServer();
-            new GUI("127.0.0.1", "Almas");
+            new GameGUI("127.0.0.1", "Almas");
         }
         else {
             LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
             // will only be called after previous gui finishes
-            new GUI(LoginFXGUI.getIP(), LoginFXGUI.getUserName());
+            new GameGUI(LoginFXGUI.getIP(), LoginFXGUI.getUserName());
         }
     }
 }
