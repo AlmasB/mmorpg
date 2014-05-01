@@ -1,10 +1,9 @@
-package uk.ac.brighton.uni.ab607.mmorpg.client;
+package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,28 +13,24 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.ui.DoubleBufferWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
-public class StatsGUI extends DoubleBufferWindow {
+public class StatsGUI extends GUI {
     /**
-     *
+     * 
      */
-    private static final long serialVersionUID = 4879390243081905006L;
-
+    private static final long serialVersionUID = -5781436876701869521L;
+    
     private JLabel attributes = new JLabel();
     private JLabel stats = new JLabel();
 
     private JButton[] buttons = new JButton[9];
     private JButton[] skillButtons = new JButton[9];
-
-    //make it private
-    public ArrayList<String> actions = new ArrayList<String>();
-
-    public StatsGUI(final Player p) {
-        super(640, 304, "Char Stats/Skills Window", true);
+    
+    public StatsGUI(final String playerName) {
+        super(640, 304, "Char Stats/Skills Window");
         this.setLocation(0, 720);
 
         attributes.setBounds(0, 0, 320, 304);
@@ -61,7 +56,7 @@ public class StatsGUI extends DoubleBufferWindow {
             buttons[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    actions.add("ATTR_UP," + p.name + "," + attr);
+                    addActionRequest("ATTR_UP," + playerName + "," + attr);
                 }
             });
             add(buttons[i]);
@@ -79,7 +74,7 @@ public class StatsGUI extends DoubleBufferWindow {
             skillButtons[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    actions.add("SKILL_UP," + p.name + "," + skillValue);
+                    addActionRequest("SKILL_UP," + playerName + "," + skillValue);
                 }
             });
             this.add(skillButtons[i]);
@@ -87,13 +82,12 @@ public class StatsGUI extends DoubleBufferWindow {
 
         setVisible(true);
     }
-
+    
     private boolean equal(Player p) {
         return attributes.getText().equals(p.attributesToPseudoHTML()) && stats.getText().equals(p.statsToPseudoHTML());
     }
 
     public void update(final Player p) {
-        // TODO: refactor when player is no longer created on client side
         if (p != null) {
             Skill[] skills = p.getSkills();
             for (int i = 0; i < skills.length; i++) {
