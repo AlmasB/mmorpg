@@ -57,6 +57,16 @@ public class ObjectManager {
         addWeapon(new Weapon(ID.Weapon.CLAYMORE, "Claymore", Desc.Weapon.CLAYMORE, 10, 5, WeaponType.TWO_H_SWORD, 35));
         addWeapon(new Weapon(ID.Weapon.BROADSWORD, "Broadsword", Desc.Weapon.BROADSWORD, 11, 5, WeaponType.TWO_H_SWORD, 28));
 
+        addWeapon(new Weapon(ID.Weapon.BATTLESWORD,
+                "Battlesword", Desc.Weapon.BATTLESWORD, 12, 5,
+                "Almas", ItemLevel.NORMAL, WeaponType.TWO_H_SWORD, 44, Element.NEUTRAL, 2,
+                new Rune(Attribute.STRENGTH, 2)));
+
+        addWeapon(new Weapon(ID.Weapon.LONGSWORD,
+                "Longsword", Desc.Weapon.LONGSWORD, 9, 5,
+                "Almas", ItemLevel.NORMAL, WeaponType.TWO_H_SWORD, 33, Element.NEUTRAL, 2,
+                new Rune(Attribute.DEXTERITY, 2), new Rune(Attribute.AGILITY, 1)));
+
         addWeapon(new Weapon(ID.Weapon.GETSUGA_TENSHO,
                 "Getsuga Tensho", Desc.Weapon.GETSUGA_TENSHO, 4, 6,
                 "Matthew", ItemLevel.EPIC, WeaponType.ONE_H_SWORD, 150, Element.NEUTRAL, 4,
