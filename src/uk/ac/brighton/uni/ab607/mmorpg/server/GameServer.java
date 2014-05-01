@@ -418,32 +418,13 @@ public class GameServer {
                     }
                 }
 
-                // move players, also reduce their active skill cooldowns
-                // and re apply passive skill bonuses
+                // process players
                 for (Player p : tmpPlayers) {
                     if (locationFacts.size() == 0) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 0.1f);
                     }
 
-                    p.move();
-                    p.xSpeed = 0;
-                    p.ySpeed = 0;
-
-                    Skill[] skills = p.getSkills();
-                    for (Skill sk : skills) {
-                        if (sk.active) {
-                            if (sk.getCurrentCooldown() > 0) {
-                                sk.reduceCurrentCooldown(0.05f);
-                            }
-                        }
-                        else {  // reapply passive skills
-                            if (sk.getLevel() > 0)
-                                sk.use(p, null);
-                        }
-                    }
-
-                    // effects
-                    p.updateEffects();
+                    p.update();
 
                     // TODO: optimize
                     for (Enemy e : enemies) {
@@ -464,6 +445,16 @@ public class GameServer {
                             e.AI.currentTarget = getLastKnownLocation();
                         }
                     }
+
+                    // player - chest interaction
+                    for (Chest c : chests) {
+                        if (distanceBetween(p, c) < 1) {
+                            c.open();
+                            for (GameItem item : c.getItems())
+                                p.getInventory().addItem(item);
+                            p.incMoney(c.money);
+                        }
+                    }
                 }
 
                 // fuzzy stuff
@@ -475,20 +466,7 @@ public class GameServer {
                         iter.remove();
                 }
 
-                // process player - chest interaction
-                for (Player p : tmpPlayers) {
-                    for (Chest c : chests) {
-                        if (distanceBetween(p, c) < 1) {
-                            c.open();
-                            for (GameItem item : c.getItems())
-                                p.getInventory().addItem(item);
-                            //p.getInventory().setChanged();
-                            p.incMoney(c.money);
-                        }
-                    }
-                }
-
-                // clean chests
+                // clean chests, can be optimized by enclosing within player loop
                 for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
                     if (it.next().isOpened()) {
                         it.remove();
@@ -525,12 +503,7 @@ public class GameServer {
                     server.send(new DataPacket(chestsToSend));
                     server.send(new DataPacket(eneToSend));
                     server.send(new DataPacket(animsToSend));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                try {
                     Thread.sleep(20);   // maybe even 10
                 }
                 catch (Exception e) {
@@ -673,7 +646,7 @@ public class GameServer {
         Player p = new Player(name, GameCharacterClass.NOVICE, x, y);
         p.setRuntimeID(runtimeID++);
         players.add(p);
-        Out.println(name + " has joined the game");
+        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID());
     }
 
     /**

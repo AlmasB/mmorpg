@@ -340,7 +340,7 @@ public abstract class GameCharacter implements java.io.Serializable {
         }
     }
 
-    public void updateEffects() {
+    protected void updateEffects() {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
             e.reduceDuration(0.05f);
@@ -350,8 +350,23 @@ public abstract class GameCharacter implements java.io.Serializable {
                 calculateStats();
             }
         }
+    }
 
-        //System.out.println(effects.size() + "");
+    public void update() {
+        for (Skill sk : skills) {
+            if (sk.active) {
+                if (sk.getCurrentCooldown() > 0) {
+                    sk.reduceCurrentCooldown(0.05f);
+                }
+            }
+            else {  // reapply passive skills
+                if (sk.getLevel() > 0)
+                    sk.use(this, null);
+            }
+        }
+
+        // check buffs
+        updateEffects();
     }
 
     /**
