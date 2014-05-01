@@ -175,6 +175,8 @@ public class GameGUI extends GUI {
             }
         }
 
+        boolean once = true;
+        
         /**
          * Update info about players
          *
@@ -195,8 +197,12 @@ public class GameGUI extends GUI {
             if (currentPlayer != null) {
                 player = currentPlayer; // synch from server
 
-                selX = player.getX();
-                selY = player.getY();
+                // TODO: consider something better
+                if (once) {
+                    selX = player.getX();
+                    selY = player.getY();
+                    once = false;
+                }
                 
 
                 updateGameClient();

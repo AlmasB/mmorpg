@@ -13,12 +13,13 @@ public abstract class GUI extends JFrame {
      */
     private static final long serialVersionUID = -2472437923536886979L;
     
-    private int W, H;
+    private final int W, H;
 
     private ArrayList<String> actionRequests = new ArrayList<String>();
     
     public GUI(int w, int h, String title) {
         super(title);
+        W = w; H = h;
         this.setSize(w, h);
         this.setResizable(false);
         this.setLayout(null);
@@ -30,7 +31,8 @@ public abstract class GUI extends JFrame {
     }
 
     public String[] clearPendingActionRequests() {
-        String[] res = (String[]) actionRequests.toArray();
+        String[] res = new String[actionRequests.size()];
+        actionRequests.toArray(res);
         actionRequests.clear();
         return res;
     }
