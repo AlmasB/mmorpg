@@ -5,6 +5,7 @@ import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
@@ -501,5 +502,12 @@ public abstract class GameCharacter implements java.io.Serializable {
     @Override
     public String toString() {
         return id + "," + name;
+    }
+
+    public boolean canSee(AgentGoalTarget ch) {
+        return ch.getX() >= getX() - 240
+                && ch.getX() <= getX() + 240
+                && ch.getY() >= getY() - 240
+                && ch.getY() <= getY() + 240;
     }
 }

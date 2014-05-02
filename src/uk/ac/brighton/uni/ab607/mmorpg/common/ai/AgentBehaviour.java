@@ -5,24 +5,36 @@ public class AgentBehaviour implements java.io.Serializable {
      *
      */
     private static final long serialVersionUID = -2595967627822210051L;
+
+    public enum AgentType {
+        GUARD, SCOUT, ASSASSIN
+    }
+
+    public enum AgentGoal {
+        FIND_OBJECT, KILL_OBJECT, GUARD_OBJECT
+    }
+
+    public enum AgentMode {
+        AGGRESSIVE, PASSIVE, PATROL
+    }
+
     public AgentType type;
     public AgentGoal currentGoal;
-    public AgentGoalTarget currentTarget;
+    public AgentMode currentMode;
+    public AgentGoalTarget currentTarget = null;
 
-    /**
-     *
-     * @param type
-     * @param target
-     *               can be null
-     */
-    public AgentBehaviour(AgentType type, AgentGoalTarget target) {
+    public AgentBehaviour(AgentType type, AgentGoal goal, AgentMode mode) {
         this.type = type;
-        currentGoal = type.initialGoal;
-        currentTarget = target;
+        currentGoal = goal;
+        currentMode = mode;
     }
 
     public void setGoal(AgentGoal goal) {
         currentGoal = goal;
+    }
+
+    public void setMode(AgentMode mode) {
+        currentMode = mode;
     }
 
     public void setTarget(AgentGoalTarget target) {
