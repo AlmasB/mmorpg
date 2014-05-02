@@ -11,11 +11,11 @@ import uk.ac.brighton.uni.ab607.libs.encryption.*;
 public class GameAccount extends Account {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 826478717098386944L;
 
-    private static final String DB_FOLDER = "db/";  // TODO: structure it, perhaps will use more DBs
+    private static final String DB_FOLDER = "db/";
     private static final String DB_FILE = DB_FOLDER + "accounts.db";
 
 
@@ -24,7 +24,7 @@ public class GameAccount extends Account {
 
     static {
         accounts = loadDB();
-        //uniqueID = Integer.parseInt(accounts.lastKey());    //TODO: exception check
+        //uniqueID = Integer.parseInt(accounts.lastKey());
     }
 
     private GameAccount(String username, String password, String key) {

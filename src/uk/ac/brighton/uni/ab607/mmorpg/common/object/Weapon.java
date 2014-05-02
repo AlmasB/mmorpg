@@ -16,7 +16,6 @@ public class Weapon extends EquippableItem implements PseudoHTML {
      */
     private static final long serialVersionUID = 2639185454495196264L;
 
-    // TODO: do weapons have aspd reduction? or if 2 weapons are equipped ?
     public enum WeaponType {
         ONE_H_SWORD(2), ONE_H_AXE(2), DAGGER(1), SPEAR(3), MACE(2), ROD(5), SHIELD(0),   // 1H, shield only left-hand
         TWO_H_SWORD(2), TWO_H_AXE(2), KATAR(1), BOW(5);    // 2H
@@ -36,7 +35,7 @@ public class Weapon extends EquippableItem implements PseudoHTML {
             ItemLevel level, WeaponType type, int pureDamage, Element element, int runesMax, Rune... defaultRunes) {
         super(id, name, description, ssX, ssY, author, level, element, runesMax, defaultRunes);
         this.type = type;
-        this.range = type.range;    // TODO: if not necessary then get type and then range from type
+        this.range = type.range;
         this.pureDamage = pureDamage;
     }
 

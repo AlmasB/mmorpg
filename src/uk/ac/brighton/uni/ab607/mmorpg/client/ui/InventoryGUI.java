@@ -73,8 +73,6 @@ public class InventoryGUI extends GUI {
         setVisible(true);
     }
 
-    // also check if items themselves have changed ie rune or essence added maybe use PseudoHTML for checking ?
-    // TODO: check the exact items in inventory and perhaps player equip and then repaint if needed
     public void update(Player p) {
         if (player == null || !player.getInventory().toString().equals(p.getInventory().toString())
                 || !isSameEquip(p) || player.getMoney() != p.getMoney()) {

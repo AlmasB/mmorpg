@@ -28,8 +28,6 @@ public abstract class GameCharacter implements java.io.Serializable {
      */
     private int runtimeID = 0;
 
-    // TODO: add statuses
-    // TODO: private int x, y;
     public abstract int getX();
     public abstract int getY();
 
@@ -134,10 +132,6 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     protected ArrayList<Effect> effects = new ArrayList<Effect>();
 
-    // TODO: redesign how bonuses added
-    // maybe hp += flat + % + something else for example and added to a list
-
-    // TODO: add hp/sp regen maybe as stat?
     protected int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp
 
@@ -204,8 +198,6 @@ public abstract class GameCharacter implements java.io.Serializable {
         return stats[stat.ordinal()] + bStats[stat.ordinal()];
     }
 
-    //TODO find a way to track changes and auto update
-    //(optional) also only recalculate those stats attributes of which changed, not all
     /**
      * Character stats are directly affected by his attributes
      * Therefore any change in attributes must be followed by
@@ -333,7 +325,6 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public void addEffect(Effect e) {
         // we should do synchronized
-        //TODO: if same effect applied maybe go thru list and rebuff the effect
         synchronized (effects) {
             e.onBegin(this);
             effects.add(e);
@@ -445,8 +436,6 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         totalPhysicalDamage = elementalDamageModifier * physicalDamageAfterReduction;
 
-        // TODO: calculate magical damage when added
-
         totalDamage = totalPhysicalDamage + totalMagicalDamage;
         totalDamage = Math.max(totalDamage, 0);
 
@@ -456,7 +445,6 @@ public abstract class GameCharacter implements java.io.Serializable {
     }*/
 
     /**
-     * TODO: implement return value, which is mainly damage
      *
      *
      * @param skillCode
@@ -496,8 +484,6 @@ public abstract class GameCharacter implements java.io.Serializable {
                 + "PER: " + B + BLUE + attributes[PER] + FONT_END + "+" + GREEN + bAttributes[PER] + BFBR
                 + "LUC: " + B + BLUE + attributes[LUC] + FONT_END + "+" + GREEN + bAttributes[LUC] + FONT_END;
     }
-
-    //TODO: maybe move stats here ?
 
     @Override
     public String toString() {

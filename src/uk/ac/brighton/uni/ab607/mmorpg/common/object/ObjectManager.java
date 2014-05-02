@@ -247,7 +247,8 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 caster.addBonusStat(Stat.ATK, -value);
-                value = (int) (10*level * caster.getTotalStat(Stat.MAX_HP) / (caster.getHP() + 1)); // TODO: check for div 0
+                // div 0 shouldn't occur
+                value = (int) (10*level * caster.getTotalStat(Stat.MAX_HP) / (caster.getHP() + 1));
                 caster.addBonusStat(Stat.ATK, value);
             }
         });

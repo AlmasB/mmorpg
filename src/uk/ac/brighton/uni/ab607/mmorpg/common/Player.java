@@ -35,7 +35,6 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     private static final int[] EXP_NEEDED = new int[MAX_LEVEL];
 
-    //TODO: add exp for stat/job progression
     static {
         EXP_NEEDED[0] = EXP_NEEDED_BASE;
         for (int i = 1; i < EXP_NEEDED.length; i++) {
@@ -70,7 +69,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     public int frame = 0;
     public int place = 0;
 
-    public int sprite = 0;  // TODO: implement
+    public int sprite = 0;
 
     public enum Dir {
         UP, DOWN, LEFT, RIGHT

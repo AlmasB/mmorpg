@@ -2,7 +2,6 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 public class ID {
 
-    // TODO: possibly divide into headgear, boots, etc
     public class Armor {
         public static final String HAT = "5000";
         public static final String CLOTHES = "5001";
@@ -72,7 +71,6 @@ public class ID {
 
     }
 
-    // TODO: do we distinguish between different types of items?
     public class Item {
 
     }

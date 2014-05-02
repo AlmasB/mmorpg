@@ -109,7 +109,7 @@ public class GameServer {
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
     public GameServer() {
-        // TODO how to send maps to players i.e. where players are, map specs?
+
         initGameMap();
         initGameObjects();
         initAI();
@@ -130,12 +130,12 @@ public class GameServer {
         @Override
         public void parseClientPacket(DataPacket packet) {
             if (packet.stringData.startsWith("CREATE_PLAYER")) {
-                String name = packet.stringData.split(",")[1];    // TODO: exc check
+                String name = packet.stringData.split(",")[1];
                 addNewPlayer(name, STARTING_X, STARTING_Y);
             }
 
             if (packet.stringData.startsWith("CHECK_PLAYER")) {
-                String[] data = new String(packet.byteData).split(","); // TODO: exception check
+                String[] data = new String(packet.byteData).split(",");
 
                 String user = data[0];
                 String pass = data[1];
@@ -169,7 +169,7 @@ public class GameServer {
             }
 
             if (packet.stringData.startsWith("CLOSE")) {
-                closePlayerConnection(packet.stringData.split(",")[1]); //TODO: ex check
+                closePlayerConnection(packet.stringData.split(",")[1]);
             }
 
             if (packet.multipleObjectData instanceof String[]) {
@@ -201,7 +201,6 @@ public class GameServer {
          * No longer tracks the player but client
          * still receives updates at this point
          *
-         * TODO: don't send updates after method finishes
          * @param playerName
          *                  name of the player to disconnect
          */
@@ -219,7 +218,6 @@ public class GameServer {
      * Parses any actions requested by game client
      *
      * General format for "action" string
-     * TODO: to be reconsidered, check length? or ifs?
      *
      * "ACTION_NAME,PLAYER_NAME,VALUES..."
      *
@@ -316,7 +314,7 @@ public class GameServer {
                                     player.gainJobExperience(target.experience);
                                     player.gainStatExperience(target.experience);
                                     spawnChest(target.onDeath());
-                                    //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+
                                 }
                             }
 
@@ -325,14 +323,12 @@ public class GameServer {
                                 animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 target.atkTime = 0;
                                 if (player.getHP() <= 0) {
-                                    // TODO: implement player death
                                 }
                             }
                         }
                     }
                     break;
                 case SKILL_USE:
-                    // TODO: check range of skill or weapon
                     Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
                     if (skTarget != null) {
                         value--;    // bring 1..9 to 0..8
@@ -408,7 +404,7 @@ public class GameServer {
                 for (Enemy e : enemies) {
                     AgentBehaviour ai = e.AI;
                     for (AgentRule rule : aiRules) {
-                        // TODO add to list
+
                         if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
                             // disable AI
                             rule.execute(e, ai.currentTarget);
@@ -423,35 +419,6 @@ public class GameServer {
                     }
 
                     p.update();
-
-                    // TODO: optimize
-                    /*for (Enemy e : enemies) {
-                        if (e.AI.currentGoal == AgentGoal.GUARD_OBJECT
-                                && p.getX() == e.AI.currentTarget.getX()
-                                && p.getY() == e.AI.currentTarget.getY()) {
-                            e.AI.setGoal(AgentGoal.KILL_OBJECT);
-                            e.AI.setTarget(p);
-                        }
-
-                        if (e.AI.currentGoal == AgentGoal.FIND_OBJECT && e.canSee(p)) {
-                            locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
-                            e.AI.currentTarget = p;
-                        }
-
-                        if (e.AI.currentGoal == AgentGoal.KILL_OBJECT && e.AI.currentTarget == null
-                                && locationFacts.size() > 0) {
-                            e.AI.currentTarget = getLastKnownLocation();
-                        }
-
-                        if (e.AI.type == AgentType.SCOUT && p.getHP() / p.getTotalStat(Stat.MAX_HP) < 0.05) {
-                            e.AI.currentGoal = AgentGoal.KILL_OBJECT;
-                            e.AI.currentMode = AgentMode.AGGRESSIVE;
-                        }
-                        else {
-                            e.AI.currentGoal = AgentGoal.FIND_OBJECT;
-                            e.AI.currentMode = AgentMode.PASSIVE;
-                        }
-                    }*/
 
                     // player - chest interaction
                     for (Chest c : chests) {
@@ -824,7 +791,6 @@ public class GameServer {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
     }
 
-    // TODO: remove when super class GameObject added
     private int distanceBetween(GameCharacter ch, Chest c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
