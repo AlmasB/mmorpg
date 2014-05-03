@@ -407,7 +407,7 @@ public class GameServer {
 
                         if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
                             // disable AI
-                            rule.execute(e, ai.currentTarget);
+                            //rule.execute(e, ai.currentTarget);
                         }
                     }
                 }

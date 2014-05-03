@@ -121,12 +121,14 @@ public abstract class GameCharacter implements java.io.Serializable {
             CRIT_CHANCE = 10,
             MCRIT_CHANCE = 11,
             CRIT_DMG = 12,
-            MCRIT_DMG = 13;
+            MCRIT_DMG = 13,
+            HP_REGEN = 14,
+            SP_REGEN = 15;
 
     protected int[] attributes = new int[9];    // we have 9 attributes
     protected int[] bAttributes = new int[9];   // on top of native attributes, bonuses can be given we items
-    protected float[] stats = new float[14];        // 14 stats
-    protected float[] bStats = new float[14];       // bonus stats given by item
+    protected float[] stats = new float[16];        // 16 stats
+    protected float[] bStats = new float[16];       // bonus stats given by item
 
     protected Skill[] skills;
 
@@ -247,6 +249,9 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         stats[CRIT_DMG]  = 2 + luck*0.01f;
         stats[MCRIT_DMG] = 2 + luck*0.01f;
+
+        stats[HP_REGEN] = 1 + vitality * MODIFIER_VERY_LOW;
+        stats[SP_REGEN] = 2 + wisdom * MODIFIER_VERY_LOW;
     }
 
     /**
@@ -344,7 +349,20 @@ public abstract class GameCharacter implements java.io.Serializable {
         }
     }
 
+    protected float regenTick = 0.0f;
+
     public void update() {
+        // HP/SP regen
+        regenTick += 0.05f;
+
+        if (regenTick >= 2.0f) {    // 2 secs
+            hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
+            sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            regenTick = 0.0f;
+        }
+
+        // skill cooldowns
+
         for (Skill sk : skills) {
             if (sk.active) {
                 if (sk.getCurrentCooldown() > 0) {
