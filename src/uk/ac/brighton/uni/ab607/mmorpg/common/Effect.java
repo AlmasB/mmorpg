@@ -12,7 +12,7 @@ public class Effect implements java.io.Serializable {
     private Rune[] runes;   // attribute bonuses
     private Essence[] essences; // stat bonuses
 
-    private float duration = 0.0f;
+    private float duration;
 
     public Effect(float duration, Rune[] runes, Essence[] essences) {
         this.duration = duration;

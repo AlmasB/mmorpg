@@ -36,7 +36,7 @@ public class Desc {
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
 
         // WARRIOR SKILL SET
-        public static final String BASH = "A powerful physical attack";
+        public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
         public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
         public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
         public static final String ROAR = "Increases STR and VIT for the duration";

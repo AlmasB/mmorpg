@@ -5,6 +5,7 @@ import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
@@ -132,6 +133,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     protected Skill[] skills;
 
+    private ArrayList<StatusEffect> statuses = new ArrayList<StatusEffect>();
     protected ArrayList<Effect> effects = new ArrayList<Effect>();
 
     protected int baseLevel = 1,
@@ -304,6 +306,18 @@ public abstract class GameCharacter implements java.io.Serializable {
         return sp;
     }
 
+    public boolean hasStatusEffect(Status status) {
+        synchronized (statuses) {
+            for (StatusEffect e : statuses) {
+                if (e.getStatus() == status) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      *
      * @return
@@ -337,6 +351,12 @@ public abstract class GameCharacter implements java.io.Serializable {
         }
     }
 
+    public void addStatusEffect(StatusEffect e) {
+        synchronized (statuses) {
+            statuses.add(e);
+        }
+    }
+
     protected void updateEffects() {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
@@ -345,6 +365,16 @@ public abstract class GameCharacter implements java.io.Serializable {
                 e.onEnd(this);
                 it.remove();
                 calculateStats();
+            }
+        }
+    }
+
+    private void updateStatusEffects() {
+        for (Iterator<StatusEffect> it = statuses.iterator(); it.hasNext(); ) {
+            StatusEffect e = it.next();
+            e.reduceDuration(0.05f);
+            if (e.getDuration() <= 0) {
+                it.remove();
             }
         }
     }
@@ -377,6 +407,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         // check buffs
         updateEffects();
+        updateStatusEffects();
     }
 
     /**

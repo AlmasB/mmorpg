@@ -4,10 +4,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
@@ -268,6 +271,7 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = (1 + (15 + 5*level) / 100.0f) * caster.getTotalStat(Stat.ATK);
                 caster.dealPhysicalDamage(target, dmg);
+                target.addStatusEffect(new StatusEffect(Status.STUNNED, 5.0f));
             }
         });
 

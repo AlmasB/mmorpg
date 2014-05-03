@@ -16,6 +16,7 @@ import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
@@ -297,6 +298,9 @@ public class GameServer {
                     moveObject(player, value, value2);
                     break;
                 case ATTACK:
+                    if (player.hasStatusEffect(Status.STUNNED))
+                        break;
+
                     // at this stage client can only target enemies
                     // when players are added this check will go
                     GameCharacter tmpChar = getGameCharacterByRuntimeID(value);
@@ -318,7 +322,8 @@ public class GameServer {
                                 }
                             }
 
-                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
+                                    && !target.hasStatusEffect(Status.STUNNED)) {
                                 int dmg = target.attack(player);
                                 animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 target.atkTime = 0;
@@ -410,6 +415,7 @@ public class GameServer {
                             //rule.execute(e, ai.currentTarget);
                         }
                     }
+                    e.update();
                 }
 
                 // process players
