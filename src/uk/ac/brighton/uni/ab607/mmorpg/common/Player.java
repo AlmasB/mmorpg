@@ -259,6 +259,16 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         if (isFree(itemPlace) || inventory.isFull())
             return; // no item at this place
 
+        if (equip[itemPlace] instanceof Weapon) {
+            Weapon w = (Weapon) equip[itemPlace];
+            if (w.type.ordinal() >= WeaponType.TWO_H_SWORD.ordinal()) { // if 2 handed
+                if (itemPlace == RIGHT_HAND)
+                    equip[LEFT_HAND]  = ObjectManager.getWeaponByID(ID.Weapon.HANDS);
+                else
+                    equip[RIGHT_HAND] = ObjectManager.getWeaponByID(ID.Weapon.HANDS);
+            }
+        }
+
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
         equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
