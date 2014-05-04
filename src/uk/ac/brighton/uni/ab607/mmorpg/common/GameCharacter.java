@@ -137,7 +137,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     /**
      *
      * @param stat
-     *              one of the constants for stat, MAX_HP = 0, MCRIT = 11
+     *              one of the constants for stat, MAX_HP = 0, SP_REGEN = 15
      * @return
      *          total value for stat, including bonuses
      */

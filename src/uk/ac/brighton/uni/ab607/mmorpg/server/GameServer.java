@@ -406,16 +406,20 @@ public class GameServer {
                 }
 
                 // process AI
-                for (Enemy e : enemies) {
-                    AgentBehaviour ai = e.AI;
-                    for (AgentRule rule : aiRules) {
-
-                        if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
-                            // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
+                    Enemy e = it.next();
+                    if (e.isAlive()) {
+                        AgentBehaviour ai = e.AI;
+                        for (AgentRule rule : aiRules) {
+                            if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
+                                rule.execute(e, ai.currentTarget);
+                            }
                         }
+                        e.update();
                     }
-                    e.update();
+                    else {
+                        it.remove();
+                    }
                 }
 
                 // process players
@@ -427,12 +431,18 @@ public class GameServer {
                     p.update();
 
                     // player - chest interaction
-                    for (Chest c : chests) {
-                        if (distanceBetween(p, c) < 1) {
-                            c.open();
-                            for (GameItem item : c.getItems())
-                                p.getInventory().addItem(item);
-                            p.incMoney(c.money);
+                    for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
+                        Chest c = it.next();
+                        if (c.isOpened()) {
+                            it.remove();
+                        }
+                        else {
+                            if (distanceBetween(p, c) < 1) {
+                                c.open();
+                                for (GameItem item : c.getItems())
+                                    p.getInventory().addItem(item);
+                                p.incMoney(c.money);
+                            }
                         }
                     }
                 }
@@ -444,20 +454,6 @@ public class GameServer {
                     pairs.setValue((float) (pairs.getValue() - 0.01));
                     if (pairs.getValue() < 0)
                         iter.remove();
-                }
-
-                // clean chests, can be optimized by enclosing within player loop
-                for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
-                    if (it.next().isOpened()) {
-                        it.remove();
-                    }
-                }
-
-                // clean enemies
-                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
-                    if (!it.next().isAlive()) {
-                        it.remove();
-                    }
                 }
 
                 // all objects to send
