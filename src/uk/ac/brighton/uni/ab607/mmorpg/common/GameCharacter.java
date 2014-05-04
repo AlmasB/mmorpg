@@ -11,7 +11,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public abstract class GameCharacter implements java.io.Serializable {
-
     /**
      *
      */
@@ -28,58 +27,6 @@ public abstract class GameCharacter implements java.io.Serializable {
      * ID of the object in 1 instance of the game
      */
     private int runtimeID = 0;
-
-    public abstract int getX();
-    public abstract int getY();
-
-    protected int x, y;
-
-    public int xSpeed, ySpeed;
-
-    public int frame = 0;
-    public int place = 0;
-
-    public int sprite = 0;
-
-    public enum Dir {
-        UP, DOWN, LEFT, RIGHT
-    }
-
-    public Dir direction = Dir.DOWN;
-
-    private int factor = 3;
-
-    public void move() {
-        x += xSpeed;
-        y += ySpeed;
-
-        if (xSpeed > 0)
-            direction = Dir.RIGHT;
-        if (xSpeed < 0)
-            direction = Dir.LEFT;
-        if (ySpeed > 0)
-            direction = Dir.DOWN;
-        if (ySpeed < 0)
-            direction = Dir.UP;
-
-        frame++;
-
-        if (frame == 4 * factor)
-            frame = 0;
-
-        if (frame /factor == 0 || frame/factor == 2)
-            place = 0;
-        if (frame/factor == 1)
-            place = 1;
-        if (frame/factor == 3)
-            place = 2;
-    }
-
-    public int getRow() {
-        return direction.ordinal();
-    }
-
-    // TEST
 
     /**
      * How attributes modify stats
@@ -99,7 +46,7 @@ public abstract class GameCharacter implements java.io.Serializable {
      * Note: the order is based on the order of attributes in
      * {@code Attribute} and {@code Stat} enums, so they have to match
      */
-    public static final int STR = 0,
+    public static final int STR = 0,    // ATTRIBUTES
             VIT = 1,
             DEX = 2,
             AGI = 3,
@@ -134,7 +81,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     protected Skill[] skills;
 
     private ArrayList<StatusEffect> statuses = new ArrayList<StatusEffect>();
-    protected ArrayList<Effect> effects = new ArrayList<Effect>();
+    private ArrayList<Effect> effects = new ArrayList<Effect>();
 
     protected int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp
@@ -306,6 +253,13 @@ public abstract class GameCharacter implements java.io.Serializable {
         return sp;
     }
 
+    /**
+     *
+     * @param status
+     * @return
+     *          true if character is under "@param status" status effect
+     *          false otherwise
+     */
     public boolean hasStatusEffect(Status status) {
         synchronized (statuses) {
             for (StatusEffect e : statuses) {
@@ -412,6 +366,7 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     /**
      * Performs basic attack with equipped weapon
+     * Damage is physical and element depends on weapon element
      *
      * @param target
      *               target being attacked
@@ -445,10 +400,30 @@ public abstract class GameCharacter implements java.io.Serializable {
         return totalDamage;
     }
 
+    /**
+     * Deals physical damage of type NEUTRAL to target.
+     * The damage is reduced by target's armor and DEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealPhysicalDamage(GameCharacter target, float baseDamage) {
         return dealPhysicalDamage(target, baseDamage, Element.NEUTRAL);
     }
 
+    /**
+     * Deal magical damage of type param element to target. The damage is reduced by target's
+     * magical armor and MDEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealMagicalDamage(GameCharacter target, float baseDamage, Element element) {
         if (GameMath.checkChance(getTotalStat(MCRIT_CHANCE))) {
             baseDamage *= getTotalStat(MCRIT_DMG);
@@ -463,35 +438,30 @@ public abstract class GameCharacter implements java.io.Serializable {
         return totalDamage;
     }
 
+    /**
+     * Deal magical damage of type NEUTRAL to target. The damage is reduced by target's
+     * magical armor and MDEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealMagicalDamage(GameCharacter target, float baseDamage) {
         return dealMagicalDamage(target, baseDamage, Element.NEUTRAL);
     }
 
+    /**
+     * Deals the exact amount of damage to target as specified by
+     * param dmg
+     *
+     * @param target
+     * @param dmg
+     */
     public void dealPureDamage(GameCharacter target, float dmg) {
         target.hp -= dmg;
     }
-
-    /*public int dealDamage(GameCharacter target) {
-        float totalDamage = 0.0f, totalPhysicalDamage = 0.0f, totalMagicalDamage = 0.0f;   // there's no magical dmg yet
-        float elementalDamageModifier = getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
-
-        float basePhysicalDamage = getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel);
-
-        if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
-            basePhysicalDamage *= getTotalStat(CRIT_DMG);
-        }
-
-        float physicalDamageAfterReduction = (100 - target.getTotalStat(ARM)) * basePhysicalDamage / 100.0f - target.getTotalStat(DEF);
-
-        totalPhysicalDamage = elementalDamageModifier * physicalDamageAfterReduction;
-
-        totalDamage = totalPhysicalDamage + totalMagicalDamage;
-        totalDamage = Math.max(totalDamage, 0);
-
-        target.hp -= Math.round(totalDamage);
-
-        return Math.round(totalDamage);
-    }*/
 
     /**
      *
@@ -544,5 +514,59 @@ public abstract class GameCharacter implements java.io.Serializable {
                 && ch.getX() <= getX() + 240
                 && ch.getY() >= getY() - 240
                 && ch.getY() <= getY() + 240;
+    }
+
+    // For Drawing/Moving screen stuff
+    protected int x, y;
+
+    public int xSpeed, ySpeed;
+
+    public int frame = 0;
+    public int place = 0;
+    public int sprite = 0;
+    private int factor = 3;
+
+    public enum Dir {
+        UP, DOWN, LEFT, RIGHT
+    }
+
+    public Dir direction = Dir.DOWN;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void move() {
+        x += xSpeed;
+        y += ySpeed;
+
+        if (xSpeed > 0)
+            direction = Dir.RIGHT;
+        if (xSpeed < 0)
+            direction = Dir.LEFT;
+        if (ySpeed > 0)
+            direction = Dir.DOWN;
+        if (ySpeed < 0)
+            direction = Dir.UP;
+
+        frame++;
+
+        if (frame == 4 * factor)
+            frame = 0;
+
+        if (frame /factor == 0 || frame/factor == 2)
+            place = 0;
+        if (frame/factor == 1)
+            place = 1;
+        if (frame/factor == 3)
+            place = 2;
+    }
+
+    public int getRow() {
+        return direction.ordinal();
     }
 }
