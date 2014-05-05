@@ -478,13 +478,13 @@ public class GameGUI extends GUI {
         }
     }
 
-    public Player getPlayer() {
+    /*public Player getPlayer() {
         return player;
     }
 
     public Player getCurrentPlayer() {
         return currentPlayer;
-    }
+    }*/
 
     private void checkRuntimeID() {
         for (Enemy e : tmpEnemies) {

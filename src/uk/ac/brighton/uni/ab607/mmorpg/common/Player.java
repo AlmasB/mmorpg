@@ -298,6 +298,10 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         return getEquip(BODY).getElement();
     }
 
+    public void onDeath() {
+        alive = false;
+    }
+
     /*
     @Override
     public boolean equals(Object o) {

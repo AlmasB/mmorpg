@@ -328,6 +328,9 @@ public class GameServer {
                                 animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 target.atkTime = 0;
                                 if (player.getHP() <= 0) {
+                                    //player.onDeath();
+                                    player.setX(STARTING_X);
+                                    player.setY(STARTING_Y);
                                 }
                             }
                         }
@@ -412,7 +415,7 @@ public class GameServer {
                         AgentBehaviour ai = e.AI;
                         for (AgentRule rule : aiRules) {
                             if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
-                                rule.execute(e, ai.currentTarget);
+                                //rule.execute(e, ai.currentTarget);
                             }
                         }
                         e.update();
