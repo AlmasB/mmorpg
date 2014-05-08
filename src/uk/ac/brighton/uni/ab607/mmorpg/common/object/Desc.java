@@ -24,6 +24,7 @@ public class Desc {
     }
 
     public class Skill {
+        /*
         public static final String HEAL = "Restores HP to target";
         public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
         public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
@@ -33,7 +34,7 @@ public class Desc {
                 + "Target's defense is not ignored. "
                 + "Damage is based on caster's DEX";
         public static final String CLAUDIUS = "Increases VIT, WIS, LUC. Decreases INT";
-        public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
+        public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";*/
 
         public class Warrior {
             public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";

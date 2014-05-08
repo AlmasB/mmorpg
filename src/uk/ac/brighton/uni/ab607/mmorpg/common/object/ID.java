@@ -25,13 +25,18 @@ public class ID {
     }
 
     public class Skill {
+        /* UNSORTED
         public static final String HEAL = "7000";
         public static final String MANA_BURN = "7001";
         public static final String FINAL_STRIKE = "7002";
         public static final String PIERCING_TOUCH = "7003";
         public static final String BULLSEYE = "7004";
         public static final String CLAUDIUS = "7005";
-        public static final String FIVE_FINGER_DEATH_PUNCH = "7006";
+        public static final String FIVE_FINGER_DEATH_PUNCH = "7006";*/
+
+        public class Novice {
+
+        }
 
         public class Warrior {
             public static final String BASH = "7010";

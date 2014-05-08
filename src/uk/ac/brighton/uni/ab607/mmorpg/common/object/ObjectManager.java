@@ -96,10 +96,7 @@ public class ObjectManager {
 
         // SKILLS
 
-        addSkill(new Skill(ID.Skill.HEAL, "Heal", Desc.Skill.HEAL, true, 10.0f) {
-            /**
-             *
-             */
+        /*addSkill(new Skill(ID.Skill.HEAL, "Heal", Desc.Skill.HEAL, true, 10.0f) {
             private static final long serialVersionUID = 1379897406205500901L;
 
             @Override
@@ -114,9 +111,6 @@ public class ObjectManager {
         });
 
         addSkill(new Skill(ID.Skill.MANA_BURN, "Mana Burn", Desc.Skill.MANA_BURN, true, 10.0f) {
-            /**
-             *
-             */
             private static final long serialVersionUID = 7719535667188968500L;
 
             @Override
@@ -133,9 +127,6 @@ public class ObjectManager {
         });
 
         addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
-            /**
-             *
-             */
             private static final long serialVersionUID = 2091028246707933529L;
 
             @Override
@@ -156,9 +147,6 @@ public class ObjectManager {
 
         // PIERCING TOUCH
         addSkill(new Skill(ID.Skill.PIERCING_TOUCH, "Piercing Touch", Desc.Skill.PIERCING_TOUCH, true, 9.0f) {
-            /**
-             *
-             */
             private static final long serialVersionUID = 1513947512801417510L;
 
             @Override
@@ -175,9 +163,6 @@ public class ObjectManager {
 
         // BULLSEYE
         addSkill(new Skill(ID.Skill.BULLSEYE, "Bullseye", Desc.Skill.BULLSEYE, true, 60.0f) {
-            /**
-             *
-             */
             private static final long serialVersionUID = 6923525936384357867L;
 
             @Override
@@ -194,9 +179,6 @@ public class ObjectManager {
 
         // CLAUDIUS
         addSkill(new Skill(ID.Skill.CLAUDIUS, "Claudius", Desc.Skill.CLAUDIUS, true, 30.0f) {
-            /**
-             *
-             */
             private static final long serialVersionUID = 5612472865672733186L;
 
             @Override
@@ -216,10 +198,6 @@ public class ObjectManager {
         // Five finger death punch
         addSkill(new Skill(ID.Skill.FIVE_FINGER_DEATH_PUNCH, "Five Finger Death Punch", Desc.Skill.FIVE_FINGER_DEATH_PUNCH,
                 true, 30.0f) {
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 168758926959802026L;
 
             @Override
@@ -232,7 +210,7 @@ public class ObjectManager {
                 float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
                 caster.dealPhysicalDamage(target, dmg);
             }
-        });
+        });*/
 
         addSkill(new Skill(ID.Skill.Warrior.BLOODLUST, "Bloodlust", Desc.Skill.Warrior.BLOODLUST, false, 0.0f) {
             /**
