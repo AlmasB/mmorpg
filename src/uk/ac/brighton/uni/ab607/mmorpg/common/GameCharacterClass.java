@@ -6,10 +6,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public enum GameCharacterClass {
     MONSTER(50, 50),
-    NOVICE(10, 10, ID.Skill.Warrior.MIGHTY_SWING, ID.Skill.Warrior.DOUBLE_EDGE, ID.Skill.Warrior.LAST_STAND, ID.Skill.Warrior.ROAR, ID.Skill.Warrior.SHATTER_ARMOR, ID.Skill.Warrior.WARRIOR_HEART, ID.Skill.Warrior.ARMOR_MASTERY, ID.Skill.Warrior.BLOODLUST, ID.Skill.Warrior.BASH),
-    WARRIOR(100, 20),
-    SCOUT(75, 55),
-    MAGE(55, 100, ID.Skill.HEAL);
+    NOVICE(10, 10),
+    WARRIOR(100, 20, ID.Skill.Warrior.MIGHTY_SWING, ID.Skill.Warrior.DOUBLE_EDGE, ID.Skill.Warrior.LAST_STAND, ID.Skill.Warrior.ROAR, ID.Skill.Warrior.SHATTER_ARMOR, ID.Skill.Warrior.WARRIOR_HEART, ID.Skill.Warrior.ARMOR_MASTERY, ID.Skill.Warrior.BLOODLUST, ID.Skill.Warrior.BASH),
+    SCOUT(75, 55, ID.Skill.Scout.CRITICAL_STRIKE, ID.Skill.Scout.DOUBLE_STRIKE, ID.Skill.Scout.EXPERIENCED_FIGHTER, ID.Skill.Scout.PINPOINT_WEAKNESS, ID.Skill.Scout.POISON_ATTACK, ID.Skill.Scout.SHAMELESS, ID.Skill.Scout.THROW_DAGGER, ID.Skill.Scout.TRIPLE_STRIKE, ID.Skill.Scout.WEAPON_MASTERY),
+    MAGE(55, 100, ID.Skill.Mage.AIR_SPEAR, ID.Skill.Mage.AMPLIFY_MAGIC, ID.Skill.Mage.ASTRAL_PROTECTION, ID.Skill.Mage.EARTH_BOULDER, ID.Skill.Mage.FIREBALL, ID.Skill.Mage.ICE_SHARD, ID.Skill.Mage.MAGIC_MASTERY, ID.Skill.Mage.MAGIC_SHIELD, ID.Skill.Mage.MENTAL_STRIKE);
 
     public final int hp;
     public final int sp;
