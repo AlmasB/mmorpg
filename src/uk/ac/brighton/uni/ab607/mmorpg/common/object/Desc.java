@@ -46,7 +46,6 @@ public class Desc {
         public static final String ARMOR_MASTERY = "Increases armor rating";
         public static final String BLOODLUST = "Increases ATK based on the missing % HP";
 
-        // MAGE CLASS
         public class Mage {
             public static final String FIREBALL = "Deals magic damage with fire element";
             public static final String ICE_SHARD = "Deals magic damage with water element";
@@ -57,6 +56,18 @@ public class Desc {
             public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
             public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
             public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
+        }
+
+        public class Scout {
+            public static final String PINPOINT_WEAKNESS = "Decreases target's armor rating for the duration";
+            public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
+            public static final String TRIPLE_STRIKE = "Quickly performs three attacks. Deals more damage if target is stunned";
+            public static final String THROW_DAGGER = "Throws a dagger dealing physical damage with a chance to poison the target";
+            public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
+            public static final String POISON_ATTACK = "Attacks the target with high chance to poison him";
+            public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
+            public static final String WEAPON_MASTERY = "Passively increases ATK";
+            public static final String EXPERIENCED_FIGHTER = "Passively increases AGI and DEX";
         }
     }
 

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -599,6 +600,204 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) * (1 + level*0.1f);
                 caster.dealPureDamage(target, dmg);
+            }
+        });
+
+        // SCOUT SKILL SET
+
+        addSkill(new Skill(ID.Skill.Scout.CRITICAL_STRIKE, "Critical Strike", Desc.Skill.Scout.CRITICAL_STRIKE, true, 20.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -7584376145233708322L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level * 2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.ATK) + 15 + 5 * level;
+                caster.addBonusStat(Stat.CRIT_CHANCE, 50 + level * 3);
+                caster.dealPhysicalDamage(target, dmg);
+                caster.addBonusStat(Stat.CRIT_CHANCE, -(50 + level * 3));
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.PINPOINT_WEAKNESS, "Pinpoint Weakness", Desc.Skill.Scout.PINPOINT_WEAKNESS, true, 15.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 2458408699758838323L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level * 2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                target.addEffect(new Effect((10.0f),
+                        new Rune[] {},
+                        new Essence[] {
+                        new Essence(Stat.ARM, -2*level)
+                }
+                        ));
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.DOUBLE_STRIKE, "Double Strike", Desc.Skill.Scout.DOUBLE_STRIKE, true, 8.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5685022402103377679L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level * 2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.attack(target);
+                caster.attack(target);
+                if (GameMath.checkChance(level*5)) {
+                    target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
+                }
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.EXPERIENCED_FIGHTER, "Experienced Fighter", Desc.Skill.Scout.EXPERIENCED_FIGHTER, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 2024648263069876L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusAttribute(Attribute.AGILITY, -value);
+                caster.addBonusAttribute(Attribute.DEXTERITY, -value);
+                value = level * 2;
+                caster.addBonusAttribute(Attribute.AGILITY, value);
+                caster.addBonusAttribute(Attribute.DEXTERITY, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.SHAMELESS, "Shameless", Desc.Skill.Scout.SHAMELESS, true, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 2306928037030551618L;
+
+            @Override
+            public int getManaCost() {
+                return 10;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.ATK);
+                float casterHPFactor = caster.getHP() / caster.getTotalStat(Stat.MAX_HP);
+                float targetHPFactor = target.getHP() / target.getTotalStat(Stat.MAX_HP);
+                if (casterHPFactor > targetHPFactor) {
+                    dmg += level * 0.1f * (casterHPFactor - targetHPFactor) * dmg;
+                }
+
+                caster.dealPhysicalDamage(target, dmg);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.WEAPON_MASTERY, "Weapon Mastery", Desc.Skill.Scout.WEAPON_MASTERY, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -6762381875332894326L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.ATK, -value);
+                value = level * 7;
+                caster.addBonusStat(Stat.ATK, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.POISON_ATTACK, "Poison Attack", Desc.Skill.Scout.POISON_ATTACK, true, 30.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 6791451275759000638L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.attack(target);
+                if (GameMath.checkChance(level*7)) {
+                    target.addStatusEffect(new StatusEffect(Status.POISONED, 10.0f));
+                }
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.THROW_DAGGER, "Throw Dagger", Desc.Skill.Scout.THROW_DAGGER, true, 20.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1031700846462374399L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level*2;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.ATK) + level * 20;
+                caster.dealPhysicalDamage(target, dmg);
+                if (GameMath.checkChance(level*2.5f)) {
+                    target.addStatusEffect(new StatusEffect(Status.POISONED, 5.0f));
+                }
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Scout.TRIPLE_STRIKE, "Triple Strike", Desc.Skill.Scout.TRIPLE_STRIKE, true, 40.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 8295208480454374043L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.ATK);
+                if (target.hasStatusEffect(Status.STUNNED)) {
+                    dmg += level * 15;
+                }
+
+                caster.dealPhysicalDamage(target, dmg);
+                caster.dealPhysicalDamage(target, dmg);
+                caster.dealPhysicalDamage(target, dmg);
             }
         });
 

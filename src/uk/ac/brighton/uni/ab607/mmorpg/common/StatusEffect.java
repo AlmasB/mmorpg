@@ -8,7 +8,7 @@ public class StatusEffect implements java.io.Serializable {
     private static final long serialVersionUID = 480489685432710301L;
 
     public enum Status {
-        NORMAL, STUNNED, SILENCED
+        NORMAL, STUNNED, SILENCED, POISONED
     }
 
     private float duration;

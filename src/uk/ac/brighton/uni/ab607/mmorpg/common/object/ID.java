@@ -56,6 +56,17 @@ public class ID {
             public static final String ASTRAL_PROTECTION = "7028";
         }
 
+        public class Scout {
+            public static final String PINPOINT_WEAKNESS = "7030";
+            public static final String DOUBLE_STRIKE = "7031";
+            public static final String TRIPLE_STRIKE = "7032";
+            public static final String THROW_DAGGER = "7033";
+            public static final String CRITICAL_STRIKE = "7034";
+            public static final String POISON_ATTACK = "7035";
+            public static final String SHAMELESS = "7036";
+            public static final String WEAPON_MASTERY = "7037";
+            public static final String EXPERIENCED_FIGHTER = "7038";
+        }
     }
 
     public class Weapon {
