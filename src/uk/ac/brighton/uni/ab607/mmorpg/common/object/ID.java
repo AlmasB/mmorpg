@@ -33,16 +33,17 @@ public class ID {
         public static final String CLAUDIUS = "7005";
         public static final String FIVE_FINGER_DEATH_PUNCH = "7006";
 
-        // WARRIOR CLASS
-        public static final String BASH = "7010";
-        public static final String MIGHTY_SWING = "7011";
-        public static final String DOUBLE_EDGE = "7012";
-        public static final String ROAR = "7013";
-        public static final String SHATTER_ARMOR = "7014";
-        public static final String LAST_STAND = "7015";
-        public static final String WARRIOR_HEART = "7016";
-        public static final String ARMOR_MASTERY = "7017";
-        public static final String BLOODLUST = "7018";
+        public class Warrior {
+            public static final String BASH = "7010";
+            public static final String MIGHTY_SWING = "7011";
+            public static final String DOUBLE_EDGE = "7012";
+            public static final String ROAR = "7013";
+            public static final String SHATTER_ARMOR = "7014";
+            public static final String LAST_STAND = "7015";
+            public static final String WARRIOR_HEART = "7016";
+            public static final String ARMOR_MASTERY = "7017";
+            public static final String BLOODLUST = "7018";
+        }
 
         public class Mage {
             public static final String FIREBALL = "7020";

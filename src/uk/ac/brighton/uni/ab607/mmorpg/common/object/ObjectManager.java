@@ -234,7 +234,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.BLOODLUST, "Bloodlust", Desc.Skill.BLOODLUST, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.BLOODLUST, "Bloodlust", Desc.Skill.Warrior.BLOODLUST, false, 0.0f) {
             /**
              *
              */
@@ -256,7 +256,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.BASH, "Bash", Desc.Skill.BASH, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.BASH, "Bash", Desc.Skill.Warrior.BASH, true, 15.0f) {
             /**
              *
              */
@@ -275,7 +275,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.MIGHTY_SWING, "Mighty Swing", Desc.Skill.MIGHTY_SWING, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.MIGHTY_SWING, "Mighty Swing", Desc.Skill.Warrior.MIGHTY_SWING, true, 15.0f) {
             /**
              *
              */
@@ -294,7 +294,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.DOUBLE_EDGE, "Double Edge", Desc.Skill.DOUBLE_EDGE, true, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.DOUBLE_EDGE, "Double Edge", Desc.Skill.Warrior.DOUBLE_EDGE, true, 0.0f) {
             /**
              *
              */
@@ -313,7 +313,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.ROAR, "Roar", Desc.Skill.ROAR, true, 5.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.ROAR, "Roar", Desc.Skill.Warrior.ROAR, true, 5.0f) {
             /**
              *
              */
@@ -336,7 +336,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.LAST_STAND, "Last Stand", Desc.Skill.LAST_STAND, true, 60.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.LAST_STAND, "Last Stand", Desc.Skill.Warrior.LAST_STAND, true, 60.0f) {
             /**
              *
              */
@@ -358,7 +358,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.SHATTER_ARMOR, true, 30.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Warrior.SHATTER_ARMOR, true, 30.0f) {
             /**
              *
              */
@@ -380,7 +380,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.ARMOR_MASTERY, "Armor Mastery", Desc.Skill.ARMOR_MASTERY, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.ARMOR_MASTERY, "Armor Mastery", Desc.Skill.Warrior.ARMOR_MASTERY, false, 0.0f) {
             /**
              *
              */
@@ -401,7 +401,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.WARRIOR_HEART, "Heart of a warrior", Desc.Skill.WARRIOR_HEART, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.WARRIOR_HEART, "Heart of a warrior", Desc.Skill.Warrior.WARRIOR_HEART, false, 0.0f) {
             /**
              *
              */
