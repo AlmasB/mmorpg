@@ -362,6 +362,20 @@ public abstract class GameCharacter implements java.io.Serializable {
         // check buffs
         updateEffects();
         updateStatusEffects();
+
+        calculateStats();
+    }
+
+    /**
+     * Change this characters game class to @param cl
+     *
+     * @param cl
+     *          game character class to change to
+     */
+    public void changeClass(GameCharacterClass cl) {
+        this.charClass = cl;
+        this.skills = cl.skills;
+        calculateStats();
     }
 
     /**
