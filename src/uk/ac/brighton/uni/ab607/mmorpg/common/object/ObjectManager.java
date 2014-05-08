@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -419,6 +418,187 @@ public class ObjectManager {
                 caster.addBonusStat(Stat.MAX_HP, -value);
                 value = Math.round(0.025f * level * caster.getBaseStat(Stat.MAX_HP));
                 caster.addBonusStat(Stat.MAX_HP, value);
+            }
+        });
+
+        // MAGE SKILL SET
+
+        addSkill(new Skill(ID.Skill.Mage.AIR_SPEAR, "Air Spear", Desc.Skill.Mage.AIR_SPEAR, true, 9.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 6306777256266732648L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) + level *20;
+                caster.dealMagicalDamage(target, dmg, Element.AIR);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.AMPLIFY_MAGIC, "Amplify Magic", Desc.Skill.Mage.AMPLIFY_MAGIC, true, 30.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -6423702278665617928L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect((15.0f),
+                        new Rune[] {},
+                        new Essence[] {
+                        new Essence(Stat.MATK, 10*level)
+                }
+                        ));
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Mage.ASTRAL_PROTECTION, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 8691650266711866295L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.MDEF, -value);
+                value = level * 2;
+                caster.addBonusStat(Stat.MDEF, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.EARTH_BOULDER, "Earth Boulder", Desc.Skill.Mage.EARTH_BOULDER, true, 15.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1871962939560471153L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) + level *25;
+                caster.dealMagicalDamage(target, dmg, Element.EARTH);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.FIREBALL, "Fireball", Desc.Skill.Mage.FIREBALL, true, 9.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -1839096679550971399L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) + level *20;
+                caster.dealMagicalDamage(target, dmg, Element.FIRE);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.ICE_SHARD, "Ice Shard", Desc.Skill.Mage.ICE_SHARD, true, 9.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5561489415884518543L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) + level *20;
+                caster.dealMagicalDamage(target, dmg, Element.WATER);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.MAGIC_MASTERY, "Magic Mastery", Desc.Skill.Mage.MAGIC_MASTERY, false, 0.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 9020149732268399438L;
+
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusAttribute(Attribute.INTELLECT, -value);
+                caster.addBonusAttribute(Attribute.WILLPOWER, -value);
+                value = level * 2;
+                caster.addBonusAttribute(Attribute.INTELLECT, value);
+                caster.addBonusAttribute(Attribute.WILLPOWER, value);
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.MAGIC_SHIELD, "Magic Shield", Desc.Skill.Mage.MAGIC_SHIELD, true, 60.0f) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 7104420977798092420L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect((25.0f),
+                        new Rune[] {},
+                        new Essence[] {
+                        new Essence(Stat.ARM, 5*level)
+                }
+                        ));
+            }
+        });
+
+        addSkill(new Skill(ID.Skill.Mage.MENTAL_STRIKE, "Mental Strike", Desc.Skill.Mage.MENTAL_STRIKE, true, 20.0f) {
+
+            /**
+             *
+             */
+            private static final long serialVersionUID = -55046003688618764L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 5;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) * (1 + level*0.1f);
+                caster.dealPureDamage(target, dmg);
             }
         });
 

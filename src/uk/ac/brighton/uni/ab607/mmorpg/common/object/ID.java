@@ -43,6 +43,19 @@ public class ID {
         public static final String WARRIOR_HEART = "7016";
         public static final String ARMOR_MASTERY = "7017";
         public static final String BLOODLUST = "7018";
+
+        public class Mage {
+            public static final String FIREBALL = "7020";
+            public static final String ICE_SHARD = "7021";
+            public static final String AIR_SPEAR = "7022";
+            public static final String EARTH_BOULDER = "7023";
+            public static final String MENTAL_STRIKE = "7024";
+            public static final String AMPLIFY_MAGIC = "7025";
+            public static final String MAGIC_SHIELD = "7026";
+            public static final String MAGIC_MASTERY = "7027";
+            public static final String ASTRAL_PROTECTION = "7028";
+        }
+
     }
 
     public class Weapon {
