@@ -10,7 +10,7 @@ public class Animation implements java.io.Serializable {
     public float duration;
     public final int ssX, ssY;
 
-    public String data = "";    // TODO: this is a hack, find a better way
+    public String data = "";
 
     public Animation(int x, int y, float duration, int ssX, int ssY, String data) {
         this.x = x;

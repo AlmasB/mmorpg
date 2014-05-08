@@ -16,12 +16,11 @@ import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoal;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentType;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.EnemyAgent;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -111,7 +110,7 @@ public class GameServer {
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
     public GameServer() {
-        // TODO how to send maps to players i.e. where players are, map specs?
+
         initGameMap();
         initGameObjects();
         initAI();
@@ -132,12 +131,12 @@ public class GameServer {
         @Override
         public void parseClientPacket(DataPacket packet) {
             if (packet.stringData.startsWith("CREATE_PLAYER")) {
-                String name = packet.stringData.split(",")[1];    // TODO: exc check
+                String name = packet.stringData.split(",")[1];
                 addNewPlayer(name, STARTING_X, STARTING_Y);
             }
 
             if (packet.stringData.startsWith("CHECK_PLAYER")) {
-                String[] data = new String(packet.byteData).split(","); // TODO: exception check
+                String[] data = new String(packet.byteData).split(",");
 
                 String user = data[0];
                 String pass = data[1];
@@ -171,7 +170,7 @@ public class GameServer {
             }
 
             if (packet.stringData.startsWith("CLOSE")) {
-                closePlayerConnection(packet.stringData.split(",")[1]); //TODO: ex check
+                closePlayerConnection(packet.stringData.split(",")[1]);
             }
 
             if (packet.multipleObjectData instanceof String[]) {
@@ -203,7 +202,6 @@ public class GameServer {
          * No longer tracks the player but client
          * still receives updates at this point
          *
-         * TODO: don't send updates after method finishes
          * @param playerName
          *                  name of the player to disconnect
          */
@@ -221,7 +219,6 @@ public class GameServer {
      * Parses any actions requested by game client
      *
      * General format for "action" string
-     * TODO: to be reconsidered, check length? or ifs?
      *
      * "ACTION_NAME,PLAYER_NAME,VALUES..."
      *
@@ -301,13 +298,16 @@ public class GameServer {
                     moveObject(player, value, value2);
                     break;
                 case ATTACK:
+                    if (player.hasStatusEffect(Status.STUNNED))
+                        break;
+
                     // at this stage client can only target enemies
                     // when players are added this check will go
                     GameCharacter tmpChar = getGameCharacterByRuntimeID(value);
                     if (tmpChar instanceof Enemy) {
                         Enemy target = (Enemy) tmpChar;
                         if (target != null && target.isAlive()
-                                && distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
+                                && distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
                             if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
                                 int dmg = player.attack(target);
@@ -318,23 +318,25 @@ public class GameServer {
                                     player.gainJobExperience(target.experience);
                                     player.gainStatExperience(target.experience);
                                     spawnChest(target.onDeath());
-                                    //e.onDeath();    // TODO: check if OK, maybe pass player as who killed ?
+
                                 }
                             }
 
-                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
+                                    && !target.hasStatusEffect(Status.STUNNED)) {
                                 int dmg = target.attack(player);
                                 animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
                                 target.atkTime = 0;
                                 if (player.getHP() <= 0) {
-                                    // TODO: implement player death
+                                    //player.onDeath();
+                                    player.setX(STARTING_X);
+                                    player.setY(STARTING_Y);
                                 }
                             }
                         }
                     }
                     break;
                 case SKILL_USE:
-                    // TODO: check range of skill or weapon
                     Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
                     if (skTarget != null) {
                         value--;    // bring 1..9 to 0..8
@@ -407,61 +409,43 @@ public class GameServer {
                 }
 
                 // process AI
-                for (Enemy e : enemies) {
-                    AgentBehaviour ai = e.AI;
-                    for (AgentRule rule : aiRules) {
-                        // TODO add to list
-                        if (rule.matches(ai.type, ai.currentGoal)) {
-                            // disable AI
-                            //rule.execute(e, ai.currentTarget);
+                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
+                    Enemy e = it.next();
+                    if (e.isAlive()) {
+                        AgentBehaviour ai = e.AI;
+                        for (AgentRule rule : aiRules) {
+                            if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
+                                //rule.execute(e, ai.currentTarget);
+                            }
                         }
+                        e.update();
+                    }
+                    else {
+                        it.remove();
                     }
                 }
 
-                // move players, also reduce their active skill cooldowns
-                // and re apply passive skill bonuses
+                // process players
                 for (Player p : tmpPlayers) {
                     if (locationFacts.size() == 0) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 0.1f);
                     }
 
-                    p.move();
-                    p.xSpeed = 0;
-                    p.ySpeed = 0;
+                    p.update();
 
-                    Skill[] skills = p.getSkills();
-                    for (Skill sk : skills) {
-                        if (sk.active) {
-                            if (sk.getCurrentCooldown() > 0) {
-                                sk.reduceCurrentCooldown(0.05f);
+                    // player - chest interaction
+                    for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
+                        Chest c = it.next();
+                        if (c.isOpened()) {
+                            it.remove();
+                        }
+                        else {
+                            if (distanceBetween(p, c) < 1) {
+                                c.open();
+                                for (GameItem item : c.getItems())
+                                    p.getInventory().addItem(item);
+                                p.incMoney(c.money);
                             }
-                        }
-                        else {  // reapply passive skills
-                            if (sk.getLevel() > 0)
-                                sk.use(p, null);
-                        }
-                    }
-
-                    // effects
-                    p.updateEffects();
-
-                    // TODO: optimize
-                    for (Enemy e : enemies) {
-                        if (e.AI.currentGoal == AgentGoal.GUARD_CHEST
-                                && p.getX() == e.AI.currentTarget.getX()
-                                && p.getY() == e.AI.currentTarget.getY()) {
-                            e.AI.setGoal(AgentGoal.KILL_PLAYER);
-                            e.AI.setTarget(p);
-                        }
-
-                        if (e.AI.currentGoal == AgentGoal.FIND_PLAYER && e.canSee(p)) {
-                            locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
-                            e.AI.currentTarget = p;
-                        }
-
-                        if (e.AI.currentGoal == AgentGoal.KILL_PLAYER && e.AI.currentTarget == null
-                                && locationFacts.size() > 0) {
-                            e.AI.currentTarget = getLastKnownLocation();
                         }
                     }
                 }
@@ -470,36 +454,9 @@ public class GameServer {
                 Iterator<Entry<Point, Float>> iter = locationFacts.entrySet().iterator();
                 while (iter.hasNext()) {
                     Map.Entry<Point, Float> pairs = (Map.Entry<Point, Float>)iter.next();
-                    pairs.setValue((float) (pairs.getValue() - 0.005));
+                    pairs.setValue((float) (pairs.getValue() - 0.01));
                     if (pairs.getValue() < 0)
                         iter.remove();
-                }
-
-                // process player - chest interaction
-                for (Player p : tmpPlayers) {
-                    for (Chest c : chests) {
-                        if (distanceBetween(p, c) < 1) {
-                            c.open();
-                            for (GameItem item : c.getItems())
-                                p.getInventory().addItem(item);
-                            //p.getInventory().setChanged();
-                            p.incMoney(c.money);
-                        }
-                    }
-                }
-
-                // clean chests
-                for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
-                    if (it.next().isOpened()) {
-                        it.remove();
-                    }
-                }
-
-                // clean enemies
-                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
-                    if (!it.next().isAlive()) {
-                        it.remove();
-                    }
                 }
 
                 // all objects to send
@@ -525,12 +482,7 @@ public class GameServer {
                     server.send(new DataPacket(chestsToSend));
                     server.send(new DataPacket(eneToSend));
                     server.send(new DataPacket(animsToSend));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                try {
                     Thread.sleep(20);   // maybe even 10
                 }
                 catch (Exception e) {
@@ -552,12 +504,11 @@ public class GameServer {
         return targ;
     }
 
-    private void processBasicAttack(EnemyAgent agent, AgentGoalTarget target) {
+    private void processBasicAttack(GameCharacter agent, AgentGoalTarget target) {
         if (agent != null && target != null && agent instanceof GameCharacter && target instanceof GameCharacter) {
             GameCharacter chAgent = (GameCharacter)agent;
             GameCharacter chTarget = (GameCharacter)target;
             if (distanceBetween(chAgent, chTarget) > 2)
-                //agent.attackAI(target);
                 moveObject(chAgent, chTarget.getX(), chTarget.getY());
             else
                 processBasicAttack((GameCharacter)agent, (GameCharacter)target);
@@ -673,7 +624,7 @@ public class GameServer {
         Player p = new Player(name, GameCharacterClass.NOVICE, x, y);
         p.setRuntimeID(runtimeID++);
         players.add(p);
-        Out.println(name + " has joined the game");
+        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID());
     }
 
     /**
@@ -727,70 +678,97 @@ public class GameServer {
         spawnEnemy("2001", 320, 160);
         spawnEnemy("2001", 40, 360);
         spawnEnemy("2001", 600, 120);
+
+        spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
     }
 
     private void initAI() {
-        AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_CHEST) {
+        AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_OBJECT, AgentMode.PATROL) {
             @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                if (target != null)
-                    agent.patrol(target);
-            }
-        };
+            public void execute(Enemy agent, AgentGoalTarget target) {
+                if (target == null) // nothing to guard, just chill
+                    return;
 
-        AgentRule rule2 = new AgentRule(AgentType.GUARD, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
+                aiPatrol(agent, target);
+
                 List<Player> tmpPlayers = new ArrayList<Player>(players);
                 for (Player p : tmpPlayers) {
-                    if (agent.canSee(p)) {
-                        target = p;
+                    if (distanceBetween(p, target) < 2) {   // if any player comes close
+                        agent.AI.setGoal(AgentGoal.KILL_OBJECT);    // change state
+                        agent.AI.setTarget(p);
                         break;
                     }
                 }
+            }
+        };
 
-                if (target != null && agent.canSee(target)) {
-                    //agent.attackAI(target);
-                    // onAttack(agent, target)
+        AgentRule rule2 = new AgentRule(AgentType.GUARD, AgentGoal.KILL_OBJECT, AgentMode.PATROL) {
+            @Override
+            public void execute(Enemy agent, AgentGoalTarget target) {
+                if (target == null)
+                    return;
+
+                if (agent.canSee(target)) {
+                    processBasicAttack(agent, target);
                 }
 
             }
         };
 
-        AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_PLAYER) {
+        AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_OBJECT, AgentMode.PASSIVE) {
             @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                //agent.search(getLastKnownLocation());
+            public void execute(Enemy agent, AgentGoalTarget target) {
                 AgentGoalTarget t = getLastKnownLocation();
                 if (t != null && !agent.canSee(t))
-                    moveObject((GameCharacter)agent, t.getX(), t.getY());
-            }
-        };
+                    moveObject(agent, t.getX(), t.getY());
 
-        AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
-                //if (target != null)
-                //agent.attackAI(target);
-            }
-        };
 
-        AgentRule rule5 = new AgentRule(AgentType.ASSASSIN, AgentGoal.KILL_PLAYER) {
-            @Override
-            public void execute(EnemyAgent agent, AgentGoalTarget target) {
                 List<Player> tmpPlayers = new ArrayList<Player>(players);
                 for (Player p : tmpPlayers) {
                     if (agent.canSee(p)) {
+                        locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
+                        if (p.getHP() / p.getTotalStat(Stat.MAX_HP) < 0.05) {
+                            agent.AI.setGoal(AgentGoal.KILL_OBJECT);
+                            agent.AI.setMode(AgentMode.AGGRESSIVE);
+                            agent.AI.setTarget(p);
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+
+        AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE) {
+            @Override
+            public void execute(Enemy agent, AgentGoalTarget target) {
+                if (target == null)
+                    return;
+
+                processBasicAttack(agent, target);
+            }
+        };
+
+        AgentRule rule5 = new AgentRule(AgentType.ASSASSIN, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE) {
+            @Override
+            public void execute(Enemy agent, AgentGoalTarget target) {
+                if (target == null)
+                    agent.AI.currentTarget = getLastKnownLocation();
+
+
+                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                for (Player p : tmpPlayers) {
+                    if (agent.canSee(p)) {
+                        locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
                         target = p;
                         break;
                     }
                 }
-
-                if (agent != null && target != null && agent.getX() == target.getX() && agent.getY() == target.getY())
-                    agent.dropTarget();
 
                 if (target != null)
                     processBasicAttack(agent, target);
+
+                if (target != null && distanceBetween(agent, target) < 1)
+                    agent.AI.currentTarget = getLastKnownLocation();
             }
         };
 
@@ -799,6 +777,10 @@ public class GameServer {
         aiRules.add(rule3);
         aiRules.add(rule4);
         aiRules.add(rule5);
+    }
+
+    private void aiPatrol(Enemy agent, AgentGoalTarget target) {
+
     }
 
     /**
@@ -814,8 +796,11 @@ public class GameServer {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
     }
 
-    // TODO: remove when super class GameObject added
     private int distanceBetween(GameCharacter ch, Chest c) {
+        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
+    }
+
+    private int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

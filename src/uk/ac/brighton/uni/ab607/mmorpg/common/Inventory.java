@@ -52,7 +52,6 @@ public class Inventory implements java.io.Serializable {
         return false;
     }*/
 
-    // TODO: clean
     public GameItem getItem(int index) {
         if (index < items.size())
             return items.get(index);

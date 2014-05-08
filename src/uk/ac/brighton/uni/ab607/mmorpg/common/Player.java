@@ -35,7 +35,6 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     private static final int[] EXP_NEEDED = new int[MAX_LEVEL];
 
-    //TODO: add exp for stat/job progression
     static {
         EXP_NEEDED[0] = EXP_NEEDED_BASE;
         for (int i = 1; i < EXP_NEEDED.length; i++) {
@@ -70,7 +69,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     public int frame = 0;
     public int place = 0;
 
-    public int sprite = 0;  // TODO: implement
+    public int sprite = 0;
 
     public enum Dir {
         UP, DOWN, LEFT, RIGHT
@@ -260,6 +259,16 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         if (isFree(itemPlace) || inventory.isFull())
             return; // no item at this place
 
+        if (equip[itemPlace] instanceof Weapon) {
+            Weapon w = (Weapon) equip[itemPlace];
+            if (w.type.ordinal() >= WeaponType.TWO_H_SWORD.ordinal()) { // if 2 handed
+                if (itemPlace == RIGHT_HAND)
+                    equip[LEFT_HAND]  = ObjectManager.getWeaponByID(ID.Weapon.HANDS);
+                else
+                    equip[RIGHT_HAND] = ObjectManager.getWeaponByID(ID.Weapon.HANDS);
+            }
+        }
+
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
         equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
@@ -287,6 +296,10 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     @Override
     public Element getArmorElement() {
         return getEquip(BODY).getElement();
+    }
+
+    public void onDeath() {
+        alive = false;
     }
 
     /*

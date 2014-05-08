@@ -33,10 +33,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 
 public class GameGUI extends GUI {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3086068923466302200L;
-    
+
     private int mapWidth;
     private int mapHeight;
 
@@ -82,7 +82,7 @@ public class GameGUI extends GUI {
         super(1280, 720, "Main Window");
 
         name = playerName;
-        
+
         inv = new InventoryGUI();
         st = new StatsGUI(name);
 
@@ -116,7 +116,7 @@ public class GameGUI extends GUI {
         }
 
         chat.setLayout(null);
-        chat.setBounds(5, 720 - 60, 1280 - 25, 20);
+        chat.setBounds(5, 720 - 53, 1280 - 25, 20);
         chat.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -146,7 +146,7 @@ public class GameGUI extends GUI {
 
         setVisible(true);
     }
-    
+
     /**
      * Parses and updates the game client, including all windows
      * with the information taken from server packets
@@ -176,7 +176,7 @@ public class GameGUI extends GUI {
         }
 
         boolean once = true;
-        
+
         /**
          * Update info about players
          *
@@ -203,7 +203,7 @@ public class GameGUI extends GUI {
                     selY = player.getY();
                     once = false;
                 }
-                
+
 
                 updateGameClient();
 
@@ -255,7 +255,7 @@ public class GameGUI extends GUI {
             tmpAnims = new ArrayList<Animation>(anims);
         }
     }
-    
+
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
@@ -287,7 +287,7 @@ public class GameGUI extends GUI {
 
         repaint();
     }
-    
+
     @Override
     protected void createPicture(Graphics2D g) {
         g.setColor(Color.GRAY);
@@ -355,9 +355,9 @@ public class GameGUI extends GUI {
     @Override
     public void paint(Graphics g) {
         showPicture((Graphics2D) g);
-        //chat.repaint();
+        chat.repaint();
     }
-    
+
     private boolean choosingTarget = false; // if player is choosing target for skill or smth
     private char input = ' ';
 
@@ -478,13 +478,13 @@ public class GameGUI extends GUI {
         }
     }
 
-    public Player getPlayer() {
+    /*public Player getPlayer() {
         return player;
     }
 
     public Player getCurrentPlayer() {
         return currentPlayer;
-    }
+    }*/
 
     private void checkRuntimeID() {
         for (Enemy e : tmpEnemies) {

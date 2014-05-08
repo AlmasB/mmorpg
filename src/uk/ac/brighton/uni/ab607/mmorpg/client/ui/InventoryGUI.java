@@ -26,12 +26,11 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 public class InventoryGUI extends GUI {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4657910668634504112L;
-    
+
     private static final String INFO_ON = "info: on", INFO_OFF = "info: off";
     private Player player;
 
@@ -41,7 +40,7 @@ public class InventoryGUI extends GUI {
     private GameItem selectedItem;
 
     private Mouse mouse = new Mouse();
-    
+
     public InventoryGUI() {
         super(640, 304, "Inventory Window");
         this.setLocation(640, 720);
@@ -73,9 +72,7 @@ public class InventoryGUI extends GUI {
 
         setVisible(true);
     }
-    
-    // also check if items themselves have changed ie rune or essence added maybe use PseudoHTML for checking ?
-    // TODO: check the exact items in inventory and perhaps player equip and then repaint if needed
+
     public void update(Player p) {
         if (player == null || !player.getInventory().toString().equals(p.getInventory().toString())
                 || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
@@ -108,26 +105,26 @@ public class InventoryGUI extends GUI {
 
         g.drawImage(Resources.getImage("inv.png"), 2, 27, this);
     }
-    
+
     private void createPicture2(Graphics2D g) {
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 205, 304);
 
         if (player != null) {
             ArrayList<GameItem> items = player.getInventory().getItems();
-    
+
             int x = 0, y = 0;
             for (int i = 0; i < items.size(); i++) {
                 drawItem(items.get(i), g, 2 + x*40, 29 + y*40);
-    
+
                 if (++x == 5) {
                     x = 0;
                     y++;
                 }
             }
-    
+
             g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
-    
+
             g.setColor(Color.YELLOW);
             g.setFont(new Font("Courier", Font.PLAIN, 20));
             g.drawString(player.getMoney() + " G", 90, 287);
@@ -144,6 +141,7 @@ public class InventoryGUI extends GUI {
      */
     private Graphics2D doubleBufferGraphics2;
 
+    @Override
     protected void showPicture(Graphics2D g) {
         if (doubleBufferGraphics == null) {
             doubleBufferImage = (BufferedImage) createImage(203, 304);
@@ -161,7 +159,7 @@ public class InventoryGUI extends GUI {
         g.drawImage(doubleBufferImage, 0, 0, this);
         g.drawImage(doubleBufferImage2, 435, 0, this);
     }
-    
+
     private void drawItem(GameItem item, Graphics2D g, int x, int y) {
         g.drawImage(Resources.getImage("ss.png"), x, y, x + 34, y + 34,
                 item.ssX*34, item.ssY*34, item.ssX*34 + 34, item.ssY*34 + 34, this);
@@ -197,11 +195,11 @@ public class InventoryGUI extends GUI {
             return Player.SHOES;
         return -1;
     }
-    
+
     private void runOnUIThread(Runnable r) {
         SwingUtilities.invokeLater(r);
     }
-    
+
     private class Mouse implements MouseListener, MouseMotionListener {
 
         @Override

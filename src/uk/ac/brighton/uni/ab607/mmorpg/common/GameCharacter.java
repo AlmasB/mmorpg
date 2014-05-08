@@ -5,11 +5,12 @@ import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 public abstract class GameCharacter implements java.io.Serializable {
-
     /**
      *
      */
@@ -26,60 +27,6 @@ public abstract class GameCharacter implements java.io.Serializable {
      * ID of the object in 1 instance of the game
      */
     private int runtimeID = 0;
-
-    // TODO: add statuses
-    // TODO: private int x, y;
-    public abstract int getX();
-    public abstract int getY();
-
-    protected int x, y;
-
-    public int xSpeed, ySpeed;
-
-    public int frame = 0;
-    public int place = 0;
-
-    public int sprite = 0;
-
-    public enum Dir {
-        UP, DOWN, LEFT, RIGHT
-    }
-
-    public Dir direction = Dir.DOWN;
-
-    private int factor = 3;
-
-    public void move() {
-        x += xSpeed;
-        y += ySpeed;
-
-        if (xSpeed > 0)
-            direction = Dir.RIGHT;
-        if (xSpeed < 0)
-            direction = Dir.LEFT;
-        if (ySpeed > 0)
-            direction = Dir.DOWN;
-        if (ySpeed < 0)
-            direction = Dir.UP;
-
-        frame++;
-
-        if (frame == 4 * factor)
-            frame = 0;
-
-        if (frame /factor == 0 || frame/factor == 2)
-            place = 0;
-        if (frame/factor == 1)
-            place = 1;
-        if (frame/factor == 3)
-            place = 2;
-    }
-
-    public int getRow() {
-        return direction.ordinal();
-    }
-
-    // TEST
 
     /**
      * How attributes modify stats
@@ -99,7 +46,7 @@ public abstract class GameCharacter implements java.io.Serializable {
      * Note: the order is based on the order of attributes in
      * {@code Attribute} and {@code Stat} enums, so they have to match
      */
-    public static final int STR = 0,
+    public static final int STR = 0,    // ATTRIBUTES
             VIT = 1,
             DEX = 2,
             AGI = 3,
@@ -122,21 +69,20 @@ public abstract class GameCharacter implements java.io.Serializable {
             CRIT_CHANCE = 10,
             MCRIT_CHANCE = 11,
             CRIT_DMG = 12,
-            MCRIT_DMG = 13;
+            MCRIT_DMG = 13,
+            HP_REGEN = 14,
+            SP_REGEN = 15;
 
     protected int[] attributes = new int[9];    // we have 9 attributes
     protected int[] bAttributes = new int[9];   // on top of native attributes, bonuses can be given we items
-    protected float[] stats = new float[14];        // 14 stats
-    protected float[] bStats = new float[14];       // bonus stats given by item
+    protected float[] stats = new float[16];        // 16 stats
+    protected float[] bStats = new float[16];       // bonus stats given by item
 
     protected Skill[] skills;
 
-    protected ArrayList<Effect> effects = new ArrayList<Effect>();
+    private ArrayList<StatusEffect> statuses = new ArrayList<StatusEffect>();
+    private ArrayList<Effect> effects = new ArrayList<Effect>();
 
-    // TODO: redesign how bonuses added
-    // maybe hp += flat + % + something else for example and added to a list
-
-    // TODO: add hp/sp regen maybe as stat?
     protected int baseLevel = 1,
             hp = 0, sp = 0; // these are current hp/sp
 
@@ -191,7 +137,7 @@ public abstract class GameCharacter implements java.io.Serializable {
     /**
      *
      * @param stat
-     *              one of the constants for stat, MAX_HP = 0, MCRIT = 11
+     *              one of the constants for stat, MAX_HP = 0, SP_REGEN = 15
      * @return
      *          total value for stat, including bonuses
      */
@@ -203,8 +149,6 @@ public abstract class GameCharacter implements java.io.Serializable {
         return stats[stat.ordinal()] + bStats[stat.ordinal()];
     }
 
-    //TODO find a way to track changes and auto update
-    //(optional) also only recalculate those stats attributes of which changed, not all
     /**
      * Character stats are directly affected by his attributes
      * Therefore any change in attributes must be followed by
@@ -254,6 +198,9 @@ public abstract class GameCharacter implements java.io.Serializable {
 
         stats[CRIT_DMG]  = 2 + luck*0.01f;
         stats[MCRIT_DMG] = 2 + luck*0.01f;
+
+        stats[HP_REGEN] = 1 + vitality * MODIFIER_VERY_LOW;
+        stats[SP_REGEN] = 2 + wisdom * MODIFIER_VERY_LOW;
     }
 
     /**
@@ -308,6 +255,25 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     /**
      *
+     * @param status
+     * @return
+     *          true if character is under "@param status" status effect
+     *          false otherwise
+     */
+    public boolean hasStatusEffect(Status status) {
+        synchronized (statuses) {
+            for (StatusEffect e : statuses) {
+                if (e.getStatus() == status) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
      * @return
      *          a skill array for this character
      */
@@ -332,7 +298,6 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public void addEffect(Effect e) {
         // we should do synchronized
-        //TODO: if same effect applied maybe go thru list and rebuff the effect
         synchronized (effects) {
             e.onBegin(this);
             effects.add(e);
@@ -340,7 +305,13 @@ public abstract class GameCharacter implements java.io.Serializable {
         }
     }
 
-    public void updateEffects() {
+    public void addStatusEffect(StatusEffect e) {
+        synchronized (statuses) {
+            statuses.add(e);
+        }
+    }
+
+    protected void updateEffects() {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
             e.reduceDuration(0.05f);
@@ -350,12 +321,52 @@ public abstract class GameCharacter implements java.io.Serializable {
                 calculateStats();
             }
         }
+    }
 
-        //System.out.println(effects.size() + "");
+    private void updateStatusEffects() {
+        for (Iterator<StatusEffect> it = statuses.iterator(); it.hasNext(); ) {
+            StatusEffect e = it.next();
+            e.reduceDuration(0.05f);
+            if (e.getDuration() <= 0) {
+                it.remove();
+            }
+        }
+    }
+
+    protected float regenTick = 0.0f;
+
+    public void update() {
+        // HP/SP regen
+        regenTick += 0.05f;
+
+        if (regenTick >= 2.0f) {    // 2 secs
+            hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
+            sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            regenTick = 0.0f;
+        }
+
+        // skill cooldowns
+
+        for (Skill sk : skills) {
+            if (sk.active) {
+                if (sk.getCurrentCooldown() > 0) {
+                    sk.reduceCurrentCooldown(0.05f);
+                }
+            }
+            else {  // reapply passive skills
+                if (sk.getLevel() > 0)
+                    sk.use(this, null);
+            }
+        }
+
+        // check buffs
+        updateEffects();
+        updateStatusEffects();
     }
 
     /**
      * Performs basic attack with equipped weapon
+     * Damage is physical and element depends on weapon element
      *
      * @param target
      *               target being attacked
@@ -389,10 +400,30 @@ public abstract class GameCharacter implements java.io.Serializable {
         return totalDamage;
     }
 
+    /**
+     * Deals physical damage of type NEUTRAL to target.
+     * The damage is reduced by target's armor and DEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealPhysicalDamage(GameCharacter target, float baseDamage) {
         return dealPhysicalDamage(target, baseDamage, Element.NEUTRAL);
     }
 
+    /**
+     * Deal magical damage of type param element to target. The damage is reduced by target's
+     * magical armor and MDEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealMagicalDamage(GameCharacter target, float baseDamage, Element element) {
         if (GameMath.checkChance(getTotalStat(MCRIT_CHANCE))) {
             baseDamage *= getTotalStat(MCRIT_DMG);
@@ -407,40 +438,32 @@ public abstract class GameCharacter implements java.io.Serializable {
         return totalDamage;
     }
 
+    /**
+     * Deal magical damage of type NEUTRAL to target. The damage is reduced by target's
+     * magical armor and MDEF
+     *
+     * @param target
+     * @param baseDamage
+     *
+     * @return
+     *          damage dealt
+     */
     public int dealMagicalDamage(GameCharacter target, float baseDamage) {
         return dealMagicalDamage(target, baseDamage, Element.NEUTRAL);
     }
 
+    /**
+     * Deals the exact amount of damage to target as specified by
+     * param dmg
+     *
+     * @param target
+     * @param dmg
+     */
     public void dealPureDamage(GameCharacter target, float dmg) {
         target.hp -= dmg;
     }
 
-    /*public int dealDamage(GameCharacter target) {
-        float totalDamage = 0.0f, totalPhysicalDamage = 0.0f, totalMagicalDamage = 0.0f;   // there's no magical dmg yet
-        float elementalDamageModifier = getWeaponElement().getDamageModifierAgainst(target.getArmorElement());  // using right hand's element
-
-        float basePhysicalDamage = getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel);
-
-        if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
-            basePhysicalDamage *= getTotalStat(CRIT_DMG);
-        }
-
-        float physicalDamageAfterReduction = (100 - target.getTotalStat(ARM)) * basePhysicalDamage / 100.0f - target.getTotalStat(DEF);
-
-        totalPhysicalDamage = elementalDamageModifier * physicalDamageAfterReduction;
-
-        // TODO: calculate magical damage when added
-
-        totalDamage = totalPhysicalDamage + totalMagicalDamage;
-        totalDamage = Math.max(totalDamage, 0);
-
-        target.hp -= Math.round(totalDamage);
-
-        return Math.round(totalDamage);
-    }*/
-
     /**
-     * TODO: implement return value, which is mainly damage
      *
      *
      * @param skillCode
@@ -481,10 +504,69 @@ public abstract class GameCharacter implements java.io.Serializable {
                 + "LUC: " + B + BLUE + attributes[LUC] + FONT_END + "+" + GREEN + bAttributes[LUC] + FONT_END;
     }
 
-    //TODO: maybe move stats here ?
-
     @Override
     public String toString() {
         return id + "," + name;
+    }
+
+    public boolean canSee(AgentGoalTarget ch) {
+        return ch.getX() >= getX() - 240
+                && ch.getX() <= getX() + 240
+                && ch.getY() >= getY() - 240
+                && ch.getY() <= getY() + 240;
+    }
+
+    // For Drawing/Moving screen stuff
+    protected int x, y;
+
+    public int xSpeed, ySpeed;
+
+    public int frame = 0;
+    public int place = 0;
+    public int sprite = 0;
+    private int factor = 3;
+
+    public enum Dir {
+        UP, DOWN, LEFT, RIGHT
+    }
+
+    public Dir direction = Dir.DOWN;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void move() {
+        x += xSpeed;
+        y += ySpeed;
+
+        if (xSpeed > 0)
+            direction = Dir.RIGHT;
+        if (xSpeed < 0)
+            direction = Dir.LEFT;
+        if (ySpeed > 0)
+            direction = Dir.DOWN;
+        if (ySpeed < 0)
+            direction = Dir.UP;
+
+        frame++;
+
+        if (frame == 4 * factor)
+            frame = 0;
+
+        if (frame /factor == 0 || frame/factor == 2)
+            place = 0;
+        if (frame/factor == 1)
+            place = 1;
+        if (frame/factor == 3)
+            place = 2;
+    }
+
+    public int getRow() {
+        return direction.ordinal();
     }
 }

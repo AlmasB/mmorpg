@@ -36,7 +36,7 @@ public class Desc {
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
 
         // WARRIOR SKILL SET
-        public static final String BASH = "A powerful physical attack";
+        public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
         public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
         public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
         public static final String ROAR = "Increases STR and VIT for the duration";
@@ -45,6 +45,19 @@ public class Desc {
         public static final String WARRIOR_HEART = "Passively increases max HP";
         public static final String ARMOR_MASTERY = "Increases armor rating";
         public static final String BLOODLUST = "Increases ATK based on the missing % HP";
+
+        // MAGE CLASS
+        public class Mage {
+            public static final String FIREBALL = "Deals magic damage with fire element";
+            public static final String ICE_SHARD = "Deals magic damage with water element";
+            public static final String AIR_SPEAR = "Deals magic damage with air element";
+            public static final String EARTH_BOULDER = "Deals magic damage with earth element";
+            public static final String MENTAL_STRIKE = "Deals pure damage based on MATK";
+            public static final String AMPLIFY_MAGIC = "Increases MATK for the duration";
+            public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
+            public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
+            public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
+        }
     }
 
     public class Weapon {
