@@ -638,16 +638,18 @@ public class GameServer {
      * @param y
      *          y coord
      */
-    private void spawnEnemy(String id, int x, int y) {
+    private Enemy spawnEnemy(String id, int x, int y) {
         Enemy e = ObjectManager.getEnemyByID(id);
         e.setRuntimeID(runtimeID++);
         e.setX(x);
         e.setY(y);
         enemies.add(e);
+        return e;
     }
 
-    private void spawnChest(Chest chest) {
+    private Chest spawnChest(Chest chest) {
         chests.add(chest);
+        return chest;
     }
 
     private void initGameMap() {
@@ -668,7 +670,7 @@ public class GameServer {
 
     private void initGameObjects() {
         spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
-        spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
+        Chest c = spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
 
         spawnEnemy("2001", 640, 160);
         spawnEnemy("2000", 720, 720);
@@ -679,7 +681,8 @@ public class GameServer {
         spawnEnemy("2001", 40, 360);
         spawnEnemy("2001", 600, 120);
 
-        spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
+        Enemy e = spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
+        e.AI.setTarget(c);
     }
 
     private void initAI() {
@@ -780,7 +783,9 @@ public class GameServer {
     }
 
     private void aiPatrol(Enemy agent, AgentGoalTarget target) {
-
+        if (distanceBetween(agent, target) > 3) {
+            moveObject(agent, target.getX(), target.getY());
+        }
     }
 
     /**
