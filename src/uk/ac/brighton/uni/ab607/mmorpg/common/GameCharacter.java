@@ -554,6 +554,14 @@ public abstract class GameCharacter implements java.io.Serializable {
         return y;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void move() {
         x += xSpeed;
         y += ySpeed;
@@ -572,11 +580,11 @@ public abstract class GameCharacter implements java.io.Serializable {
         if (frame == 4 * factor)
             frame = 0;
 
-        if (frame /factor == 0 || frame/factor == 2)
+        if (frame / factor == 0 || frame / factor == 2)
             place = 0;
-        if (frame/factor == 1)
+        if (frame / factor == 1)
             place = 1;
-        if (frame/factor == 3)
+        if (frame / factor == 3)
             place = 2;
     }
 

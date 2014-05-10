@@ -61,74 +61,6 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     private EquippableItem[] equip = new EquippableItem[5];
 
-    /* EXPERIMENTAL ADDITIONS */
-
-    /* private int x, y;
-    public int xSpeed, ySpeed;
-
-    public int frame = 0;
-    public int place = 0;
-
-    public int sprite = 0;
-
-    public enum Dir {
-        UP, DOWN, LEFT, RIGHT
-    }
-
-    public Dir direction = Dir.DOWN;
-
-    private int factor = 3;
-
-    public void move() {
-        x += xSpeed;
-        y += ySpeed;
-
-        if (xSpeed > 0)
-            direction = Dir.RIGHT;
-        if (xSpeed < 0)
-            direction = Dir.LEFT;
-        if (ySpeed > 0)
-            direction = Dir.DOWN;
-        if (ySpeed < 0)
-            direction = Dir.UP;
-
-        frame++;
-
-        if (frame == 4 * factor)
-            frame = 0;
-
-        if (frame /factor == 0 || frame/factor == 2)
-            place = 0;
-        if (frame/factor == 1)
-            place = 1;
-        if (frame/factor == 3)
-            place = 2;
-    }
-
-    public int getRow() {
-        return direction.ordinal();
-    }*/
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    /* UP TO HERE */
-
     public Player(String name, GameCharacterClass charClass, int x, int y) {
         super(name, "Player", charClass);
         this.x = x;
@@ -324,5 +256,15 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
                 + "ARM: " + BLUE + (int)getTotalStat(ARM) + "%" + FONT_END + " MARM: " + BLUE + (int)getTotalStat(MARM) + "%" + FBR
                 + "ASPD: " + BLUE + (int)getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
     }
 }
