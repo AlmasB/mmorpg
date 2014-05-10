@@ -51,7 +51,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             skillPoints = 0;
 
     private int money = 0;
-    private Inventory inventory = new Inventory(10);
+    private Inventory inventory = new Inventory();
 
     public static final int HELM = 0,
             BODY = 1,

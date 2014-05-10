@@ -441,10 +441,13 @@ public class GameServer {
                         }
                         else {
                             if (distanceBetween(p, c) < 1) {
-                                c.open();
-                                for (GameItem item : c.getItems())
-                                    p.getInventory().addItem(item);
-                                p.incMoney(c.money);
+                                if (p.getInventory().getSize() + c.getItems().size()
+                                        <= Inventory.MAX_SIZE) {
+                                    c.open();
+                                    for (GameItem item : c.getItems())
+                                        p.getInventory().addItem(item);
+                                    p.incMoney(c.money);
+                                }
                             }
                         }
                     }

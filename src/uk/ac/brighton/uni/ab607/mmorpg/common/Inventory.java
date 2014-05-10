@@ -13,72 +13,91 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
  *
  */
 public class Inventory implements java.io.Serializable {
-
     /**
      *
      */
     private static final long serialVersionUID = 7187464078429433554L;
 
-    private static final int MAX_SIZE = 30;
+    /**
+     * Matches number of elements that can be shown in inventory GUI
+     */
+    public static final int MAX_SIZE = 30;
 
-    private int size;
+    /**
+     * Actual data structure
+     */
+    private ArrayList<GameItem> items = new ArrayList<GameItem>(MAX_SIZE);
 
-    private ArrayList<GameItem> items;
-
-    private boolean hasChanged = false;
-
-    public Inventory(int size) {
-        this.size = Math.min(size, MAX_SIZE);
-        items = new ArrayList<GameItem>(this.size);
-    }
-
+    /**
+     * Adds item to inventory if inventory isnt full
+     *
+     * @param item
+     *              item to add
+     * @return
+     *          true if added, false otherwise
+     */
     public boolean addItem(GameItem item) {
-        if (items.size() < size) {
-            return items.add(item);
+        if (isFull()) {
+            Out.err("Inventory is full");
+            return false;
         }
-        Out.err("Inventory is full");
-        return false;
+        return items.add(item);
     }
 
-    /*public void setChanged() {
-        hasChanged = true;
-    }
-
-    public boolean hasChanged() {
-        if (hasChanged) {
-            hasChanged = false;
-            return true;
-        }
-        return false;
-    }*/
-
+    /**
+     * Retrieve item at given index
+     *
+     * @param index
+     * @return
+     *          item if index less than inventory size
+     *          otherwise null
+     */
     public GameItem getItem(int index) {
-        if (index < items.size())
-            return items.get(index);
-        else
-            return null;
+        return index < items.size() ? items.get(index) : null;
     }
 
-    public GameItem removeItem(GameItem item) {
-        if (!items.remove(item))
+    /**
+     * Removes item from the inventory if it is in it
+     *
+     * @param item
+     * @return
+     *          true if removed, false otherwise
+     */
+    public boolean removeItem(GameItem item) {
+        if (!items.remove(item)) {
             Out.err("This item isn't in the inventory");
-        return item;
+            return false;
+        }
+        return true;
     }
 
+    /**
+     *
+     * @return
+     *          a new copy of items list, retaining
+     *          references to original items
+     */
     public ArrayList<GameItem> getItems() {
         return new ArrayList<GameItem>(items);
     }
 
-    public int getMaxSize() {
-        return size;
-    }
-
-    public int getCurrentSize() {
+    /**
+     *
+     * @return
+     *          number of items in inventory
+     */
+    public int getSize() {
         return items.size();
     }
 
+    /**
+     *
+     * @return
+     *          true if number of items in inventory reached maximum
+     *          false otherwise
+     */
     public boolean isFull() {
-        return items.size() >= size;
+        return items.size() == MAX_SIZE;
     }
 
     @Override

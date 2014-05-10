@@ -217,7 +217,7 @@ public class InventoryGUI extends GUI {
             x /= 40; y /= 40;
 
             int itemIndex = x + 5*y;  // convert to 1d array, 5 columns
-            if (itemIndex < player.getInventory().getMaxSize()) {
+            if (itemIndex < player.getInventory().getSize()) {
                 GameItem item = player.getInventory().getItem(itemIndex);
                 if (item != null) {
                     // if weapon or armor
@@ -280,7 +280,7 @@ public class InventoryGUI extends GUI {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             int itemIndex = x + 5*y;  // convert to 1d array, 5 columns
-            if (itemIndex < player.getInventory().getMaxSize()) {
+            if (itemIndex < player.getInventory().getSize()) {
                 GameItem item = player.getInventory().getItem(itemIndex);
                 if (item != null && item != selectedItem) {
                     selectedItem = item;
