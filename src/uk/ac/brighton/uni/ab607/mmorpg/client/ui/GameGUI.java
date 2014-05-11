@@ -311,7 +311,7 @@ public class GameGUI extends GUI {
         }
 
         for (Enemy e : tmpEnemies) {
-            g.drawImage(Resources.getImage("enemy3.png"),
+            g.drawImage(Resources.getImage(e.spriteName),
                     e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
                     e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
 

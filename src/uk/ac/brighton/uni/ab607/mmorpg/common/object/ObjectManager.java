@@ -784,15 +784,15 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, AgentGoal.FIND_OBJECT, AgentMode.PASSIVE),
-                Element.FIRE, 1, 5, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                Element.FIRE, 1, 5, Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE),
-                Element.EARTH, 1, 5, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                Element.EARTH, 1, 5, Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, AgentGoal.GUARD_OBJECT, AgentMode.PATROL),
-                Element.WATER, 1, 5, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                Element.WATER, 1, 5, Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
