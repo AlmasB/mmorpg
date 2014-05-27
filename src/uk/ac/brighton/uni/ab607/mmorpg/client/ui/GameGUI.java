@@ -78,7 +78,7 @@ public class GameGUI extends GUI {
 
     private int selX = 0, selY = 0; // selected point
 
-    public GameGUI(String ip, String playerName) {
+    public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
 
         name = playerName;
@@ -107,13 +107,8 @@ public class GameGUI extends GUI {
             }
         }
 
-        try {
-            client = new UDPClient(ip, 55555, new ServerResponseParser());
-            client.send(new DataPacket("CREATE_PLAYER," + name));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        client = new UDPClient(ip, 55555, new ServerResponseParser());
+        client.send(new DataPacket("CREATE_PLAYER," + name));
 
         chat.setLayout(null);
         chat.setBounds(5, 720 - 53, 1280 - 25, 20);

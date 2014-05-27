@@ -109,19 +109,13 @@ public class GameServer {
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
 
-    public GameServer() {
-
+    public GameServer() throws SocketException {
         initGameMap();
         initGameObjects();
         initAI();
 
         // init server connection
-        try {
-            server = new UDPServer(55555, new ClientQueryParser());
-        }
-        catch (SocketException e) {
-            e.printStackTrace();
-        }
+        server = new UDPServer(55555, new ClientQueryParser());
 
         // start main server loop
         new Thread(new ServerLoop()).start();
