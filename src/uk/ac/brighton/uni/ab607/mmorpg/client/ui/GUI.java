@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
+
 /**
  * Abstract GUI to be subclassed by any game related windows
  *
@@ -22,7 +24,7 @@ public abstract class GUI extends JFrame {
 
     private final int W, H;
 
-    private ArrayList<String> actionRequests = new ArrayList<String>();
+    private ArrayList<ActionRequest> requests = new ArrayList<ActionRequest>();
 
     public GUI(int w, int h, String title) {
         super(title);
@@ -33,14 +35,14 @@ public abstract class GUI extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    public void addActionRequest(String action) {
-        actionRequests.add(action);
+    public void addActionRequest(ActionRequest action) {
+        requests.add(action);
     }
 
-    public String[] clearPendingActionRequests() {
-        String[] res = new String[actionRequests.size()];
-        actionRequests.toArray(res);
-        actionRequests.clear();
+    public ActionRequest[] clearPendingActionRequests() {
+        ActionRequest[] res = new ActionRequest[requests.size()];
+        requests.toArray(res);
+        requests.clear();
         return res;
     }
 

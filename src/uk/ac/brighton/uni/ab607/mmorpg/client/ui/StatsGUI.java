@@ -13,6 +13,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
@@ -56,7 +58,7 @@ public class StatsGUI extends GUI {
             buttons[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    addActionRequest("ATTR_UP," + playerName + "," + attr);
+                    addActionRequest(new ActionRequest(Action.ATTR_UP, playerName, attr));
                 }
             });
             add(buttons[i]);
@@ -74,7 +76,7 @@ public class StatsGUI extends GUI {
             skillButtons[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    addActionRequest("SKILL_UP," + playerName + "," + skillValue);
+                    addActionRequest(new ActionRequest(Action.SKILL_UP, playerName, skillValue));
                 }
             });
             this.add(skillButtons[i]);

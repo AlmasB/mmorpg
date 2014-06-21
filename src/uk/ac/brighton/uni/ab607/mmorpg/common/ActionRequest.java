@@ -12,16 +12,19 @@ public class ActionRequest implements java.io.Serializable {
 
     public final Action action;
     public final String playerName, data;
-    private int[] values;
+    
+    // add more as necessary, 2 should be sufficient
+    public final int value1, value2;
     
     public ActionRequest(Action action, String player, String data, int... values) {
         this.action = action;
         this.playerName = player;
         this.data = data;
-        this.values = values;
+        this.value1 = values.length > 0 ? values[0] : 0;
+        this.value2 = values.length > 1 ? values[1] : 0;
     }
     
-    public int[] getValues() {
-        return values;
+    public ActionRequest(Action action, String player, int... values) {
+        this(action, player, "", values);
     }
 }

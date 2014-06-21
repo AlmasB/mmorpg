@@ -27,6 +27,8 @@ import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
@@ -117,7 +119,7 @@ public class GameGUI extends GUI {
             public void actionPerformed(ActionEvent e) {
                 String chatText = e.getActionCommand();
                 if (!chatText.isEmpty()) {
-                    addActionRequest("CHAT," + player.name + ",0,0," + chatText);
+                    addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
                     chat.setText("");
                 }
             }
@@ -257,7 +259,7 @@ public class GameGUI extends GUI {
 
         if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
             target = map[selX/40][selY/40];
-            addActionRequest("MOVE," + player.name + "," + (selX) + "," + (selY));
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, selX, selY));
         }
         else {
             target = null;
@@ -266,7 +268,7 @@ public class GameGUI extends GUI {
         checkRuntimeID();
 
         if (targetRuntimeID != 0) {
-            addActionRequest("ATTACK," + player.name + "," + targetRuntimeID);
+            addActionRequest(new ActionRequest(Action.ATTACK, player.name, targetRuntimeID));
         }
 
         if (!stop) {
@@ -443,7 +445,7 @@ public class GameGUI extends GUI {
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        addActionRequest("SKILL_USE," + player.name + "," + input + "," + enemy.getRuntimeID());
+                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, (int)input - 1, enemy.getRuntimeID()));
                         return;
                     }
                 }
