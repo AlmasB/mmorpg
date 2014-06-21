@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
@@ -69,15 +70,6 @@ public class GameServer {
 
     private AStarNode targetNode;
     private AStarNode playerParent;
-
-    /*public enum Command {
-        ATTR_UP, EQUIP, UNEQUIP, REFINE;
-
-        @Override
-        public String toString() {
-            return this.name();
-        }
-    }*/
 
     public static final String ATTR_UP = "ATTR_UP",
             SKILL_UP = "SKILL_UP",
@@ -438,8 +430,7 @@ public class GameServer {
                                 if (p.getInventory().getSize() + c.getItems().size()
                                         <= Inventory.MAX_SIZE) {
                                     c.open();
-                                    for (GameItem item : c.getItems())
-                                        p.getInventory().addItem(item);
+                                    c.getItems().forEach(p.getInventory()::addItem);
                                     p.incMoney(c.money);
                                 }
                             }
@@ -490,15 +481,9 @@ public class GameServer {
     }
 
     private AgentGoalTarget getLastKnownLocation() {
-        AgentGoalTarget targ = null;
-        float max = 0;
-        for (Point p : locationFacts.keySet()) {
-            if (locationFacts.get(p) > max) {
-                max = locationFacts.get(p);
-                targ = p;
-            }
-        }
-        return targ;
+        return locationFacts.keySet().stream()
+                .max((Point o1, Point o2) -> (int)(10*(locationFacts.get(o1)-locationFacts.get(o2))))
+                .orElse(null);
     }
 
     private void processBasicAttack(GameCharacter agent, AgentGoalTarget target) {
