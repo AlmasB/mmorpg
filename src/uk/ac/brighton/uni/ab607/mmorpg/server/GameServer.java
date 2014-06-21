@@ -102,25 +102,10 @@ public class GameServer {
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
     
-    // new stuff down here
-    
-    private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
     private ServerActionHandler actionHandler;
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
-        
-        // init server actions
-        actions.put(Action.ATTACK,    actionHandler::serverActionAttack);
-        actions.put(Action.ATTR_UP,   actionHandler::serverActionAttrUp);
-        actions.put(Action.CHAT,      actionHandler::serverActionChat);
-        actions.put(Action.EQUIP,     actionHandler::serverActionEquip);
-        actions.put(Action.MOVE,      actionHandler::serverActionMove);
-        actions.put(Action.REFINE,    actionHandler::serverActionRefine);
-        actions.put(Action.SKILL_UP,  actionHandler::serverActionSkillUp);
-        actions.put(Action.SKILL_USE, actionHandler::serverActionSkillUse);
-        actions.put(Action.UNEQUIP,   actionHandler::serverActionUnequip);
-        actions.put(Action.USE_ITEM,  actionHandler::serverActionUseItem);
         
         // init world
         initGameMap();
@@ -182,16 +167,7 @@ public class GameServer {
 
             // handle action requests from clients
             if (packet.multipleObjectData instanceof ActionRequest[]) {
-                for (ActionRequest req : (ActionRequest[]) packet.multipleObjectData) {
-                    try {
-                        Player p = getPlayerByName(req.playerName);
-                        actions.getOrDefault(req.action, (Player pl, ActionRequest r) 
-                                -> actionHandler.serverActionNone(pl, r)).execute(p, req);
-                    }
-                    catch (BadActionRequestException e) {
-                        Out.err(e);
-                    }
-                }
+                actionHandler.process((ActionRequest[]) packet.multipleObjectData);
             }
         }
 

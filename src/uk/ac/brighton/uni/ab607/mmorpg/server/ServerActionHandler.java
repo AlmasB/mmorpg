@@ -1,10 +1,13 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
+import java.util.HashMap;
+
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -15,10 +18,36 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 public class ServerActionHandler {
     
+    private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
     private GameServer server;
     
     public ServerActionHandler(GameServer server) {
         this.server = server;
+        
+        // init server actions
+        actions.put(Action.ATTACK,    this::serverActionAttack);
+        actions.put(Action.ATTR_UP,   this::serverActionAttrUp);
+        actions.put(Action.CHAT,      this::serverActionChat);
+        actions.put(Action.EQUIP,     this::serverActionEquip);
+        actions.put(Action.MOVE,      this::serverActionMove);
+        actions.put(Action.REFINE,    this::serverActionRefine);
+        actions.put(Action.SKILL_UP,  this::serverActionSkillUp);
+        actions.put(Action.SKILL_USE, this::serverActionSkillUse);
+        actions.put(Action.UNEQUIP,   this::serverActionUnequip);
+        actions.put(Action.USE_ITEM,  this::serverActionUseItem);
+    }
+    
+    public void process(ActionRequest[] requests) {
+        for (ActionRequest req : requests) {
+            try {
+                Player p = server.getPlayerByName(req.playerName);
+                actions.getOrDefault(req.action, (Player pl, ActionRequest r) 
+                        -> serverActionNone(pl, r)).execute(p, req);
+            }
+            catch (BadActionRequestException e) {
+                Out.err(e);
+            }
+        }
     }
     
     public void serverActionAttrUp(Player p, ActionRequest req) {
