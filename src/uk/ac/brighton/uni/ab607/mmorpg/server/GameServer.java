@@ -83,11 +83,11 @@ public class GameServer {
             CHAT = "CHAT",
             MOVE = "MOVE";
 
-    private static final int ATK_INTERVAL = 50;
+    /*package-private*/ static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;
 
-    private static final int STARTING_X = 25*40;
-    private static final int STARTING_Y = 15*40;
+    /*package-private*/ static final int STARTING_X = 25*40;
+    /*package-private*/ static final int STARTING_Y = 15*40;
 
     private int runtimeID = 1;
 
@@ -97,7 +97,7 @@ public class GameServer {
     private ArrayList<Chest> chests = new ArrayList<Chest>();
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 
-    private ArrayList<Animation> animations = new ArrayList<Animation>();
+    /*package-private*/ ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
@@ -105,19 +105,22 @@ public class GameServer {
     // new stuff down here
     
     private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
+    private ServerActionHandler actionHandler;
 
     public GameServer() throws SocketException {
+        actionHandler = new ServerActionHandler(this);
+        
         // init server actions
-        actions.put(Action.ATTACK,    this::serverActionAttack);
-        actions.put(Action.ATTR_UP,   this::serverActionAttrUp);
-        actions.put(Action.CHAT,      this::serverActionChat);
-        actions.put(Action.EQUIP,     this::serverActionEquip);
-        actions.put(Action.MOVE,      this::serverActionMove);
-        actions.put(Action.REFINE,    this::serverActionRefine);
-        actions.put(Action.SKILL_UP,  this::serverActionSkillUp);
-        actions.put(Action.SKILL_USE, this::serverActionSkillUse);
-        actions.put(Action.UNEQUIP,   this::serverActionUnequip);
-        actions.put(Action.USE_ITEM,  this::serverActionUseItem);
+        actions.put(Action.ATTACK,    actionHandler::serverActionAttack);
+        actions.put(Action.ATTR_UP,   actionHandler::serverActionAttrUp);
+        actions.put(Action.CHAT,      actionHandler::serverActionChat);
+        actions.put(Action.EQUIP,     actionHandler::serverActionEquip);
+        actions.put(Action.MOVE,      actionHandler::serverActionMove);
+        actions.put(Action.REFINE,    actionHandler::serverActionRefine);
+        actions.put(Action.SKILL_UP,  actionHandler::serverActionSkillUp);
+        actions.put(Action.SKILL_USE, actionHandler::serverActionSkillUse);
+        actions.put(Action.UNEQUIP,   actionHandler::serverActionUnequip);
+        actions.put(Action.USE_ITEM,  actionHandler::serverActionUseItem);
         
         // init world
         initGameMap();
@@ -183,7 +186,7 @@ public class GameServer {
                     try {
                         Player p = getPlayerByName(req.playerName);
                         actions.getOrDefault(req.action, (Player pl, ActionRequest r) 
-                                -> serverActionNone(pl, r)).execute(p, req);
+                                -> actionHandler.serverActionNone(pl, r)).execute(p, req);
                     }
                     catch (BadActionRequestException e) {
                         Out.err(e);
@@ -223,118 +226,6 @@ public class GameServer {
             }
         }
     }
-    
-    private void serverActionAttrUp(Player p, ActionRequest req) {
-        p.increaseAttr(req.value1);
-    }
-    
-    private void serverActionSkillUp(Player p, ActionRequest req) {
-        p.increaseSkillLevel(req.value1);
-    }
-    
-    private void serverActionEquip(Player player, ActionRequest req) throws BadActionRequestException {
-        GameItem item = player.getInventory().getItem(req.value1);
-        if (item != null) {
-            if (item instanceof Weapon) {
-                player.equipWeapon((Weapon) item);
-            }
-            else if (item instanceof Armor) {
-                player.equipArmor((Armor) item);
-            }
-            else
-                throw new BadActionRequestException("Item not equippable: " + req.value1);
-        }
-        else
-            throw new BadActionRequestException("Item not found: " + req.value1);
-    }
-    
-    private void serverActionUnequip(Player player, ActionRequest req) {
-        player.unEquipItem(req.value1);
-    }
-    
-    private void serverActionRefine(Player player, ActionRequest req) throws BadActionRequestException {
-        GameItem itemToRefine = player.getInventory().getItem(req.value1);
-
-        if (itemToRefine != null) {
-            if (itemToRefine instanceof EquippableItem) {
-                ((EquippableItem) itemToRefine).refine();
-            }
-            else
-                throw new BadActionRequestException("Item cannot be refined: " + req.value1);
-        }
-        else
-            throw new BadActionRequestException("Item not found: " + req.value1);
-    }
-    
-    private void serverActionUseItem(Player player, ActionRequest req) {
-        ((UsableItem) player.getInventory().getItem(req.value1)).onUse(player);
-    }
-    
-    private void serverActionAttack(Player player, ActionRequest req) {
-        if (player.hasStatusEffect(Status.STUNNED))
-            return;
-
-        // at this stage client can only target enemies
-        // when players are added this check will go
-        GameCharacter tmpChar = getGameCharacterByRuntimeID(req.value1);
-        if (tmpChar instanceof Enemy) {
-            Enemy target = (Enemy) tmpChar;
-            if (target != null && target.isAlive()
-                    && distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
-
-                if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                    int dmg = player.attack(target);
-                    animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
-                    player.atkTime = 0;
-                    if (target.getHP() <= 0) {
-                        player.gainBaseExperience(target.experience);
-                        player.gainJobExperience(target.experience);
-                        player.gainStatExperience(target.experience);
-                        spawnChest(target.onDeath());
-
-                    }
-                }
-
-                if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
-                        && !target.hasStatusEffect(Status.STUNNED)) {
-                    int dmg = target.attack(player);
-                    animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
-                    target.atkTime = 0;
-                    if (player.getHP() <= 0) {
-                        //player.onDeath();
-                        player.setX(STARTING_X);
-                        player.setY(STARTING_Y);
-                    }
-                }
-            }
-        }
-    }
-    
-    private void serverActionSkillUse(Player player, ActionRequest req) {
-        Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(req.value2);
-        if (skTarget != null) {
-            player.useSkill(req.value1, skTarget);
-
-            if (skTarget.getHP() <= 0) {
-                player.gainBaseExperience(skTarget.experience);
-                player.gainJobExperience(skTarget.experience);
-                player.gainStatExperience(skTarget.experience);
-                chests.add(skTarget.onDeath());
-            }
-        }
-    }
-    
-    private void serverActionChat(Player player, ActionRequest req) {
-        animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, req.data));
-    }
-    
-    private void serverActionMove(Player p, ActionRequest req) {
-        moveObject(p, req.value1, req.value2);
-    }
-    
-    private void serverActionNone(Player p, ActionRequest req) {
-        Out.debug("GameServer::serverActionNone called");
-    }
 
     /**
      *
@@ -343,7 +234,7 @@ public class GameServer {
      * @return
      *          player if name exists on the server, if not then null
      */
-    private Player getPlayerByName(String name) {
+    /*package-private*/ Player getPlayerByName(String name) {
         for (Player p : players)
             if (p.name.equals(name))
                 return p;
@@ -359,7 +250,7 @@ public class GameServer {
      *          character (player, enemy or NPC) associated with this ID
      *          or null if ID doesn't exist
      */
-    private GameCharacter getGameCharacterByRuntimeID(int id) {
+    /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id) {
         for (Enemy e : enemies)
             if (e.getRuntimeID() == id)
                 return e;
@@ -511,7 +402,7 @@ public class GameServer {
         return closed.get(index++);
     }*/
 
-    private void moveObject(GameCharacter ch, int x, int y) {
+    /*package-private*/ void moveObject(GameCharacter ch, int x, int y) {
         x /= 40; y /= 40;
 
         if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
@@ -616,7 +507,7 @@ public class GameServer {
         return e;
     }
 
-    private Chest spawnChest(Chest chest) {
+    /*package-private*/ Chest spawnChest(Chest chest) {
         chests.add(chest);
         return chest;
     }
@@ -766,15 +657,15 @@ public class GameServer {
      * @return
      *          distance between 2 characters in number of cells
      */
-    private int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
+    /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
     }
 
-    private int distanceBetween(GameCharacter ch, Chest c) {
+    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 
-    private int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
+    /*package-private*/ int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }
