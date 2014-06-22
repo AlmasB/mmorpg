@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,17 +72,6 @@ public class GameServer {
 
     private AStarNode targetNode;
     private AStarNode playerParent;
-
-    public static final String ATTR_UP = "ATTR_UP",
-            SKILL_UP = "SKILL_UP",
-            EQUIP = "EQUIP",
-            UNEQUIP = "UNEQUIP",
-            REFINE = "REFINE",
-            USE_ITEM = "USE_ITEM",
-            ATTACK = "ATTACK",
-            SKILL_USE = "SKILL_USE",
-            CHAT = "CHAT",
-            MOVE = "MOVE";
 
     /*package-private*/ static final int ATK_INTERVAL = 50;
     private static final int ENEMY_SIGHT = 320;

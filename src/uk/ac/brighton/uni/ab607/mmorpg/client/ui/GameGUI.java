@@ -257,9 +257,10 @@ public class GameGUI extends GUI {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
 
-        if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
+        //if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
+        if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
             target = map[selX/40][selY/40];
-            addActionRequest(new ActionRequest(Action.MOVE, player.name, selX, selY));
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, target.getX()*40, target.getY()*40));
         }
         else {
             target = null;
@@ -336,6 +337,14 @@ public class GameGUI extends GUI {
 
             g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
         }
+        
+        // debug full grid drawing
+        /*for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                g.setColor(Color.YELLOW);
+                g.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
+            }
+        }*/
     }
 
     @Override
