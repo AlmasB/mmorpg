@@ -53,20 +53,16 @@ public class InventoryGUI extends GUI {
         this.add(itemInfoLabel);
 
         infoButton.setBounds(346, 235, 80, 30);
-        infoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                runOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        infoButton.setText(e.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON);
-                        if (selectedItem != null)
-                            itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                                    : selectedItem.toPseudoHTMLShort());
-                    }
-                });
-            }
+        infoButton.addActionListener(event -> {
+            runOnUIThread(() -> {
+                infoButton.setText(event.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON);
+                if (selectedItem != null)
+                    itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
+                            : selectedItem.toPseudoHTMLShort());
+            });
         });
+        
+        
         this.add(infoButton);
 
         this.addMouseListener(mouse);
@@ -99,10 +95,10 @@ public class InventoryGUI extends GUI {
 
         if (player != null) {
             drawItem(player.getEquip(Player.RIGHT_HAND), g, 45, 130);
-            drawItem(player.getEquip(Player.LEFT_HAND), g, 135, 130);
-            drawItem(player.getEquip(Player.BODY), g, 90, 130);
-            drawItem(player.getEquip(Player.HELM), g, 90, 85);
-            drawItem(player.getEquip(Player.SHOES), g, 90, 180);
+            drawItem(player.getEquip(Player.LEFT_HAND),  g, 135, 130);
+            drawItem(player.getEquip(Player.BODY),       g, 90, 130);
+            drawItem(player.getEquip(Player.HELM),       g, 90, 85);
+            drawItem(player.getEquip(Player.SHOES),      g, 90, 180);
         }
 
         g.drawImage(Resources.getImage("inv.png"), 2, 27, this);
@@ -203,7 +199,6 @@ public class InventoryGUI extends GUI {
     }
 
     private class Mouse implements MouseListener, MouseMotionListener {
-
         @Override
         public void mouseClicked(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -235,24 +230,7 @@ public class InventoryGUI extends GUI {
                 }
             }
         }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {}
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            //e.getComponent()
-            //Out.println(e.getComponent().toString());
-        }
-        @Override
-        public void mouseExited(MouseEvent e) {}
-        @Override
-        public void mouseDragged(MouseEvent e) {}
-
+        
         @Override
         public void mouseMoved(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -261,13 +239,10 @@ public class InventoryGUI extends GUI {
             if (bodyPart != -1) {
                 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 selectedItem = player.getEquip(bodyPart);
-                runOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (selectedItem != null)
-                            itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                                    : selectedItem.toPseudoHTMLShort());
-                    }
+                runOnUIThread(() -> {
+                    if (selectedItem != null)
+                        itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
+                                : selectedItem.toPseudoHTMLShort());
                 });
                 return;
             }
@@ -286,16 +261,24 @@ public class InventoryGUI extends GUI {
                 GameItem item = player.getInventory().getItem(itemIndex);
                 if (item != null && item != selectedItem) {
                     selectedItem = item;
-                    runOnUIThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (selectedItem != null)
-                                itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                                        : selectedItem.toPseudoHTMLShort());
-                        }
+                    runOnUIThread(() -> {
+                        if (selectedItem != null)
+                            itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
+                                    : selectedItem.toPseudoHTMLShort());
                     });
                 }
             }
         }
+
+        @Override
+        public void mousePressed(MouseEvent e) {}
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
+        @Override
+        public void mouseDragged(MouseEvent e) {}
     }
 }

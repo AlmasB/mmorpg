@@ -266,7 +266,6 @@ public class GameGUI extends GUI {
         if (gContext != null)
             gContext.setRenderOffset(renderX, renderY);
 
-        //if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
         if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
             target = map[selX/40][selY/40];
             addActionRequest(new ActionRequest(Action.MOVE, player.name, target.getX()*40, target.getY()*40));
@@ -302,8 +301,6 @@ public class GameGUI extends GUI {
         
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
-        
-        //Out.println(g.getFont().toString());
 
         if (player != null) {
             int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
@@ -352,10 +349,6 @@ public class GameGUI extends GUI {
         }
 
         for (Animation a : tmpAnims) {
-            //g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
-                    //a.ssX*34, a.ssY*34, a.ssX*34+34, a.ssY*34+34, this);
-
-            //g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
             a.draw(gContext);
         }
         

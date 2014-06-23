@@ -31,30 +31,13 @@ public class TextAnimation extends Animation {
     }
     
     private String text;
-    //private Font font;
-    //private Color color;
     private TextAnimationType type;
-  
-    /*public TextAnimation(int x, int y, float duration, String text, Font font, Color color) {
-        super(x, y, duration);
-        this.text = text;
-        this.font = font;
-        this.color = color;
-    }*/
     
     public TextAnimation(int x, int y, String text, TextAnimationType type) {
         super(x, y, type.duration);
         this.text = text;
         this.type = type;
     }
-    
-    /*public TextAnimation(int x, int y, float duration, String text) {
-        this(x, y, duration, text, AnimationUtils.DEFAULT_FONT, Color.WHITE);
-    }
-    
-    public TextAnimation(int x, int y, float duration, String text, Color color) {
-        this(x, y, duration, text, AnimationUtils.DEFAULT_FONT, color);
-    }*/
 
     @Override
     protected void updateImpl(float completed) {

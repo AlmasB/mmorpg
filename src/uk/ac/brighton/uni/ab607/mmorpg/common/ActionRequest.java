@@ -1,5 +1,12 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+/**
+ * A container for commands/actions requested by the game client
+ * 
+ * @author Almas Baimagambetov
+ * @version 1.1
+ *
+ */
 public class ActionRequest implements java.io.Serializable {
     /**
      * 

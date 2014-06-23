@@ -8,10 +8,5 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
  *
  */
 public enum Stat {
-    MAX_HP, MAX_SP, ATK, MATK, DEF, MDEF, ARM, MARM, ASPD, MSPD, CRIT_CHANCE, MCRIT_CHANCE, CRIT_DMG, MCRIT_DMG, HP_REGEN, SP_REGEN;
-
-    @Override
-    public String toString() {
-        return this.name();
-    }
+    MAX_HP, MAX_SP, ATK, MATK, DEF, MDEF, ARM, MARM, ASPD, MSPD, CRIT_CHANCE, MCRIT_CHANCE, CRIT_DMG, MCRIT_DMG, HP_REGEN, SP_REGEN
 }

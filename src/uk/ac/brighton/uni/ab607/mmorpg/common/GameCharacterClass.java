@@ -4,6 +4,13 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
+/**
+ * A game character will have one of these classes
+ * Profession/job in a nutshell
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public enum GameCharacterClass {
     MONSTER(50, 50),
     NOVICE(10, 10),

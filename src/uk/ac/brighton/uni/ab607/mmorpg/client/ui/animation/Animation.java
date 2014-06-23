@@ -2,6 +2,13 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 
+/**
+ * Any visible image/text/object that may or may not
+ * change over the duration
+ * 
+ * @author Almas Baimagambetov
+ * @version 1.1
+ */
 public abstract class Animation implements java.io.Serializable {
     /**
      * 

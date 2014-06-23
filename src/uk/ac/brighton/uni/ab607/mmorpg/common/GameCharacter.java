@@ -10,6 +10,13 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
+/**
+ * Essentially alive game object
+ * Enemies/NPCs/players
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public abstract class GameCharacter implements java.io.Serializable {
     /**
      *
@@ -74,7 +81,7 @@ public abstract class GameCharacter implements java.io.Serializable {
             SP_REGEN = 15;
 
     protected int[] attributes = new int[9];    // we have 9 attributes
-    protected int[] bAttributes = new int[9];   // on top of native attributes, bonuses can be given we items
+    protected int[] bAttributes = new int[9];   // on top of native attributes items can give bonuses
     protected float[] stats = new float[16];        // 16 stats
     protected float[] bStats = new float[16];       // bonus stats given by item
 

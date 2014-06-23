@@ -11,8 +11,13 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
+/**
+ * Actual user, 1 per client
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget {
-
     /**
      *
      */

@@ -65,12 +65,8 @@ public class StatsGUI extends GUI {
             buttons[i] = new JButton("+");
             buttons[i].setBounds(125, 3 + 30 * i, 45, 28);
             buttons[i].setFont(new Font("Courier", Font.PLAIN, 18));
-            buttons[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addActionRequest(new ActionRequest(Action.ATTR_UP, playerName, attr));
-                }
-            });
+            buttons[i].addActionListener(e 
+                    -> addActionRequest(new ActionRequest(Action.ATTR_UP, playerName, attr)));
             add(buttons[i]);
         }
 
@@ -83,12 +79,8 @@ public class StatsGUI extends GUI {
             skillButtons[i].setSize(40, 40);
             skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
             skillButtons[i].setEnabled(false);
-            skillButtons[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addActionRequest(new ActionRequest(Action.SKILL_UP, playerName, skillValue));
-                }
-            });
+            skillButtons[i].addActionListener(e
+                    -> addActionRequest(new ActionRequest(Action.SKILL_UP, playerName, skillValue)));
             this.add(skillButtons[i]);
         }
 
@@ -139,12 +131,9 @@ public class StatsGUI extends GUI {
             }
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                attributes.setText(p.attributesToPseudoHTML());
-                stats.setText(p.statsToPseudoHTML());
-            }
+        SwingUtilities.invokeLater(() -> {
+            attributes.setText(p.attributesToPseudoHTML());
+            stats.setText(p.statsToPseudoHTML());
         });
     }
 
