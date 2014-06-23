@@ -3,13 +3,11 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
@@ -17,25 +15,17 @@ import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.DamageTextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
-import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 class Point implements java.io.Serializable, AgentGoalTarget {
     /**
@@ -66,18 +56,11 @@ public class GameServer {
     private AStarLogic logic = new AStarLogic();
     private AStarNode[][] map;
     private List<AStarNode> closed = new ArrayList<AStarNode>();
-
-
-    private int index = 0;
     private AStarNode n = null;
-    private AStarNode parent = null;
 
     private AStarNode targetNode;
-    private AStarNode playerParent;
 
     /*package-private*/ static final int ATK_INTERVAL = 50;
-    private static final int ENEMY_SIGHT = 320;
-
     /*package-private*/ static final int STARTING_X = 25*40;
     /*package-private*/ static final int STARTING_Y = 15*40;
 
@@ -357,7 +340,7 @@ public class GameServer {
 
         if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
             int dmg = attacker.attack(target);
-            addAnimation(new DamageTextAnimation(attacker.getX(), attacker.getY() + 80, 0.5f, dmg+""));
+            addAnimation(new TextAnimation(attacker.getX(), attacker.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
             //addAnimation(new ImageAnimation());
             attacker.atkTime = 0;
         }
@@ -388,7 +371,6 @@ public class GameServer {
             busy[i] = busyNodes.get(i);
 
         closed = logic.getPath(map, startN, targetNode, busy);
-        index = 0;
 
         if (closed.size() > 0) {
             n = closed.get(0);

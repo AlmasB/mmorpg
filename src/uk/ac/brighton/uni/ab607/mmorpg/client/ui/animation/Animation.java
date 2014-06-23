@@ -1,7 +1,5 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import java.awt.image.BufferedImage;
-
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 
 public abstract class Animation implements java.io.Serializable {
@@ -47,5 +45,9 @@ public abstract class Animation implements java.io.Serializable {
     
     public int getY() {
         return y;
+    }
+    
+    public void setMaxDuration(float maxDuration) {
+        this.maxDuration = maxDuration;
     }
 }

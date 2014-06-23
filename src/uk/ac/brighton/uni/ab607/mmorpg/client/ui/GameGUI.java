@@ -29,6 +29,7 @@ import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
@@ -326,6 +327,9 @@ public class GameGUI extends GUI {
                     e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
                     e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
 
+            g.setFont(AnimationUtils.DEFAULT_FONT);
+            g.setColor(AnimationUtils.DEFAULT_COLOR);
+            
             g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
         }
 
@@ -337,6 +341,9 @@ public class GameGUI extends GUI {
                     p.getX() - renderX, p.getY() - renderY, p.getX() - renderX+40, p.getY() - renderY+40,
                     p.place*40, p.getRow()*40, p.place*40+40, p.getRow()*40+40, this);
 
+            g.setFont(AnimationUtils.DEFAULT_FONT);
+            g.setColor(AnimationUtils.DEFAULT_COLOR);
+            
             g.drawString(p.name, p.getX() - renderX + 20 - (width/2), p.getY() + 5 + 40 - renderY);
         }
 
