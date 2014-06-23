@@ -14,23 +14,18 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 class Point implements java.io.Serializable, AgentGoalTarget {
     /**
@@ -61,40 +56,13 @@ public class GameServer {
     private AStarLogic logic = new AStarLogic();
     private AStarNode[][] map;
     private List<AStarNode> closed = new ArrayList<AStarNode>();
-
-
-    private int index = 0;
     private AStarNode n = null;
-    private AStarNode parent = null;
 
     private AStarNode targetNode;
-    private AStarNode playerParent;
 
-    /*public enum Command {
-        ATTR_UP, EQUIP, UNEQUIP, REFINE;
-
-        @Override
-        public String toString() {
-            return this.name();
-        }
-    }*/
-
-    public static final String ATTR_UP = "ATTR_UP",
-            SKILL_UP = "SKILL_UP",
-            EQUIP = "EQUIP",
-            UNEQUIP = "UNEQUIP",
-            REFINE = "REFINE",
-            USE_ITEM = "USE_ITEM",
-            ATTACK = "ATTACK",
-            SKILL_USE = "SKILL_USE",
-            CHAT = "CHAT",
-            MOVE = "MOVE";
-
-    private static final int ATK_INTERVAL = 50;
-    private static final int ENEMY_SIGHT = 320;
-
-    private static final int STARTING_X = 25*40;
-    private static final int STARTING_Y = 15*40;
+    /*package-private*/ static final int ATK_INTERVAL = 50;
+    /*package-private*/ static final int STARTING_X = 25*40;
+    /*package-private*/ static final int STARTING_Y = 15*40;
 
     private int runtimeID = 1;
 
@@ -103,25 +71,24 @@ public class GameServer {
     private ArrayList<Player> players = new ArrayList<Player>();
     private ArrayList<Chest> chests = new ArrayList<Chest>();
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-
+    
     private ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
+    
+    private ServerActionHandler actionHandler;
 
-    public GameServer() {
-
+    public GameServer() throws SocketException {
+        actionHandler = new ServerActionHandler(this);
+        
+        // init world
         initGameMap();
         initGameObjects();
         initAI();
 
         // init server connection
-        try {
-            server = new UDPServer(55555, new ClientQueryParser());
-        }
-        catch (SocketException e) {
-            e.printStackTrace();
-        }
+        server = new UDPServer(55555, new ClientQueryParser());
 
         // start main server loop
         new Thread(new ServerLoop()).start();
@@ -173,13 +140,9 @@ public class GameServer {
                 closePlayerConnection(packet.stringData.split(",")[1]);
             }
 
-            if (packet.multipleObjectData instanceof String[]) {
-                try {
-                    parseActions((String[]) packet.multipleObjectData);
-                }
-                catch (BadActionRequestException e) {
-                    Out.err(e);
-                }
+            // handle action requests from clients
+            if (packet.multipleObjectData instanceof ActionRequest[]) {
+                actionHandler.process((ActionRequest[]) packet.multipleObjectData);
             }
         }
 
@@ -216,161 +179,13 @@ public class GameServer {
     }
 
     /**
-     * Parses any actions requested by game client
-     *
-     * General format for "action" string
-     *
-     * "ACTION_NAME,PLAYER_NAME,VALUES..."
-     *
-     * @param actions
-     *                  an array containing all actions from 1 client
-     * @throws BadActionRequestException
-     */
-    private void parseActions(String[] actions) throws BadActionRequestException {
-        for (String action : actions) {
-            String[] tokens = action.split(",");
-
-            String cmd = tokens[0];
-            Player player = getPlayerByName(tokens[1]);
-            if (player == null)
-                throw new BadActionRequestException("No player name found: " + tokens[1]);
-
-            int value = 0;
-            try {
-                value = Integer.parseInt(tokens[2]);
-            }
-            catch (NumberFormatException e) {
-                throw new BadActionRequestException("Bad value: " + tokens[2]);
-            }
-
-            int value2 = 0; // for skill use, specifies runtimeID of the target
-            // also for movement value is x, value2 is y
-            if (tokens.length == 4) {
-                try {
-                    value2 = Integer.parseInt(tokens[3]);
-                }
-                catch (NumberFormatException e) {
-                    throw new BadActionRequestException("Bad value: " + tokens[2]);
-                }
-            }
-
-            // if tokens.length == 5 chat
-
-            switch (cmd) {
-                case ATTR_UP:
-                    player.increaseAttr(value);
-                    break;
-                case SKILL_UP:
-                    player.increaseSkillLevel(value);
-                    break;
-                case EQUIP:
-                    GameItem item = player.getInventory().getItem(value);
-                    if (item != null) {
-                        if (item instanceof Weapon) {
-                            player.equipWeapon((Weapon) item);
-                        }
-                        else if (item instanceof Armor) {
-                            player.equipArmor((Armor) item);
-                        }
-                        else
-                            throw new BadActionRequestException("Item not equippable: " + value);
-                    }
-                    else
-                        throw new BadActionRequestException("Item not found: " + value);
-                    break;
-                case UNEQUIP:
-                    player.unEquipItem(value);
-                    break;
-                case REFINE:
-                    GameItem itemToRefine = player.getInventory().getItem(value);
-
-                    if (itemToRefine != null) {
-                        if (itemToRefine instanceof EquippableItem) {
-                            ((EquippableItem) itemToRefine).refine();
-                        }
-                        else
-                            throw new BadActionRequestException("Item cannot be refined: " + value);
-                    }
-                    else
-                        throw new BadActionRequestException("Item not found: " + value);
-                    break;
-                case MOVE:
-                    moveObject(player, value, value2);
-                    break;
-                case ATTACK:
-                    if (player.hasStatusEffect(Status.STUNNED))
-                        break;
-
-                    // at this stage client can only target enemies
-                    // when players are added this check will go
-                    GameCharacter tmpChar = getGameCharacterByRuntimeID(value);
-                    if (tmpChar instanceof Enemy) {
-                        Enemy target = (Enemy) tmpChar;
-                        if (target != null && target.isAlive()
-                                && distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
-
-                            if (++player.atkTime >= ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
-                                int dmg = player.attack(target);
-                                animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
-                                player.atkTime = 0;
-                                if (target.getHP() <= 0) {
-                                    player.gainBaseExperience(target.experience);
-                                    player.gainJobExperience(target.experience);
-                                    player.gainStatExperience(target.experience);
-                                    spawnChest(target.onDeath());
-
-                                }
-                            }
-
-                            if (++target.atkTime >= ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
-                                    && !target.hasStatusEffect(Status.STUNNED)) {
-                                int dmg = target.attack(player);
-                                animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
-                                target.atkTime = 0;
-                                if (player.getHP() <= 0) {
-                                    //player.onDeath();
-                                    player.setX(STARTING_X);
-                                    player.setY(STARTING_Y);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case SKILL_USE:
-                    Enemy skTarget = (Enemy) getGameCharacterByRuntimeID(value2);
-                    if (skTarget != null) {
-                        value--;    // bring 1..9 to 0..8
-                        player.useSkill(value, skTarget);
-
-                        if (skTarget.getHP() <= 0) {
-                            player.gainBaseExperience(skTarget.experience);
-                            player.gainJobExperience(skTarget.experience);
-                            player.gainStatExperience(skTarget.experience);
-                            chests.add(skTarget.onDeath());
-                        }
-                    }
-                    break;
-                case USE_ITEM:
-                    UsableItem itemToUse = (UsableItem) player.getInventory().getItem(value);
-                    itemToUse.onUse(player);
-                    break;
-                case CHAT:
-                    animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, tokens[4]));
-                    break;
-                default:
-                    throw new BadActionRequestException("No such command: " + tokens[0]);
-            }
-        }
-    }
-
-    /**
      *
      * @param name
      *              player name
      * @return
      *          player if name exists on the server, if not then null
      */
-    private Player getPlayerByName(String name) {
+    /*package-private*/ Player getPlayerByName(String name) {
         for (Player p : players)
             if (p.name.equals(name))
                 return p;
@@ -386,7 +201,7 @@ public class GameServer {
      *          character (player, enemy or NPC) associated with this ID
      *          or null if ID doesn't exist
      */
-    private GameCharacter getGameCharacterByRuntimeID(int id) {
+    /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id) {
         for (Enemy e : enemies)
             if (e.getRuntimeID() == id)
                 return e;
@@ -401,10 +216,11 @@ public class GameServer {
             while (true) {
                 tmpPlayers = new ArrayList<Player>(players);
 
+                // process animations
                 for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
                     Animation a = it.next();
-                    a.duration -= 20.0f / 1000.0f;
-                    if (a.duration <= 0)
+                    a.update(0.02f);    // that's how much we sleep
+                    if (a.hasFinished())
                         it.remove();
                 }
 
@@ -441,10 +257,12 @@ public class GameServer {
                         }
                         else {
                             if (distanceBetween(p, c) < 1) {
-                                c.open();
-                                for (GameItem item : c.getItems())
-                                    p.getInventory().addItem(item);
-                                p.incMoney(c.money);
+                                if (p.getInventory().getSize() + c.getItems().size()
+                                        <= Inventory.MAX_SIZE) {
+                                    c.open();
+                                    c.getItems().forEach(p.getInventory()::addItem);
+                                    p.incMoney(c.money);
+                                }
                             }
                         }
                     }
@@ -493,15 +311,9 @@ public class GameServer {
     }
 
     private AgentGoalTarget getLastKnownLocation() {
-        AgentGoalTarget targ = null;
-        float max = 0;
-        for (Point p : locationFacts.keySet()) {
-            if (locationFacts.get(p) > max) {
-                max = locationFacts.get(p);
-                targ = p;
-            }
-        }
-        return targ;
+        return locationFacts.keySet().stream()
+                .max((Point o1, Point o2) -> (int)(10*(locationFacts.get(o1)-locationFacts.get(o2))))
+                .orElse(null);
     }
 
     private void processBasicAttack(GameCharacter agent, AgentGoalTarget target) {
@@ -528,21 +340,13 @@ public class GameServer {
 
         if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
             int dmg = attacker.attack(target);
-            animations.add(new Animation(attacker.getX(), attacker.getY() + 80, 0.5f, 0, 25, dmg+""));
+            addAnimation(new TextAnimation(attacker.getX(), attacker.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
+            //addAnimation(new ImageAnimation());
             attacker.atkTime = 0;
         }
     }
 
-    /*public AStarNode getNext() {
-        if (closed.size() == 0) return playerParent;
-
-        if (index >= closed.size())
-            index = closed.size() - 1;
-
-        return closed.get(index++);
-    }*/
-
-    private void moveObject(GameCharacter ch, int x, int y) {
+    /*package-private*/ void moveObject(GameCharacter ch, int x, int y) {
         x /= 40; y /= 40;
 
         if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
@@ -567,7 +371,6 @@ public class GameServer {
             busy[i] = busyNodes.get(i);
 
         closed = logic.getPath(map, startN, targetNode, busy);
-        index = 0;
 
         if (closed.size() > 0) {
             n = closed.get(0);
@@ -586,38 +389,6 @@ public class GameServer {
             ch.xSpeed = 0;
             ch.ySpeed = 0;
         }
-
-        /*if (move) {
-        n = getNext();
-        parent = playerParent;
-        }
-
-        if (n != parent) {
-            move = false;
-
-            if (player.getX() > n.getX() * 40)
-                player.xSpeed = -10;
-            if (player.getX() < n.getX() * 40)
-                player.xSpeed = 10;
-            if (player.getY() > n.getY() * 40)
-                player.ySpeed = -10;
-            if (player.getY() < n.getY() * 40)
-                player.ySpeed = 10;
-
-            // determine whether parent has changed
-
-            if (player.getX() == n.getX()*40 && player.getY() == n.getY() *40) {
-                playerParent = n;
-                move = true;
-
-                if (target != null && target == playerParent) {
-                    target = null;
-                }
-            }
-
-            renderX = player.getX() - 640;  // half of width
-            renderY = player.getY() - 360;  // half of height
-        }*/
     }
 
     private void addNewPlayer(String name, int x, int y) {
@@ -638,16 +409,22 @@ public class GameServer {
      * @param y
      *          y coord
      */
-    private void spawnEnemy(String id, int x, int y) {
+    private Enemy spawnEnemy(String id, int x, int y) {
         Enemy e = ObjectManager.getEnemyByID(id);
         e.setRuntimeID(runtimeID++);
         e.setX(x);
         e.setY(y);
         enemies.add(e);
+        return e;
     }
 
-    private void spawnChest(Chest chest) {
+    /*package-private*/ Chest spawnChest(Chest chest) {
         chests.add(chest);
+        return chest;
+    }
+    
+    /*package-private*/ void addAnimation(Animation a) {
+        animations.add(a);
     }
 
     private void initGameMap() {
@@ -668,18 +445,19 @@ public class GameServer {
 
     private void initGameObjects() {
         spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
-        spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
+        Chest c = spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
 
-        spawnEnemy("2001", 640, 160);
-        spawnEnemy("2000", 720, 720);
-        spawnEnemy("2000", 40, 40);
-        spawnEnemy("2001", 40, 120);
-        spawnEnemy("2001", 400, 120);
-        spawnEnemy("2001", 320, 160);
-        spawnEnemy("2001", 40, 360);
-        spawnEnemy("2001", 600, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 640, 160);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 720, 720);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 40);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 400, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 320, 160);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 360);
+        spawnEnemy(ID.Enemy.MINOR_FIRE_SPIRIT, 600, 120);
 
-        spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
+        Enemy e = spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
+        e.AI.setTarget(c);
     }
 
     private void initAI() {
@@ -780,7 +558,9 @@ public class GameServer {
     }
 
     private void aiPatrol(Enemy agent, AgentGoalTarget target) {
-
+        if (distanceBetween(agent, target) > 3) {
+            moveObject(agent, target.getX(), target.getY());
+        }
     }
 
     /**
@@ -792,15 +572,15 @@ public class GameServer {
      * @return
      *          distance between 2 characters in number of cells
      */
-    private int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
+    /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
     }
 
-    private int distanceBetween(GameCharacter ch, Chest c) {
+    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 
-    private int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
+    /*package-private*/ int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

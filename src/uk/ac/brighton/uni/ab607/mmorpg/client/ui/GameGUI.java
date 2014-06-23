@@ -23,10 +23,16 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
@@ -77,8 +83,10 @@ public class GameGUI extends GUI {
     private Cursor walkCursor = null;
 
     private int selX = 0, selY = 0; // selected point
+    
+    private GraphicsContext gContext = null;
 
-    public GameGUI(String ip, String playerName) {
+    public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
 
         name = playerName;
@@ -107,13 +115,8 @@ public class GameGUI extends GUI {
             }
         }
 
-        try {
-            client = new UDPClient(ip, 55555, new ServerResponseParser());
-            client.send(new DataPacket("CREATE_PLAYER," + name));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        client = new UDPClient(ip, 55555, new ServerResponseParser());
+        client.send(new DataPacket("CREATE_PLAYER," + name));
 
         chat.setLayout(null);
         chat.setBounds(5, 720 - 53, 1280 - 25, 20);
@@ -122,7 +125,7 @@ public class GameGUI extends GUI {
             public void actionPerformed(ActionEvent e) {
                 String chatText = e.getActionCommand();
                 if (!chatText.isEmpty()) {
-                    addActionRequest("CHAT," + player.name + ",0,0," + chatText);
+                    addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
                     chat.setText("");
                 }
             }
@@ -259,10 +262,13 @@ public class GameGUI extends GUI {
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
+        
+        if (gContext != null)
+            gContext.setRenderOffset(renderX, renderY);
 
-        if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
+        if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
             target = map[selX/40][selY/40];
-            addActionRequest("MOVE," + player.name + "," + (selX) + "," + (selY));
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, target.getX()*40, target.getY()*40));
         }
         else {
             target = null;
@@ -271,7 +277,7 @@ public class GameGUI extends GUI {
         checkRuntimeID();
 
         if (targetRuntimeID != 0) {
-            addActionRequest("ATTACK," + player.name + "," + targetRuntimeID);
+            addActionRequest(new ActionRequest(Action.ATTACK, player.name, targetRuntimeID));
         }
 
         if (!stop) {
@@ -290,6 +296,9 @@ public class GameGUI extends GUI {
 
     @Override
     protected void createPicture(Graphics2D g) {
+        if (gContext == null)
+            gContext = new GraphicsContext(g);
+        
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
 
@@ -311,10 +320,13 @@ public class GameGUI extends GUI {
         }
 
         for (Enemy e : tmpEnemies) {
-            g.drawImage(Resources.getImage("enemy3.png"),
+            g.drawImage(Resources.getImage(e.spriteName),
                     e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
                     e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
 
+            g.setFont(AnimationUtils.DEFAULT_FONT);
+            g.setColor(AnimationUtils.DEFAULT_COLOR);
+            
             g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
         }
 
@@ -326,6 +338,9 @@ public class GameGUI extends GUI {
                     p.getX() - renderX, p.getY() - renderY, p.getX() - renderX+40, p.getY() - renderY+40,
                     p.place*40, p.getRow()*40, p.place*40+40, p.getRow()*40+40, this);
 
+            g.setFont(AnimationUtils.DEFAULT_FONT);
+            g.setColor(AnimationUtils.DEFAULT_COLOR);
+            
             g.drawString(p.name, p.getX() - renderX + 20 - (width/2), p.getY() + 5 + 40 - renderY);
         }
 
@@ -334,11 +349,16 @@ public class GameGUI extends GUI {
         }
 
         for (Animation a : tmpAnims) {
-            g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
-                    a.ssX*34, a.ssY*34, a.ssX*34+34, a.ssY*34+34, this);
-
-            g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
+            a.draw(gContext);
         }
+        
+        // debug full grid drawing
+        /*for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                g.setColor(Color.YELLOW);
+                g.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
+            }
+        }*/
     }
 
     @Override
@@ -448,7 +468,7 @@ public class GameGUI extends GUI {
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        addActionRequest("SKILL_USE," + player.name + "," + input + "," + enemy.getRuntimeID());
+                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;
                     }
                 }

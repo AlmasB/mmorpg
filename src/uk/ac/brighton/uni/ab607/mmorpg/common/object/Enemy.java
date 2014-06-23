@@ -1,5 +1,8 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import java.awt.image.BufferedImage;
+
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
@@ -30,7 +33,9 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
 
     private DroppableItem[] drops;
 
-    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, DroppableItem... drops) {
+    public final String spriteName;
+
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
         this.type = type;
@@ -38,11 +43,12 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
         this.element = element;
         this.baseLevel = level;
         this.experience = baseXP;
+        this.spriteName = spriteName;
         this.drops = drops;
     }
 
     /*package-private*/ Enemy(Enemy copy) {
-        this(copy.id, copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.drops);
+        this(copy.id, copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.spriteName, copy.drops);
     }
 
     public Chest onDeath() {
@@ -75,18 +81,4 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
     public Element getArmorElement() {
         return element;
     }
-
-    /* EXPERIMENTAL ADDITIONS */
-
-    //public int xSpeed, ySpeed;
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    /* UP TO HERE */
 }

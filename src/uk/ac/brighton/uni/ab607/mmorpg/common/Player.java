@@ -11,8 +11,13 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
+/**
+ * Actual user, 1 per client
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget {
-
     /**
      *
      */
@@ -43,7 +48,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     }
 
     private int statLevel = 1, jobLevel = 1;
-
+   
     private int gainedBaseExperience = 0,
             gainedStatExperience = 0,
             gainedJobExperience = 0,
@@ -51,7 +56,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             skillPoints = 0;
 
     private int money = 0;
-    private Inventory inventory = new Inventory(10);
+    private Inventory inventory = new Inventory();
 
     public static final int HELM = 0,
             BODY = 1,
@@ -60,74 +65,6 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             LEFT_HAND = 4;
 
     private EquippableItem[] equip = new EquippableItem[5];
-
-    /* EXPERIMENTAL ADDITIONS */
-
-    /* private int x, y;
-    public int xSpeed, ySpeed;
-
-    public int frame = 0;
-    public int place = 0;
-
-    public int sprite = 0;
-
-    public enum Dir {
-        UP, DOWN, LEFT, RIGHT
-    }
-
-    public Dir direction = Dir.DOWN;
-
-    private int factor = 3;
-
-    public void move() {
-        x += xSpeed;
-        y += ySpeed;
-
-        if (xSpeed > 0)
-            direction = Dir.RIGHT;
-        if (xSpeed < 0)
-            direction = Dir.LEFT;
-        if (ySpeed > 0)
-            direction = Dir.DOWN;
-        if (ySpeed < 0)
-            direction = Dir.UP;
-
-        frame++;
-
-        if (frame == 4 * factor)
-            frame = 0;
-
-        if (frame /factor == 0 || frame/factor == 2)
-            place = 0;
-        if (frame/factor == 1)
-            place = 1;
-        if (frame/factor == 3)
-            place = 2;
-    }
-
-    public int getRow() {
-        return direction.ordinal();
-    }*/
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    /* UP TO HERE */
 
     public Player(String name, GameCharacterClass charClass, int x, int y) {
         super(name, "Player", charClass);
@@ -143,14 +80,18 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
      *
      * @param value
      *              base experience earned
+     * @return 
+     *          true if player gained new level, false otherwise
      */
-    public void gainBaseExperience(final int value) {
+    public boolean gainBaseExperience(final int value) {
         gainedBaseExperience += value;
         if (gainedBaseExperience >= EXP_NEEDED[baseLevel-1]) {
-            Out.println("Base Level UP!");
             baseLevelUp();
             gainedBaseExperience = 0;
+            return true;
         }
+        
+        return false;
     }
 
     public void gainStatExperience(final int value) {
@@ -301,6 +242,10 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     public void onDeath() {
         alive = false;
     }
+    
+    public int getJobLevel() {
+        return jobLevel;
+    }
 
     /*
     @Override
@@ -324,5 +269,15 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
                 + "ARM: " + BLUE + (int)getTotalStat(ARM) + "%" + FONT_END + " MARM: " + BLUE + (int)getTotalStat(MARM) + "%" + FBR
                 + "ASPD: " + BLUE + (int)getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
     }
 }

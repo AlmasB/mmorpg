@@ -174,12 +174,7 @@ public class LoginController extends AnchorPane implements Initializable {
     }
 
     private void setErrorMessage(final String msg) {
-        runOnUI(new Runnable() {
-            @Override
-            public void run() {
-                errorMessage.setText(msg);
-            }
-        });
+        runOnUI(() -> errorMessage.setText(msg));
     }
 
     /**
@@ -191,12 +186,7 @@ public class LoginController extends AnchorPane implements Initializable {
      *          false to disable
      */
     private void showProgressBar(final boolean b) {
-        runOnUI(new Runnable() {
-            @Override
-            public void run() {
-                progress.setVisible(b);
-            }
-        });
+        runOnUI(() -> progress.setVisible(b));
     }
 
     /**
@@ -206,12 +196,7 @@ public class LoginController extends AnchorPane implements Initializable {
      *          false to hide
      */
     private void enableButton(final boolean b) {
-        runOnUI(new Runnable() {
-            @Override
-            public void run() {
-                login.setDisable(!b);
-            }
-        });
+        runOnUI(() -> login.setDisable(!b));
     }
 
     private void delay(long millis) {
@@ -241,12 +226,7 @@ public class LoginController extends AnchorPane implements Initializable {
             }
 
             if (!packet.stringData.isEmpty()) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        errorMessage.setText(packet.stringData);
-                    }
-                });
+                Platform.runLater(() -> errorMessage.setText(packet.stringData));
             }
         }
     }

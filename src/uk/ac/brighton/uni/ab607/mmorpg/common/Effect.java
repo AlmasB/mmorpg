@@ -3,6 +3,13 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Essence;
 
+/**
+ * Buff that lasts for a period of time, can be negative
+ * i.e. atk decrease
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class Effect implements java.io.Serializable {
     /**
      *
