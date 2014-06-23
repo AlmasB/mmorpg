@@ -447,14 +447,14 @@ public class GameServer {
         spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
         Chest c = spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
 
-        spawnEnemy("2001", 640, 160);
-        spawnEnemy("2000", 720, 720);
-        spawnEnemy("2000", 40, 40);
-        spawnEnemy("2001", 40, 120);
-        spawnEnemy("2001", 400, 120);
-        spawnEnemy("2001", 320, 160);
-        spawnEnemy("2001", 40, 360);
-        spawnEnemy("2001", 600, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 640, 160);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 720, 720);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 40);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 400, 120);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 320, 160);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 360);
+        spawnEnemy(ID.Enemy.MINOR_FIRE_SPIRIT, 600, 120);
 
         Enemy e = spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
         e.AI.setTarget(c);
