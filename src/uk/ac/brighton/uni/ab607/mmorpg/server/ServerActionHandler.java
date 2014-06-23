@@ -3,7 +3,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.DamageTextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -110,7 +111,7 @@ public class ServerActionHandler {
 
                 if (++player.atkTime >= GameServer.ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
                     int dmg = player.attack(target);
-                    server.animations.add(new Animation(player.getX(), player.getY(), 0.5f, 0, 25, dmg+""));
+                    server.addAnimation(new DamageTextAnimation(player.getX(), player.getY(), 0.5f, dmg+""));
                     player.atkTime = 0;
                     if (target.getHP() <= 0) {
                         player.gainBaseExperience(target.experience);
@@ -124,7 +125,7 @@ public class ServerActionHandler {
                 if (++target.atkTime >= GameServer.ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
                         && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
-                    server.animations.add(new Animation(player.getX(), player.getY() + 80, 0.5f, 0, 25, dmg+""));
+                    server.addAnimation(new DamageTextAnimation(player.getX(), player.getY() + 80, 0.5f, dmg+""));
                     target.atkTime = 0;
                     if (player.getHP() <= 0) {
                         //player.onDeath();
@@ -151,7 +152,7 @@ public class ServerActionHandler {
     }
     
     public void serverActionChat(Player player, ActionRequest req) {
-        server.animations.add(new Animation(player.getX(), player.getY(), 2.0f, 0, 0, req.data));
+        server.addAnimation(new TextAnimation(player.getX(), player.getY(), 2.0f, req.data));
     }
     
     public void serverActionMove(Player p, ActionRequest req) {

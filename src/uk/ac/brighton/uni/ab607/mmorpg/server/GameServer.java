@@ -16,7 +16,9 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.DamageTextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -86,8 +88,8 @@ public class GameServer {
     private ArrayList<Player> players = new ArrayList<Player>();
     private ArrayList<Chest> chests = new ArrayList<Chest>();
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-
-    /*package-private*/ ArrayList<Animation> animations = new ArrayList<Animation>();
+    
+    private ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
@@ -231,10 +233,11 @@ public class GameServer {
             while (true) {
                 tmpPlayers = new ArrayList<Player>(players);
 
+                // process animations
                 for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
                     Animation a = it.next();
-                    a.duration -= 20.0f / 1000.0f;
-                    if (a.duration <= 0)
+                    a.update(0.02f);    // that's how much we sleep
+                    if (a.hasFinished())
                         it.remove();
                 }
 
@@ -354,19 +357,11 @@ public class GameServer {
 
         if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
             int dmg = attacker.attack(target);
-            animations.add(new Animation(attacker.getX(), attacker.getY() + 80, 0.5f, 0, 25, dmg+""));
+            addAnimation(new DamageTextAnimation(attacker.getX(), attacker.getY() + 80, 0.5f, dmg+""));
+            //addAnimation(new ImageAnimation());
             attacker.atkTime = 0;
         }
     }
-
-    /*public AStarNode getNext() {
-        if (closed.size() == 0) return playerParent;
-
-        if (index >= closed.size())
-            index = closed.size() - 1;
-
-        return closed.get(index++);
-    }*/
 
     /*package-private*/ void moveObject(GameCharacter ch, int x, int y) {
         x /= 40; y /= 40;
@@ -412,38 +407,6 @@ public class GameServer {
             ch.xSpeed = 0;
             ch.ySpeed = 0;
         }
-
-        /*if (move) {
-        n = getNext();
-        parent = playerParent;
-        }
-
-        if (n != parent) {
-            move = false;
-
-            if (player.getX() > n.getX() * 40)
-                player.xSpeed = -10;
-            if (player.getX() < n.getX() * 40)
-                player.xSpeed = 10;
-            if (player.getY() > n.getY() * 40)
-                player.ySpeed = -10;
-            if (player.getY() < n.getY() * 40)
-                player.ySpeed = 10;
-
-            // determine whether parent has changed
-
-            if (player.getX() == n.getX()*40 && player.getY() == n.getY() *40) {
-                playerParent = n;
-                move = true;
-
-                if (target != null && target == playerParent) {
-                    target = null;
-                }
-            }
-
-            renderX = player.getX() - 640;  // half of width
-            renderY = player.getY() - 360;  // half of height
-        }*/
     }
 
     private void addNewPlayer(String name, int x, int y) {
@@ -476,6 +439,10 @@ public class GameServer {
     /*package-private*/ Chest spawnChest(Chest chest) {
         chests.add(chest);
         return chest;
+    }
+    
+    /*package-private*/ void addAnimation(Animation a) {
+        animations.add(a);
     }
 
     private void initGameMap() {

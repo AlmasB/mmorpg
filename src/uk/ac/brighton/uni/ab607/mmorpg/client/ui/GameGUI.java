@@ -23,10 +23,13 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -79,6 +82,8 @@ public class GameGUI extends GUI {
     private Cursor walkCursor = null;
 
     private int selX = 0, selY = 0; // selected point
+    
+    private GraphicsContext gContext = null;
 
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
@@ -256,6 +261,9 @@ public class GameGUI extends GUI {
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
+        
+        if (gContext != null)
+            gContext.setRenderOffset(renderX, renderY);
 
         //if (selX /40 != player.getX()/40 || selY/40 != player.getY()/40) {
         if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
@@ -288,8 +296,13 @@ public class GameGUI extends GUI {
 
     @Override
     protected void createPicture(Graphics2D g) {
+        if (gContext == null)
+            gContext = new GraphicsContext(g);
+        
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
+        
+        //Out.println(g.getFont().toString());
 
         if (player != null) {
             int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
@@ -332,10 +345,11 @@ public class GameGUI extends GUI {
         }
 
         for (Animation a : tmpAnims) {
-            g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
-                    a.ssX*34, a.ssY*34, a.ssX*34+34, a.ssY*34+34, this);
+            //g.drawImage(Resources.getImage("ss.png"), a.getX() - renderX, a.getY() - renderY - 17, a.getX()+17 - renderX, a.getY()+17 - renderY - 17,
+                    //a.ssX*34, a.ssY*34, a.ssX*34+34, a.ssY*34+34, this);
 
-            g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
+            //g.drawString(a.data, a.getX() - renderX + 20, a.getY() - 7 - renderY);
+            a.draw(gContext);
         }
         
         // debug full grid drawing
