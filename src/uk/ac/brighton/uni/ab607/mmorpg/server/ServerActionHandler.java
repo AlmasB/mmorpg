@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
@@ -119,6 +120,8 @@ public class ServerActionHandler {
                         player.gainStatExperience(target.experience);
                         server.spawnChest(target.onDeath());
 
+                        // test
+                        server.addAnimation(new ImageAnimation(player.getX(), player.getY(), 2.0f, "levelUP.jpg"));
                     }
                 }
 
