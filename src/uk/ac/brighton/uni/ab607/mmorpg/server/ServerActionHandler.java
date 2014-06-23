@@ -8,6 +8,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -37,6 +38,7 @@ public class ServerActionHandler {
         actions.put(Action.SKILL_USE, this::serverActionSkillUse);
         actions.put(Action.UNEQUIP,   this::serverActionUnequip);
         actions.put(Action.USE_ITEM,  this::serverActionUseItem);
+        actions.put(Action.CHANGE_CLASS, this::serverActionChangeClass);
     }
     
     public void process(ActionRequest[] requests) {
@@ -115,13 +117,12 @@ public class ServerActionHandler {
                     server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER));
                     player.atkTime = 0;
                     if (target.getHP() <= 0) {
-                        player.gainBaseExperience(target.experience);
+                        if (player.gainBaseExperience(target.experience))
+                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"));
+                        
                         player.gainJobExperience(target.experience);
                         player.gainStatExperience(target.experience);
                         server.spawnChest(target.onDeath());
-
-                        // test
-                        server.addAnimation(new ImageAnimation(player.getX(), player.getY(), 2.0f, "levelUP.jpg"));
                     }
                 }
 
@@ -146,7 +147,8 @@ public class ServerActionHandler {
             player.useSkill(req.value1, skTarget);
 
             if (skTarget.getHP() <= 0) {
-                player.gainBaseExperience(skTarget.experience);
+                if (player.gainBaseExperience(skTarget.experience))
+                    server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"));
                 player.gainJobExperience(skTarget.experience);
                 player.gainStatExperience(skTarget.experience);
                 server.spawnChest(skTarget.onDeath());
@@ -160,6 +162,10 @@ public class ServerActionHandler {
     
     public void serverActionMove(Player p, ActionRequest req) {
         server.moveObject(p, req.value1, req.value2);
+    }
+    
+    public void serverActionChangeClass(Player p, ActionRequest req) {
+        p.changeClass(GameCharacterClass.valueOf(req.data));
     }
     
     public void serverActionNone(Player p, ActionRequest req) {

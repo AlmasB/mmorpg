@@ -475,7 +475,7 @@ public class GameGUI extends GUI {
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, (int)input - 1, enemy.getRuntimeID()));
+                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;
                     }
                 }

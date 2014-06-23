@@ -22,9 +22,4 @@ public enum GameCharacterClass {
         for (int i = 0; i < skills.length; i++)
             skills[i] = ObjectManager.getSkillByID(IDs[i]);
     }
-
-    @Override
-    public String toString() {
-        return this.name();
-    }
 }

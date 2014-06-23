@@ -7,7 +7,7 @@ public class ActionRequest implements java.io.Serializable {
     private static final long serialVersionUID = 1853741539850521348L;
     
     public enum Action {
-        ATTR_UP, SKILL_UP, EQUIP, UNEQUIP, REFINE, USE_ITEM, ATTACK, SKILL_USE, CHAT, MOVE
+        ATTR_UP, SKILL_UP, EQUIP, UNEQUIP, REFINE, USE_ITEM, ATTACK, SKILL_USE, CHAT, MOVE, CHANGE_CLASS
     }
 
     public final Action action;

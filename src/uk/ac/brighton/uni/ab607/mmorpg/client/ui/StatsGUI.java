@@ -5,17 +5,23 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
+
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClassChanger;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
@@ -30,6 +36,10 @@ public class StatsGUI extends GUI {
 
     private JButton[] buttons = new JButton[9];
     private JButton[] skillButtons = new JButton[9];
+    
+    private JButton classChangeButton = new JButton("Change Class");
+    
+    private Player player;
     
     public StatsGUI(final String playerName) {
         super(640, 304, "Char Stats/Skills Window");
@@ -82,6 +92,18 @@ public class StatsGUI extends GUI {
             this.add(skillButtons[i]);
         }
 
+        classChangeButton.addActionListener(event -> {
+            if (player == null) return;
+            
+            GameCharacterClass[] options = GameCharacterClassChanger.getAscensionClasses(player);
+            GameCharacterClass chosen = (GameCharacterClass) this.showInputDialog("Choose your class", "Ascension", (Object[]) options);
+            if (chosen != null)
+                this.addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, chosen.toString()));
+        });
+        classChangeButton.setBounds(500, 5, 125, 30);
+        classChangeButton.setVisible(false);
+        this.add(classChangeButton);
+        
         setVisible(true);
     }
     
@@ -91,6 +113,8 @@ public class StatsGUI extends GUI {
 
     public void update(final Player p) {
         if (p != null) {
+            player = p;
+            
             Skill[] skills = p.getSkills();
             for (int i = 0; i < skills.length; i++) {
                 skillButtons[i].setToolTipText(skills[i].name + " " + "Level: " + skills[i].getLevel() + " " + skills[i].description);
@@ -98,6 +122,8 @@ public class StatsGUI extends GUI {
                     skillButtons[i].setEnabled(p.hasSkillPoints());
                 }
             }
+            
+            classChangeButton.setVisible(GameCharacterClassChanger.canChangeClass(p));
         }
 
         if (p == null || equal(p))
@@ -126,5 +152,27 @@ public class StatsGUI extends GUI {
     protected void createPicture(Graphics2D g) {
         attributes.repaint();
         stats.repaint();
+    }
+    
+    /**
+     * Creates and shows <b>input</b> dialog with given message and title and
+     * provides with given options.
+     * 
+     * If no options are provided any user input will be valid
+     * 
+     * @param message
+     *            the dialog message
+     * @param title
+     *            the dialog title
+     * @param options
+     *            selectable values
+     * @return user chosen option/typed value or {@code null} if dialog was
+     *         cancelled
+     */
+    public Object showInputDialog(String message, String title,
+            Object... options) {
+        return JOptionPane.showInputDialog(this, message, title,
+                JOptionPane.PLAIN_MESSAGE, null, options.length > 0 ? options
+                        : null, options.length > 0 ? options[0] : null);
     }
 }

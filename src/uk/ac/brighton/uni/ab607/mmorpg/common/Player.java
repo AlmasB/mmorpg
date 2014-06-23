@@ -43,7 +43,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     }
 
     private int statLevel = 1, jobLevel = 1;
-
+   
     private int gainedBaseExperience = 0,
             gainedStatExperience = 0,
             gainedJobExperience = 0,
@@ -75,14 +75,18 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
      *
      * @param value
      *              base experience earned
+     * @return 
+     *          true if player gained new level, false otherwise
      */
-    public void gainBaseExperience(final int value) {
+    public boolean gainBaseExperience(final int value) {
         gainedBaseExperience += value;
         if (gainedBaseExperience >= EXP_NEEDED[baseLevel-1]) {
-            Out.println("Base Level UP!");
             baseLevelUp();
             gainedBaseExperience = 0;
+            return true;
         }
+        
+        return false;
     }
 
     public void gainStatExperience(final int value) {
@@ -232,6 +236,10 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
     public void onDeath() {
         alive = false;
+    }
+    
+    public int getJobLevel() {
+        return jobLevel;
     }
 
     /*
