@@ -2,12 +2,19 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 /**
@@ -17,7 +24,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
  * @author Almas Baimagambetov
  *
  */
-public abstract class GameCharacter implements java.io.Serializable {
+public abstract class GameCharacter implements java.io.Serializable, Drawable {
     /**
      *
      */
@@ -546,6 +553,12 @@ public abstract class GameCharacter implements java.io.Serializable {
     public int place = 0;
     public int sprite = 0;
     private int factor = 3;
+    
+    protected String spriteName;
+    
+    public String getSpriteName() {
+        return spriteName;
+    }
 
     public enum Dir {
         UP, DOWN, LEFT, RIGHT
@@ -597,5 +610,25 @@ public abstract class GameCharacter implements java.io.Serializable {
 
     public int getRow() {
         return direction.ordinal();
+    }
+    
+    @Override
+    public void draw(GraphicsContext gContext) {
+        Graphics2D g = gContext.getGraphics();
+        
+        int tmpX = x - gContext.getRenderX();
+        int tmpY = y - gContext.getRenderY();
+        
+        g.drawImage(Resources.getImage(spriteName),
+                tmpX, tmpY, tmpX + 40, tmpY + 40,
+                place*40, getRow()*40, place*40+40, getRow()*40+40, null);
+        
+        g.setFont(AnimationUtils.DEFAULT_FONT);
+        g.setColor(AnimationUtils.DEFAULT_COLOR);
+        
+        FontMetrics fm = g.getFontMetrics(g.getFont());
+        int width = fm.stringWidth(name);
+        
+        g.drawString(name, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push down a lil bit
     }
 }

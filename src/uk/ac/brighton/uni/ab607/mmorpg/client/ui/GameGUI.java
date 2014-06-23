@@ -36,6 +36,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 
 public class GameGUI extends GUI {
     /**
@@ -85,6 +86,7 @@ public class GameGUI extends GUI {
     private int selX = 0, selY = 0; // selected point
     
     private GraphicsContext gContext = null;
+    private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
 
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
@@ -120,14 +122,11 @@ public class GameGUI extends GUI {
 
         chat.setLayout(null);
         chat.setBounds(5, 720 - 53, 1280 - 25, 20);
-        chat.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String chatText = e.getActionCommand();
-                if (!chatText.isEmpty()) {
-                    addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
-                    chat.setText("");
-                }
+        chat.addActionListener(e -> {
+            String chatText = e.getActionCommand();
+            if (!chatText.isEmpty()) {
+                addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
+                chat.setText("");
             }
         });
         chat.addKeyListener(new KeyListener() {
@@ -227,9 +226,7 @@ public class GameGUI extends GUI {
         private void update(Chest[] sChests) {
             chests.clear();
             for (Chest ch : sChests) {
-                if (!ch.isOpened()) {   // server has already checked, remove this line at some point
-                    chests.add(ch);
-                }
+                chests.add(ch);
             }
 
             tmpChests = new ArrayList<Chest>(chests);   // for drawing chests
@@ -299,49 +296,32 @@ public class GameGUI extends GUI {
         if (gContext == null)
             gContext = new GraphicsContext(g);
         
+        // draw background / clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
 
+        // draw map
         if (player != null) {
             int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
             int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
 
             int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
             int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-            g.drawImage(Resources.getImage("map1.png"),
+            g.drawImage(Resources.getImage(Resource.Image.MAP1),
                     dx, dy, dx1, dy1,
                     sx, sy, sx1, sy1, this);
         }
 
-        g.setColor(Color.YELLOW);
-
-        for (Chest ch : tmpChests) {
-            g.drawImage(Resources.getImage("chest.png"), 0 + ch.x - renderX, 0 + 10 + ch.y - renderY, this);
+        for (Chest chest : tmpChests) {
+            chest.draw(gContext);
         }
 
         for (Enemy e : tmpEnemies) {
-            g.drawImage(Resources.getImage(e.spriteName),
-                    e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
-                    e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
-
-            g.setFont(AnimationUtils.DEFAULT_FONT);
-            g.setColor(AnimationUtils.DEFAULT_COLOR);
-            
-            g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
+            e.draw(gContext);
         }
 
         for (Player p : tmpPlayers) {
-            FontMetrics fm = g.getFontMetrics(g.getFont());
-            int width = fm.stringWidth(p.name);
-
-            g.drawImage(Resources.getImage("player1.png"),
-                    p.getX() - renderX, p.getY() - renderY, p.getX() - renderX+40, p.getY() - renderY+40,
-                    p.place*40, p.getRow()*40, p.place*40+40, p.getRow()*40+40, this);
-
-            g.setFont(AnimationUtils.DEFAULT_FONT);
-            g.setColor(AnimationUtils.DEFAULT_COLOR);
-            
-            g.drawString(p.name, p.getX() - renderX + 20 - (width/2), p.getY() + 5 + 40 - renderY);
+            p.draw(gContext);
         }
 
         if (target != null) {

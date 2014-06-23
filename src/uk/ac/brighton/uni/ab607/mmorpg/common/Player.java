@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
@@ -70,6 +71,7 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         super(name, "Player", charClass);
         this.x = x;
         this.y = y;
+        this.spriteName = "player1.png";
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }

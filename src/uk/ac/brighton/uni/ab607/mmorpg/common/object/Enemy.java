@@ -33,8 +33,6 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
 
     private DroppableItem[] drops;
 
-    public final String spriteName;
-
     /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
