@@ -1,8 +1,5 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.awt.image.BufferedImage;
-
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;

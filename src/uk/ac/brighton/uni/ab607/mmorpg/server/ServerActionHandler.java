@@ -19,6 +19,12 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
+/**
+ * Processes all client action requests
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class ServerActionHandler {
     
     private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
@@ -162,6 +168,8 @@ public class ServerActionHandler {
     
     public void serverActionMove(Player p, ActionRequest req) {
         server.moveObject(p, req.value1, req.value2);
+        //RTS click animation sprite
+        //server.addAnimation(new ImageAnimation());
     }
     
     public void serverActionChangeClass(Player p, ActionRequest req) {

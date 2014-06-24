@@ -629,6 +629,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         FontMetrics fm = g.getFontMetrics(g.getFont());
         int width = fm.stringWidth(name);
         
-        g.drawString(name, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push down a lil bit
+        g.drawString(name, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
     }
 }
