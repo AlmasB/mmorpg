@@ -262,6 +262,7 @@ public class GameServer {
                                     c.open();
                                     c.getItems().forEach(p.getInventory()::addItem);
                                     p.incMoney(c.money);
+                                    addAnimation(new TextAnimation(c.getX(), c.getY(), c.money + "", TextAnimationType.FADE));
                                 }
                             }
                         }
