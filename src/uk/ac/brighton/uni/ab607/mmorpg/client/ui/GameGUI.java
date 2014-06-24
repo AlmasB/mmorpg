@@ -23,7 +23,6 @@ import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
-import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
@@ -40,11 +39,6 @@ public class GameGUI extends GUI {
 
     private int mapWidth;
     private int mapHeight;
-
-    private AStarNode[][] map;
-    private Mouse mouse = new Mouse();
-
-    private AStarNode target;
 
     private int renderX = 0, renderY = 0;
     private String name = "";
@@ -80,39 +74,24 @@ public class GameGUI extends GUI {
     private int selX = 0, selY = 0; // selected point
     
     private GraphicsContext gContext = null;
-    private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
+    //private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
 
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
 
-        name = playerName;
+        name = playerName;        
 
         inv = new InventoryGUI();
         st = new StatsGUI(name);
+        
+        client = new UDPClient(ip, 55555, new ServerResponseParser());
+        client.send(new DataPacket("LOGIN_PLAYER," + name));
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         this.addKeyListener(new Keyboard());
-        this.addMouseListener(mouse);
-        //this.addMouseMotionListener(mouse);
-
-        List<String> lines = Resources.getText("map1.txt");
-
-        mapHeight = lines.size();
-        mapWidth = lines.get(0).length();
-
-        map = new AStarNode[mapWidth][mapHeight];
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (int j = 0; j < line.length(); j++) {
-                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
-            }
-        }
-
-        client = new UDPClient(ip, 55555, new ServerResponseParser());
-        client.send(new DataPacket("CREATE_PLAYER," + name));
+        this.addMouseListener(new Mouse());
 
         chat.setLayout(null);
         chat.setBounds(5, 720 - 53, 1280 - 25, 20);
@@ -154,6 +133,20 @@ public class GameGUI extends GUI {
     class ServerResponseParser extends ServerPacketParser {
         @Override
         public void parseServerPacket(DataPacket packet) {
+            if (packet.stringData.startsWith("LOGIN_OK")) {
+                String data = packet.stringData;
+                
+                String mapName = data.split(",")[1];    // exception check
+                
+                List<String> lines = Resources.getText(mapName);
+
+                mapHeight = lines.size();
+                mapWidth = lines.get(0).length();
+                
+                selX = Integer.parseInt(data.split(",")[2]);
+                selY = Integer.parseInt(data.split(",")[3]);
+            }
+            
             if (packet.multipleObjectData instanceof Player[]) {
                 update((Player[]) packet.multipleObjectData);
             }
@@ -192,14 +185,6 @@ public class GameGUI extends GUI {
 
             if (currentPlayer != null) {
                 player = currentPlayer; // synch from server
-
-                // TODO: consider something better
-                if (once) {
-                    selX = player.getX();
-                    selY = player.getY();
-                    once = false;
-                }
-
 
                 updateGameClient();
 
@@ -256,13 +241,12 @@ public class GameGUI extends GUI {
         
         if (gContext != null)
             gContext.setRenderOffset(renderX, renderY);
+        
+        int moveToX = (selX/40)*40;
+        int moveToY = (selY/40)*40;
 
-        if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
-            target = map[selX/40][selY/40];
-            addActionRequest(new ActionRequest(Action.MOVE, player.name, target.getX()*40, target.getY()*40));
-        }
-        else {
-            target = null;
+        if (moveToX != player.getX() || moveToY != player.getY()) {
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, moveToX, moveToY));
         }
 
         checkRuntimeID();
@@ -301,7 +285,7 @@ public class GameGUI extends GUI {
 
             int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
             int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-            g.drawImage(Resources.getImage(Resource.Image.MAP1),
+            g.drawImage(Resources.getImage(Resource.Image.MAP1),    // in future mapname will be used
                     dx, dy, dx1, dy1,
                     sx, sy, sx1, sy1, this);
         }
@@ -316,10 +300,6 @@ public class GameGUI extends GUI {
 
         for (Player p : tmpPlayers) {
             p.draw(gContext);
-        }
-
-        if (target != null) {
-            g.drawImage(Resources.getImage("target.png"), target.getX()*40 - renderX, target.getY()*40 - renderY, this);
         }
 
         for (Animation a : tmpAnims) {

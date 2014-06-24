@@ -97,9 +97,32 @@ public class GameServer {
     class ClientQueryParser extends ClientPacketParser {
         @Override
         public void parseClientPacket(DataPacket packet) {
-            if (packet.stringData.startsWith("CREATE_PLAYER")) {
-                String name = packet.stringData.split(",")[1];
-                addNewPlayer(name, STARTING_X, STARTING_Y);
+            if (packet.stringData.startsWith("LOGIN_PLAYER")) {
+                String name = packet.stringData.split(",")[1];  // exception check ?
+                // get data from game account
+                GameAccount acc = GameAccount.getAccountByUserName(name);
+                if (acc != null) {
+                    int x = acc.getX(), y = acc.getY();
+                    
+                    try {
+                        server.send(new DataPacket("LOGIN_OK," + acc.getMapName() + "," + x + "," + y), packet.getIP(), packet.getPort());
+                        addNewPlayer(name, x, y);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    // this is purely for debugging when using local connection
+                    // in release launch at this point wrong user name passed
+                    try {
+                        server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
+                        addNewPlayer(name, 1000, 600);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             if (packet.stringData.startsWith("CHECK_PLAYER")) {
@@ -262,7 +285,7 @@ public class GameServer {
                                     c.open();
                                     c.getItems().forEach(p.getInventory()::addItem);
                                     p.incMoney(c.money);
-                                    addAnimation(new TextAnimation(c.getX(), c.getY(), c.money + "", TextAnimationType.FADE));
+                                    addAnimation(new TextAnimation(c.getX(), c.getY(), c.money + " G", TextAnimationType.FADE));
                                 }
                             }
                         }

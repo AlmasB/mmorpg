@@ -1,67 +1,43 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
-import java.io.IOException;
-import java.util.TreeMap;
-
 import uk.ac.brighton.uni.ab607.libs.encryption.Account;
-import uk.ac.brighton.uni.ab607.libs.io.ResourceManager;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.encryption.*;
 
+/**
+ * One client's account
+ * 
+ * Username is also the player's name in game
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class GameAccount extends Account {
-
     /**
      *
      */
     private static final long serialVersionUID = 826478717098386944L;
+    
+    /**
+     * name of the map where current account's player is last seen
+     * and coordinates
+     */
+    private String mapName = "map1.txt";    // or .txt ?
+    private int x = 1000, y = 600;
 
-    private static final String DB_FOLDER = "db/";
-    private static final String DB_FILE = DB_FOLDER + "accounts.db";
-
-
-    private static TreeMap<String, GameAccount> accounts;
-    //private static int uniqueID;
-
-    static {
-        accounts = loadDB();
-        //uniqueID = Integer.parseInt(accounts.lastKey());
-    }
-
+    /**
+     * Hidden ctor
+     * 
+     * @param username
+     * @param password
+     * @param key
+     */
     private GameAccount(String username, String password, String key) {
         super(username, password, key);
     }
 
-    public static void saveDB() {
-        try {
-            ResourceManager.writeJavaObject(DB_FILE, accounts);
-        }
-        catch (IOException e) {
-            Out.err("Failed to save DB");
-            Out.err(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static TreeMap<String, GameAccount> loadDB() {
-        TreeMap<String, GameAccount> map = null;
-
-        try {
-            map = (TreeMap<String, GameAccount>) ResourceManager.loadJavaObject(DB_FILE);
-        }
-        catch (IOException | ClassNotFoundException e) {
-            Out.err(e);
-        }
-
-        if (map == null) {
-            map = new TreeMap<String, GameAccount>();
-            Out.println("Using new DB");
-        }
-
-        return map;
-    }
-
     public static boolean addAccount(String username, String password, String email) {
-        if (accounts.containsKey(username)) {
+        if (DBAccess.getAccounts().containsKey(username)) {
             Out.err("Can't create account - username exists");
             return false;
         }
@@ -77,14 +53,12 @@ public class GameAccount extends Account {
             return false;
         }
 
-
-        //accounts.put(++uniqueID + "", new GameAccount(username, encryptedPass, passkey));
-        accounts.put(username, new GameAccount(username, encryptedPass, passkey));
+        DBAccess.getAccounts().put(username, new GameAccount(username, encryptedPass, passkey));
         return true;
     }
 
     public static GameAccount getAccountByUserName(String username) {
-        return accounts.get(username);
+        return DBAccess.getAccounts().get(username);
     }
 
     public static boolean validateLogin(final String username, final String pass) {
@@ -92,5 +66,26 @@ public class GameAccount extends Account {
         if (acc == null)
             return false;
         return PasswordManager.isValid(acc, pass);
+    }
+    
+    public String getMapName() {
+        return mapName;
+    }
+    
+    public int getX() {
+        return x;
+    }
+    
+    public int getY() {
+        return y;
+    }
+    
+    public void setMapName(String map) {
+        mapName = map;
+    }
+    
+    public void setXY(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }
