@@ -11,6 +11,8 @@ email: a.baimagambetov1@uni.brighton.ac.uk
 
 mvn package
 
+Java 1.8+ is required
+
 java -cp "lib/*;target/*" uk.ac.brighton.uni.ab607.mmorpg.ClientMain
 
 This will run local server and connect client to it
