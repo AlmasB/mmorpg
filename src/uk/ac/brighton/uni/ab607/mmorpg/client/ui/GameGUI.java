@@ -249,9 +249,7 @@ public class GameGUI extends GUI {
             addActionRequest(new ActionRequest(Action.MOVE, player.name, moveToX, moveToY));
         }
 
-        checkRuntimeID();
-
-        if (targetRuntimeID != 0) {
+        if ((targetRuntimeID = checkRuntimeID()) != 0) {
             addActionRequest(new ActionRequest(Action.ATTACK, player.name, targetRuntimeID));
         }
 
@@ -408,10 +406,10 @@ public class GameGUI extends GUI {
                         return;
                     }
                 }
-
+                
+                // if no enemy in that selection
+                // drop target, then move player to that cell
                 targetRuntimeID = 0;
-
-                // if no enemy in that selection then move player to that cell
 
                 selX = mouseX + renderX;
                 selY = mouseY + renderY;
@@ -460,11 +458,20 @@ public class GameGUI extends GUI {
         return currentPlayer;
     }*/
 
-    private void checkRuntimeID() {
+    /**
+     * This check is needed to see if target runtimeID
+     * still exists in the world
+     * 
+     * @return
+     *          target's runtimeID or 0 if invalid
+     */
+    private int checkRuntimeID() {
+        if (targetRuntimeID == 0) return 0;
+        
         for (Enemy e : tmpEnemies) {
             if (e.getRuntimeID() == targetRuntimeID)
-                return;
+                return targetRuntimeID;
         }
-        targetRuntimeID = 0;
+        return 0;
     }
 }
