@@ -109,7 +109,10 @@ public class StatsGUI extends GUI {
             
             Skill[] skills = p.getSkills();
             for (int i = 0; i < skills.length; i++) {
-                skillButtons[i].setToolTipText(skills[i].name + " " + "Level: " + skills[i].getLevel() + " " + skills[i].description);
+                skillButtons[i].setToolTipText("<html><b>" + skills[i].name + "</b><br>"
+                        + "Level: <font color=green><b>" + skills[i].getLevel() + "</b></font><br>"
+                        + skills[i].description + "</html>");
+                
                 if (skills[i].getLevel() < Skill.MAX_LEVEL) {
                     skillButtons[i].setEnabled(p.hasSkillPoints());
                 }
