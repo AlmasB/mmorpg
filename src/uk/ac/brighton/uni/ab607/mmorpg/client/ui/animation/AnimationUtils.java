@@ -6,4 +6,7 @@ import java.awt.Font;
 public class AnimationUtils {
     public static final Font DEFAULT_FONT = new Font("Lucida Grande", Font.PLAIN, 13);
     public static final Color DEFAULT_COLOR = Color.YELLOW;
+    
+    
+    public static final Color COLOR_GOLD = new Color(255, 215, 0);
 }

@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
@@ -17,6 +18,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 
 /**
@@ -150,7 +153,17 @@ public class ServerActionHandler {
     public void serverActionSkillUse(Player player, ActionRequest req) {
         Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2);
         if (skTarget != null) {
-            player.useSkill(req.value1, skTarget);
+            SkillUseResult result = player.useSkill(req.value1, skTarget);
+            if (!result.success)
+                return;
+            
+            if (result.target == Target.ENEMY) {
+                server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f));
+                server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL));
+            }
+            else if (result.target == Target.SELF) {
+                server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f));
+            }
 
             if (skTarget.getHP() <= 0) {
                 if (player.gainBaseExperience(skTarget.experience))

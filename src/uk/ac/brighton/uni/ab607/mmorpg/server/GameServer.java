@@ -474,10 +474,10 @@ public class GameServer {
         spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 640, 160);
         spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 720, 720);
         spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 40);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 120);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 400, 120);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 320, 160);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 360);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 720);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 760);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 800);
+        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 840);
         spawnEnemy(ID.Enemy.MINOR_FIRE_SPIRIT, 600, 120);
 
         Enemy e = spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);

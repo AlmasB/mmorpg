@@ -15,6 +15,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 
 /**
  * Essentially alive game object
@@ -497,19 +498,21 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      * @param target
      * @return
      */
-    public int useSkill(int skillCode, GameCharacter target) {
+    public SkillUseResult useSkill(int skillCode, GameCharacter target) {
         if (skillCode >= skills.length)
-            return -1;
+            return SkillUseResult.DEFAULT_FALSE;
 
         Skill sk = skills[skillCode];
         if (sk != null && sk.active && sk.getLevel() > 0 && sk.getCurrentCooldown() == 0) {
             if (this.sp >= sk.getManaCost()) {
                 this.sp -= sk.getManaCost();
                 sk.use(this, target);
+                // successful use of skill
+                return sk.getUseResult();
             }
         }
 
-        return 0;
+        return SkillUseResult.DEFAULT_FALSE;
     }
 
     /**

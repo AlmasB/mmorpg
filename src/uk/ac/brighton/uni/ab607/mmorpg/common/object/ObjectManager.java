@@ -20,6 +20,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
 public class ObjectManager {
@@ -269,6 +270,7 @@ public class ObjectManager {
                 float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
                 float dmg = (Math.max(diff, 0) + 10*level) * 5;
                 caster.dealPhysicalDamage(target, dmg);
+                useResult = new SkillUseResult(Target.ENEMY, (int) dmg);
             }
         });
 
