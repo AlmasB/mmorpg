@@ -351,7 +351,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     public void update() {
         // HP/SP regen
-        regenTick += 0.05f;
+        regenTick += 0.02f;
 
         if (regenTick >= 2.0f) {    // 2 secs
             hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
@@ -364,7 +364,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         for (Skill sk : skills) {
             if (sk.active) {
                 if (sk.getCurrentCooldown() > 0) {
-                    sk.reduceCurrentCooldown(0.05f);
+                    sk.reduceCurrentCooldown(0.02f);
                 }
             }
             else {  // reapply passive skills

@@ -269,8 +269,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
                 float dmg = (Math.max(diff, 0) + 10*level) * 5;
-                caster.dealPhysicalDamage(target, dmg);
-                useResult = new SkillUseResult(Target.ENEMY, (int) dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
+                useResult = new SkillUseResult(Target.ENEMY, d);
             }
         });
 
@@ -418,7 +418,8 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
-                caster.dealMagicalDamage(target, dmg, Element.AIR);
+                int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
+                useResult = new SkillUseResult(Target.ENEMY, d);
             }
         });
 

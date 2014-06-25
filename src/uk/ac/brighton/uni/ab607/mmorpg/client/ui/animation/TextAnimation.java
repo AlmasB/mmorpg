@@ -17,7 +17,7 @@ public class TextAnimation extends Animation {
     public enum TextAnimationType {
         DAMAGE_PLAYER(new Font("Lucida Grande", Font.PLAIN, 15), new Color(0x73, 0x6A, 0xFF), 0.5f),
         DAMAGE_ENEMY(AnimationUtils.DEFAULT_FONT, Color.WHITE, 0.5f),
-        SKILL(AnimationUtils.DEFAULT_FONT, Color.BLUE, 0.5f),
+        SKILL(AnimationUtils.DEFAULT_FONT, Color.BLUE, 1.0f),
         CHAT(AnimationUtils.DEFAULT_FONT, Color.WHITE, 2.0f),
         FADE(AnimationUtils.DEFAULT_FONT, Color.YELLOW, 1.5f),
         NONE(AnimationUtils.DEFAULT_FONT, Color.WHITE, 1.0f);
@@ -37,10 +37,15 @@ public class TextAnimation extends Animation {
     private TextAnimationType type;
     private float alpha = 1.0f; // fully visible
     
+    // experimental
+    private Font font;
+    
     public TextAnimation(int x, int y, String text, TextAnimationType type) {
         super(x, y, type.duration);
         this.text = text;
         this.type = type;
+        //
+        this.font = type.font;
     }
 
     @Override
@@ -57,6 +62,7 @@ public class TextAnimation extends Animation {
             case NONE:
                 break;
             case SKILL:
+                font = new Font("Lucida Grande", Font.PLAIN, 13 + (int)(completed * 5));
                 break;
             default:
                 break;
@@ -70,7 +76,7 @@ public class TextAnimation extends Animation {
         Composite tmp = g.getComposite();
         Composite c = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         
-        g.setFont(type.font);
+        g.setFont(font);
         g.setColor(type.color);
         g.setComposite(c);
         g.drawString(text, x - gContext.getRenderX(), y - gContext.getRenderY());

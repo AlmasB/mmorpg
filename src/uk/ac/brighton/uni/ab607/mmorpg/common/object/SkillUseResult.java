@@ -35,4 +35,8 @@ public class SkillUseResult implements java.io.Serializable {
     public SkillUseResult(Target target, int damage) {
         this(target, damage, true);
     }
+    
+    public SkillUseResult(Target target, float damage) {
+        this(target, (int)damage, true);
+    }
 }
