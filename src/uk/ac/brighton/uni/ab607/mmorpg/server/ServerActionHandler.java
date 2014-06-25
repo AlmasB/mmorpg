@@ -109,13 +109,16 @@ public class ServerActionHandler {
         ((UsableItem) player.getInventory().getItem(req.value1)).onUse(player);
     }
     
-    public void serverActionAttack(Player player, ActionRequest req) {
+    public void serverActionAttack(Player player, ActionRequest req) throws BadActionRequestException {
         if (player.hasStatusEffect(Status.STUNNED))
             return;
 
         // at this stage client can only target enemies
         // when players are added this check will go
         GameCharacter tmpChar = server.getGameCharacterByRuntimeID(req.value1);
+        if (tmpChar == null)
+            throw new BadActionRequestException("RuntimeID not found: " + req.value1);
+        
         if (tmpChar instanceof Enemy) {
             Enemy target = (Enemy) tmpChar;
             if (target != null && target.isAlive()
