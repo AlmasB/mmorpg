@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -419,7 +420,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
-                useResult = new SkillUseResult(Target.ENEMY, d);
+                useResult = new SkillUseResult(Target.ENEMY, d, new ImageAnimation(caster.getX(), caster.getY(),
+                        target.getX(), target.getY(), 2.5f, "levelUP.png"));
             }
         });
 

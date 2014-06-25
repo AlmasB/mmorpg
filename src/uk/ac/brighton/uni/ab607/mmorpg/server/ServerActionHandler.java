@@ -164,6 +164,9 @@ public class ServerActionHandler {
             else if (result.target == Target.SELF) {
                 server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f));
             }
+            
+            if (result.animation != null)
+                server.addAnimation(result.animation);
 
             if (skTarget.getHP() <= 0) {
                 if (player.gainBaseExperience(skTarget.experience))
