@@ -337,8 +337,10 @@ public class GameGUI extends GUI {
         @Override
         public void keyTyped(KeyEvent e) {
             input = e.getKeyChar();
-            if (input >= '1' && input <= '9')
+            if (input >= '1' && input <= '9') {
                 choosingTarget = true;
+                setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            }
 
 
             // once skill is clicked cursor changes
@@ -417,6 +419,7 @@ public class GameGUI extends GUI {
             }
             else {
                 choosingTarget = false;
+                setCursor(walkCursor);
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
