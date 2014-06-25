@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -420,8 +422,9 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
-                useResult = new SkillUseResult(Target.ENEMY, d, new ImageAnimation(caster.getX(), caster.getY(),
-                        target.getX(), target.getY(), 2.5f, "levelUP.png"));
+                useResult = new SkillUseResult(Target.ENEMY, d,
+                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
+                        new TextAnimation(target.getX(), target.getY(), d + "", TextAnimationType.SKILL));
             }
         });
 
@@ -643,11 +646,15 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.attack(target);
-                caster.attack(target);
+                int dmg1 = caster.attack(target);
+                int dmg2 = caster.attack(target);
                 if (GameMath.checkChance(level*5)) {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
                 }
+                useResult = new SkillUseResult(Target.ENEMY, 0, 
+                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX(), target.getY()+40, "x2", TextAnimationType.FADE)); 
             }
         });
 

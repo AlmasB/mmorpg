@@ -12,17 +12,14 @@ public class SkillUseResult implements java.io.Serializable {
         SELF, ENEMY, AREA
     }
     
-    public static SkillUseResult DEFAULT_FALSE = new SkillUseResult(Target.SELF, 0, false, null);
-    public static SkillUseResult DEFAULT_TRUE = new SkillUseResult(Target.SELF, 0, true, null);
+    public static SkillUseResult DEFAULT_FALSE = new SkillUseResult(Target.SELF, 0, false);
+    public static SkillUseResult DEFAULT_TRUE = new SkillUseResult(Target.SELF, 0, true);
     
     public final Target target;
     public final int damage;
     public final boolean success;
     
-    /**
-     * Animation of the skill - can be null
-     */
-    public final Animation animation;
+    public final Animation[] animations;
     //public final boolean buffSkill ? if yes maybe get value of buff i.e. armor + 20%
     //public final int selfDamage/targetDamage ?
     
@@ -33,18 +30,14 @@ public class SkillUseResult implements java.io.Serializable {
      * @param damage
      * @param success
      */
-    private SkillUseResult(Target target, int damage, boolean success, Animation animation) {
+    private SkillUseResult(Target target, int damage, boolean success, Animation... animations) {
         this.target = target;
         this.damage = damage;
         this.success = success;
-        this.animation = animation;
+        this.animations = animations;
     }
     
-    public SkillUseResult(Target target, int damage, Animation anim) {
-        this(target, damage, true, anim);
-    }
-    
-    public SkillUseResult(Target target, int damage) {
-        this(target, damage, true, null);
+    public SkillUseResult(Target target, int damage, Animation... anims) {
+        this(target, damage, true, anims);
     }
 }

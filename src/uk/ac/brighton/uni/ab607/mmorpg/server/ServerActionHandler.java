@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
@@ -157,16 +158,17 @@ public class ServerActionHandler {
             if (!result.success)
                 return;
             
-            if (result.target == Target.ENEMY) {
+            if (result.animations.length > 0) {
+                for (Animation a : result.animations)
+                    server.addAnimation(a);
+            }
+            else if (result.target == Target.ENEMY) {
                 server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f));
                 server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL));
             }
             else if (result.target == Target.SELF) {
                 server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f));
             }
-            
-            if (result.animation != null)
-                server.addAnimation(result.animation);
 
             if (skTarget.getHP() <= 0) {
                 if (player.gainBaseExperience(skTarget.experience))
