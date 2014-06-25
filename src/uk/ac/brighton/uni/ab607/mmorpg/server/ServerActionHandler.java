@@ -116,10 +116,7 @@ public class ServerActionHandler {
         // at this stage client can only target enemies
         // when players are added this check will go
         GameCharacter tmpChar = server.getGameCharacterByRuntimeID(req.value1);
-        if (tmpChar == null)
-            throw new BadActionRequestException("RuntimeID not found: " + req.value1);
-        
-        if (tmpChar instanceof Enemy) {
+        if (tmpChar instanceof Enemy) { // if tmpChar == null, it isn't instance of Enemy
             Enemy target = (Enemy) tmpChar;
             if (target != null && target.isAlive()
                     && server.distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {

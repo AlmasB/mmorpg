@@ -33,7 +33,7 @@ public class BasicAnimation extends Animation {
         Graphics2D g = gContext.getGraphics();
         // atm only circle for skill target, more later
         g.setColor(AnimationUtils.COLOR_GOLD);
-        g.drawOval((int)(x - gContext.getRenderX() - radius*10), (int)(y - gContext.getRenderY() - radius*10),
-                30 + (int)(20*radius), 30 + (int)(20*radius));
+        g.drawOval((int)(x - gContext.getRenderX() - radius*8), (int)(y - gContext.getRenderY() - radius*8),
+                40 + (int)(16*radius), 40 + (int)(16*radius));
     }
 }
