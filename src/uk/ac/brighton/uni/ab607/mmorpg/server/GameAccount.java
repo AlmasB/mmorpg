@@ -3,6 +3,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import uk.ac.brighton.uni.ab607.libs.encryption.Account;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.encryption.*;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 
 /**
  * One client's account
@@ -22,8 +24,9 @@ public class GameAccount extends Account {
      * name of the map where current account's player is last seen
      * and coordinates
      */
-    private String mapName = "map1.txt";    // or .txt ?
+    private String mapName = "map1.txt";
     private int x = 1000, y = 600;
+    private Player player;
 
     /**
      * Hidden ctor
@@ -34,6 +37,7 @@ public class GameAccount extends Account {
      */
     private GameAccount(String username, String password, String key) {
         super(username, password, key);
+        player = new Player(getUserName(), GameCharacterClass.NOVICE, x, y, "" , 0);
     }
 
     public static boolean addAccount(String username, String password, String email) {
@@ -78,6 +82,14 @@ public class GameAccount extends Account {
     
     public int getY() {
         return y;
+    }
+    
+    public Player getPlayer() {
+        return player;
+    }
+    
+    public void setPlayer(Player p) {
+        player = p;
     }
     
     public void setMapName(String map) {

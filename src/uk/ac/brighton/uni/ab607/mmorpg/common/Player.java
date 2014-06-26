@@ -69,11 +69,16 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             LEFT_HAND = 4;
 
     private EquippableItem[] equip = new EquippableItem[5];
+    
+    public String ip; 
+    public int port;
 
-    public Player(String name, GameCharacterClass charClass, int x, int y) {
+    public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
         this.x = x;
         this.y = y;
+        this.ip = ip;
+        this.port = port;
         this.spriteName = "player1.png";
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);

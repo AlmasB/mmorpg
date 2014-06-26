@@ -116,7 +116,7 @@ public class ServerActionHandler {
 
         // at this stage client can only target enemies
         // when players are added this check will go
-        GameCharacter tmpChar = server.getGameCharacterByRuntimeID(req.value1);
+        GameCharacter tmpChar = server.getGameCharacterByRuntimeID(req.value1, req.data);
         if (tmpChar instanceof Enemy) { // if tmpChar == null, it isn't instance of Enemy
             Enemy target = (Enemy) tmpChar;
             if (target != null && target.isAlive()
@@ -124,22 +124,22 @@ public class ServerActionHandler {
 
                 if (++player.atkTime >= GameServer.ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
                     int dmg = player.attack(target);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER));
+                    server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER), req.data);
                     player.atkTime = 0;
                     if (target.getHP() <= 0) {
                         if (player.gainBaseExperience(target.experience))
-                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"));
+                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
                         
                         player.gainJobExperience(target.experience);
                         player.gainStatExperience(target.experience);
-                        server.spawnChest(target.onDeath());
+                        server.spawnChest(target.onDeath(), req.data);
                     }
                 }
 
                 if (++target.atkTime >= GameServer.ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
                         && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
+                    server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
                     target.atkTime = 0;
                     if (player.getHP() <= 0) {
                         //player.onDeath();
@@ -152,7 +152,7 @@ public class ServerActionHandler {
     }
     
     public void serverActionSkillUse(Player player, ActionRequest req) {
-        Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2);
+        Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2, req.data);
         if (skTarget != null) {
             SkillUseResult result = player.useSkill(req.value1, skTarget);
             if (!result.success)
@@ -160,32 +160,32 @@ public class ServerActionHandler {
             
             if (result.animations.length > 0) {
                 for (Animation a : result.animations)
-                    server.addAnimation(a);
+                    server.addAnimation(a, req.data);
             }
             else if (result.target == Target.ENEMY) {
-                server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f));
-                server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL));
+                server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
+                server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
             }
             else if (result.target == Target.SELF) {
-                server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f));
+                server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
             }
 
             if (skTarget.getHP() <= 0) {
                 if (player.gainBaseExperience(skTarget.experience))
-                    server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"));
+                    server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
                 player.gainJobExperience(skTarget.experience);
                 player.gainStatExperience(skTarget.experience);
-                server.spawnChest(skTarget.onDeath());
+                server.spawnChest(skTarget.onDeath(), req.data);
             }
         }
     }
     
     public void serverActionChat(Player player, ActionRequest req) {
-        server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data, TextAnimationType.CHAT));
+        server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data.split(",")[1], TextAnimationType.CHAT), req.data.split(",")[0]);
     }
     
     public void serverActionMove(Player p, ActionRequest req) {
-        server.moveObject(p, req.value1, req.value2);
+        server.moveObject(p, req.data, req.value1, req.value2);
         //RTS click animation sprite
         //server.addAnimation(new ImageAnimation());
     }

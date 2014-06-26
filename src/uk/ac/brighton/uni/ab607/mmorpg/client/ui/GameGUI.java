@@ -25,6 +25,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 
 public class GameGUI extends GUI {
@@ -70,6 +72,7 @@ public class GameGUI extends GUI {
     private int selX = 0, selY = 0; // selected point
     
     private GraphicsContext gContext = null;
+    private GameMap map;
     //private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
 
     public GameGUI(String ip, String playerName) throws IOException {
@@ -111,7 +114,7 @@ public class GameGUI extends GUI {
         chat.addActionListener(e -> {
             String chatText = e.getActionCommand();
             if (!chatText.isEmpty()) {
-                addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
+                addActionRequest(new ActionRequest(Action.CHAT, player.name, map.name + "," + chatText));
                 chat.setText("");
             }
         });
@@ -150,11 +153,15 @@ public class GameGUI extends GUI {
                 String data = packet.stringData;
                 
                 String mapName = data.split(",")[1];    // exception check
+                map = ObjectManager.getMapByName(mapName);
                 
-                List<String> lines = Resources.getText(mapName);
+                mapHeight = map.height;
+                mapWidth = map.width;
+                
+                /*List<String> lines = Resources.getText(mapName);
 
                 mapHeight = lines.size();
-                mapWidth = lines.get(0).length();
+                mapWidth = lines.get(0).length();*/
                 
                 selX = Integer.parseInt(data.split(",")[2]);
                 selY = Integer.parseInt(data.split(",")[3]);
@@ -259,11 +266,11 @@ public class GameGUI extends GUI {
         int moveToY = (selY/40)*40;
 
         if (moveToX != player.getX() || moveToY != player.getY()) {
-            addActionRequest(new ActionRequest(Action.MOVE, player.name, moveToX, moveToY));
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, map.name, moveToX, moveToY));
         }
 
         if ((targetRuntimeID = checkRuntimeID()) != 0) {
-            addActionRequest(new ActionRequest(Action.ATTACK, player.name, targetRuntimeID));
+            addActionRequest(new ActionRequest(Action.ATTACK, player.name, map.name, targetRuntimeID));
         }
 
         if (!stop) {
@@ -444,7 +451,8 @@ public class GameGUI extends GUI {
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
+                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
+                                map.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;
                     }
                 }

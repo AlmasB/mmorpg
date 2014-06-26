@@ -24,6 +24,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 
@@ -50,11 +51,11 @@ class Point implements java.io.Serializable, AgentGoalTarget {
 
 public class GameServer {
 
-    private int mapWidth;
-    private int mapHeight;
+    //private int mapWidth;
+    //private int mapHeight;
 
     private AStarLogic logic = new AStarLogic();
-    private AStarNode[][] map;
+    //private AStarNode[][] map;
     private List<AStarNode> closed = new ArrayList<AStarNode>();
     private AStarNode n = null;
 
@@ -64,27 +65,28 @@ public class GameServer {
     /*package-private*/ static final int STARTING_X = 25*40;
     /*package-private*/ static final int STARTING_Y = 15*40;
 
-    private int runtimeID = 1;
+    private int playerRuntimeID = 1000;
 
     private UDPServer server = null;
 
-    private ArrayList<Player> players = new ArrayList<Player>();
-    private ArrayList<Chest> chests = new ArrayList<Chest>();
-    private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+    //private ArrayList<Player> players = new ArrayList<Player>();
+    //private ArrayList<Chest> chests = new ArrayList<Chest>();
+    //private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     
-    private ArrayList<Animation> animations = new ArrayList<Animation>();
+    //private ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
     
     private ServerActionHandler actionHandler;
+    
+    private ArrayList<GameMap> maps = new ArrayList<GameMap>();
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
         
         // init world
-        initGameMap();
-        initGameObjects();
+        initGameMaps();
         initAI();
 
         // init server connection
@@ -92,6 +94,10 @@ public class GameServer {
 
         // start main server loop
         new Thread(new ServerLoop()).start();
+        
+        spawnChest(new Chest(1000, 680, 1000, 
+                ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
+                ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
     }
 
     class ClientQueryParser extends ClientPacketParser {
@@ -106,7 +112,12 @@ public class GameServer {
                     
                     try {
                         server.send(new DataPacket("LOGIN_OK," + acc.getMapName() + "," + x + "," + y), packet.getIP(), packet.getPort());
-                        addNewPlayer(name, x, y);
+                        //loginPlayer(acc.getMapName(), name, x, y, packet.getIP(), packet.getPort());
+                        Player p = acc.getPlayer();
+                        p.ip = packet.getIP();
+                        p.port = packet.getPort();
+                        
+                        loginPlayer(acc.getMapName(), p);
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -117,7 +128,7 @@ public class GameServer {
                     // in release launch at this point wrong user name passed
                     try {
                         server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
-                        addNewPlayer(name, 1000, 600);
+                        loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -177,9 +188,9 @@ public class GameServer {
          *          true if player name exists on server, false otherwise
          */
         private boolean playerNameExists(String name) {
-            for (Player p : players)
+            /*for (Player p : players)
                 if (p.name.equals(name))
-                    return true;
+                    return true;*/
 
             return false;
         }
@@ -192,12 +203,12 @@ public class GameServer {
          *                  name of the player to disconnect
          */
         private void closePlayerConnection(String playerName) {
-            for (Iterator<Player> iter = players.iterator(); iter.hasNext(); ) {
+            /*for (Iterator<Player> iter = players.iterator(); iter.hasNext(); ) {
                 if (iter.next().name.equals(playerName)) {
                     iter.remove();
                     break;
                 }
-            }
+            }*/
         }
     }
 
@@ -209,10 +220,13 @@ public class GameServer {
      *          player if name exists on the server, if not then null
      */
     /*package-private*/ Player getPlayerByName(String name) {
-        for (Player p : players)
-            if (p.name.equals(name))
+        Player p = null;
+        for (GameMap m : maps) {
+            p = m.getPlayerByName(name);
+            if (p != null)
                 return p;
-
+        }
+        
         return null;
     }
 
@@ -224,20 +238,21 @@ public class GameServer {
      *          character (player, enemy or NPC) associated with this ID
      *          or null if ID doesn't exist
      */
-    /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id) {
-        for (Enemy e : enemies)
+    /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id, String mapName) {
+        /*for (Enemy e : enemies)
             if (e.getRuntimeID() == id)
                 return e;
-        return null;
+        return null;*/
+        return getMapByName(mapName).getEnemyByRuntimeID(id);
     }
 
     class ServerLoop implements Runnable {
         @Override
         public void run() {
-            List<Player> tmpPlayers = new ArrayList<Player>();
+            //List<Player> tmpPlayers = new ArrayList<Player>();
 
             while (true) {
-                tmpPlayers = new ArrayList<Player>(players);
+                /*tmpPlayers = new ArrayList<Player>(players);
 
                 // process animations
                 for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
@@ -316,15 +331,15 @@ public class GameServer {
 
                 Animation[] animsToSend = new Animation[animations.size()];
                 for (int i = 0; i < animations.size(); i++)
-                    animsToSend[i] = animations.get(i);
+                    animsToSend[i] = animations.get(i);*/
 
+                for (GameMap map : maps)
+                    map.update(server);
+                
 
                 try {
-                    server.send(new DataPacket(toSend));
-                    server.send(new DataPacket(chestsToSend));
-                    server.send(new DataPacket(eneToSend));
-                    server.send(new DataPacket(animsToSend));
 
+                    // add delay calculation
                     Thread.sleep(20);   // maybe even 10
                 }
                 catch (Exception e) {
@@ -344,15 +359,16 @@ public class GameServer {
         if (agent != null && target != null && agent instanceof GameCharacter && target instanceof GameCharacter) {
             GameCharacter chAgent = (GameCharacter)agent;
             GameCharacter chTarget = (GameCharacter)target;
-            if (distanceBetween(chAgent, chTarget) > 2)
-                moveObject(chAgent, chTarget.getX(), chTarget.getY());
+            if (distanceBetween(chAgent, chTarget) > 2) {
+                //moveObject(chAgent, chTarget.getX(), chTarget.getY());
+            }
             else
                 processBasicAttack((GameCharacter)agent, (GameCharacter)target);
         }
         else {
             if (agent != null && agent instanceof GameCharacter && target != null && target instanceof Point) {
                 GameCharacter chAgent = (GameCharacter)agent;
-                moveObject(chAgent, target.getX(), target.getY());  // use that maybe for all?
+                //moveObject(chAgent, target.getX(), target.getY());  // use that maybe for all?
             }
         }
     }
@@ -364,16 +380,51 @@ public class GameServer {
 
         if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
             int dmg = attacker.attack(target);
-            addAnimation(new TextAnimation(attacker.getX(), attacker.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
+            //addAnimation(new TextAnimation(attacker.getX(), attacker.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
             //addAnimation(new ImageAnimation());
             attacker.atkTime = 0;
         }
     }
+    
+    /*package-private*/ GameMap getMapByName(String name) {
+        for (GameMap m : maps)
+            if (m.name.equals(name))
+                return m;
+        
+        return null;
+    }
 
-    /*package-private*/ void moveObject(GameCharacter ch, int x, int y) {
+    /*package-private*/ void moveObject(GameCharacter ch, String mapName, int x, int y) {
         x /= 40; y /= 40;
+        
+        GameMap m = getMapByName(mapName);
+        
+        if (x < 0 || x >= m.width || y < 0 || y >= m.height)
+            return;
+        
+        AStarNode[][] grid = m.getGrid();
 
-        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
+        targetNode = grid[x][y];
+        AStarNode startN = grid[ch.getX()/40][ch.getY() / 40];
+
+        for (int i = 0; i < m.width; i++)
+            for (int j = 0; j < m.height; j++)
+                grid[i][j].setHCost(Math.abs(x - i) + Math.abs(y - j));
+
+
+        ArrayList<AStarNode> busyNodes = new ArrayList<AStarNode>();
+        // find "busy" nodes
+        //for (Enemy e : enemies) {
+            //busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
+        //}
+
+        AStarNode[] busy = new AStarNode[busyNodes.size()];
+        for (int i = 0; i < busyNodes.size(); i++)
+            busy[i] = busyNodes.get(i);
+
+        closed = logic.getPath(grid, startN, targetNode, busy);
+
+        /*if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
             return;
 
         targetNode = map[x][y];
@@ -394,7 +445,7 @@ public class GameServer {
         for (int i = 0; i < busyNodes.size(); i++)
             busy[i] = busyNodes.get(i);
 
-        closed = logic.getPath(map, startN, targetNode, busy);
+        closed = logic.getPath(map, startN, targetNode, busy);*/
 
         if (closed.size() > 0) {
             n = closed.get(0);
@@ -415,11 +466,21 @@ public class GameServer {
         }
     }
 
-    private void addNewPlayer(String name, int x, int y) {
-        Player p = new Player(name, GameCharacterClass.NOVICE, x, y);
-        p.setRuntimeID(runtimeID++);
-        players.add(p);
-        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID());
+    private void loginPlayer(String mapName, String name, int x, int y, String ip, int port) {
+        Player p = new Player(name, GameCharacterClass.NOVICE, x, y, ip ,port);
+        p.setRuntimeID(playerRuntimeID++);
+        GameMap m = getMapByName(mapName);
+        m.addPlayer(p);
+        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID()
+                + " Map: " + m.name);
+    }
+    
+    private void loginPlayer(String mapName, Player p) {
+        p.setRuntimeID(playerRuntimeID++);
+        GameMap m = getMapByName(mapName);
+        m.addPlayer(p);
+        Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
+                + " Map: " + m.name);
     }
 
     /**
@@ -433,26 +494,28 @@ public class GameServer {
      * @param y
      *          y coord
      */
-    private Enemy spawnEnemy(String id, int x, int y) {
+    /*private Enemy spawnEnemy(String id, int x, int y) {
         Enemy e = ObjectManager.getEnemyByID(id);
         e.setRuntimeID(runtimeID++);
         e.setX(x);
         e.setY(y);
         enemies.add(e);
         return e;
-    }
+    }*/
 
-    /*package-private*/ Chest spawnChest(Chest chest) {
-        chests.add(chest);
+    /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
+        //chests.add(chest);
+        getMapByName(mapName).chests.add(chest);
         return chest;
     }
     
-    /*package-private*/ void addAnimation(Animation a) {
-        animations.add(a);
+    /*package-private*/ void addAnimation(Animation a, String mapName) {
+        //animations.add(a);
+        getMapByName(mapName).animations.add(a);
     }
 
-    private void initGameMap() {
-        List<String> lines = Resources.getText("map1.txt");
+    private void initGameMaps() {
+        /*List<String> lines = Resources.getText("map1.txt");
 
         mapHeight = lines.size();
         mapWidth = lines.get(0).length();
@@ -464,24 +527,9 @@ public class GameServer {
             for (int j = 0; j < line.length(); j++) {
                 map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
             }
-        }
-    }
-
-    private void initGameObjects() {
-        spawnChest(new Chest(25*40, 16*40, 1000, ObjectManager.getWeaponByID(ID.Weapon.GUT_RIPPER), ObjectManager.getWeaponByID(ID.Weapon.SOUL_REAPER)));
-        Chest c = spawnChest(new Chest(0, 80, 2033, ObjectManager.getArmorByID(ID.Armor.THANATOS_BODY_ARMOR), ObjectManager.getArmorByID(ID.Armor.DOMOVOI)));
-
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 640, 160);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 720, 720);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 40, 40);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 720);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 760);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 800);
-        spawnEnemy(ID.Enemy.MINOR_EARTH_SPIRIT, 1000, 840);
-        spawnEnemy(ID.Enemy.MINOR_FIRE_SPIRIT, 600, 120);
-
-        Enemy e = spawnEnemy(ID.Enemy.MINOR_WATER_SPIRIT, 360, 40);
-        e.AI.setTarget(c);
+        }*/
+        
+        maps.add(ObjectManager.getMapByName("map1.txt"));
     }
 
     private void initAI() {
@@ -493,14 +541,14 @@ public class GameServer {
 
                 aiPatrol(agent, target);
 
-                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
                 for (Player p : tmpPlayers) {
                     if (distanceBetween(p, target) < 2) {   // if any player comes close
                         agent.AI.setGoal(AgentGoal.KILL_OBJECT);    // change state
                         agent.AI.setTarget(p);
                         break;
                     }
-                }
+                }*/
             }
         };
 
@@ -521,11 +569,11 @@ public class GameServer {
             @Override
             public void execute(Enemy agent, AgentGoalTarget target) {
                 AgentGoalTarget t = getLastKnownLocation();
-                if (t != null && !agent.canSee(t))
-                    moveObject(agent, t.getX(), t.getY());
+                //if (t != null && !agent.canSee(t))
+                   // moveObject(agent, t.getX(), t.getY());
 
 
-                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
                 for (Player p : tmpPlayers) {
                     if (agent.canSee(p)) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
@@ -536,7 +584,7 @@ public class GameServer {
                         }
                         break;
                     }
-                }
+                }*/
             }
         };
 
@@ -557,14 +605,14 @@ public class GameServer {
                     agent.AI.currentTarget = getLastKnownLocation();
 
 
-                List<Player> tmpPlayers = new ArrayList<Player>(players);
+                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
                 for (Player p : tmpPlayers) {
                     if (agent.canSee(p)) {
                         locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
                         target = p;
                         break;
                     }
-                }
+                }*/
 
                 if (target != null)
                     processBasicAttack(agent, target);
@@ -583,7 +631,7 @@ public class GameServer {
 
     private void aiPatrol(Enemy agent, AgentGoalTarget target) {
         if (distanceBetween(agent, target) > 3) {
-            moveObject(agent, target.getX(), target.getY());
+            //moveObject(agent, target.getX(), target.getY());
         }
     }
 

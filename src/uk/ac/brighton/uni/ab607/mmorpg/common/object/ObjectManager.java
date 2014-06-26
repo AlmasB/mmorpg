@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
@@ -25,6 +26,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
+
 
 public class ObjectManager {
 
@@ -33,6 +36,7 @@ public class ObjectManager {
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
     private static HashMap<String, Enemy> defaultEnemies = new HashMap<String, Enemy>();
     private static HashMap<String, Essence> defaultEssences = new HashMap<String, Essence>();
+    private static HashMap<String, GameMap> defaultMaps = new HashMap<String, GameMap>();
 
     private ObjectManager() {}
 
@@ -836,6 +840,13 @@ public class ObjectManager {
          * Increases cost of all skills by that % for 30s
          *
          * */
+        
+        // MAPS
+        
+        addMap(new GameMap("map1.txt", "map1.png", 
+                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
+                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
+                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));
     }
 
     private static void addArmor(Armor armor) {
@@ -856,6 +867,10 @@ public class ObjectManager {
 
     private static void addEssence(Essence e) {
         defaultEssences.put(e.id, e);
+    }
+    
+    private static void addMap(GameMap m) {
+        defaultMaps.put(m.name, m);
     }
 
     public static Skill getSkillByID(String id) {
@@ -899,5 +914,15 @@ public class ObjectManager {
 
     public static Essence getEssenceByID(String id) {
         return defaultEssences.containsKey(id) ? new Essence(defaultEssences.get(id)) : null;
+    }
+    
+    /**
+     * 
+     * @param name
+     * @return
+     *          COPY of a map
+     */
+    public static GameMap getMapByName(String name) {
+        return defaultMaps.containsKey(name) ? new GameMap(defaultMaps.get(name)) : null;
     }
 }
