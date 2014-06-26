@@ -1,10 +1,15 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 
-public class Chest implements java.io.Serializable, AgentGoalTarget {
+public class Chest implements java.io.Serializable, Drawable, AgentGoalTarget {
 
     /**
      *
@@ -52,5 +57,12 @@ public class Chest implements java.io.Serializable, AgentGoalTarget {
     @Override
     public int getY() {
         return y;
+    }
+    
+    @Override
+    public void draw(GraphicsContext gContext) {
+        Graphics2D g = gContext.getGraphics();
+        g.drawImage(Resources.getImage(Resource.Image.CHEST), x - gContext.getRenderX(),
+                10 + y - gContext.getRenderY(), null);  // + 10, so that image looks nicer on grid
     }
 }

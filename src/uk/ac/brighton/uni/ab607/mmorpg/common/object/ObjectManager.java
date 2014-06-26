@@ -4,6 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import uk.ac.brighton.uni.ab607.libs.main.Out;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -20,7 +24,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
+
 
 public class ObjectManager {
 
@@ -29,6 +36,7 @@ public class ObjectManager {
     private static HashMap<String, Skill> defaultSkills = new HashMap<String, Skill>();
     private static HashMap<String, Enemy> defaultEnemies = new HashMap<String, Enemy>();
     private static HashMap<String, Essence> defaultEssences = new HashMap<String, Essence>();
+    private static HashMap<String, GameMap> defaultMaps = new HashMap<String, GameMap>();
 
     private ObjectManager() {}
 
@@ -268,7 +276,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
                 float dmg = (Math.max(diff, 0) + 10*level) * 5;
-                caster.dealPhysicalDamage(target, dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
+                useResult = new SkillUseResult(Target.ENEMY, d);
             }
         });
 
@@ -416,7 +425,10 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
-                caster.dealMagicalDamage(target, dmg, Element.AIR);
+                int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
+                useResult = new SkillUseResult(Target.ENEMY, d,
+                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
+                        new TextAnimation(target.getX(), target.getY(), d + "", TextAnimationType.SKILL));
             }
         });
 
@@ -638,11 +650,17 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.attack(target);
-                caster.attack(target);
+                int dmg1 = caster.attack(target);
+                int dmg2 = caster.attack(target);
+                boolean stun = false;
                 if (GameMath.checkChance(level*5)) {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
+                    stun = true;
                 }
+                useResult = new SkillUseResult(Target.ENEMY, 0, 
+                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE)); 
             }
         });
 
@@ -773,9 +791,15 @@ public class ObjectManager {
                     dmg += level * 15;
                 }
 
-                caster.dealPhysicalDamage(target, dmg);
-                caster.dealPhysicalDamage(target, dmg);
-                caster.dealPhysicalDamage(target, dmg);
+                int dmg1 = caster.dealPhysicalDamage(target, dmg);
+                int dmg2 = caster.dealPhysicalDamage(target, dmg);
+                int dmg3 = caster.dealPhysicalDamage(target, dmg);
+                
+                useResult = new SkillUseResult(Target.ENEMY, 0, 
+                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 40, target.getY()+40, dmg3 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));
             }
         });
 
@@ -816,6 +840,13 @@ public class ObjectManager {
          * Increases cost of all skills by that % for 30s
          *
          * */
+        
+        // MAPS
+        
+        addMap(new GameMap("map1.txt", "map1.png", 
+                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
+                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
+                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));
     }
 
     private static void addArmor(Armor armor) {
@@ -836,6 +867,10 @@ public class ObjectManager {
 
     private static void addEssence(Essence e) {
         defaultEssences.put(e.id, e);
+    }
+    
+    private static void addMap(GameMap m) {
+        defaultMaps.put(m.name, m);
     }
 
     public static Skill getSkillByID(String id) {
@@ -879,5 +914,15 @@ public class ObjectManager {
 
     public static Essence getEssenceByID(String id) {
         return defaultEssences.containsKey(id) ? new Essence(defaultEssences.get(id)) : null;
+    }
+    
+    /**
+     * 
+     * @param name
+     * @return
+     *          COPY of a map
+     */
+    public static GameMap getMapByName(String name) {
+        return defaultMaps.containsKey(name) ? new GameMap(defaultMaps.get(name)) : null;
     }
 }

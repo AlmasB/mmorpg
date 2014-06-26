@@ -2,19 +2,12 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,19 +16,18 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
-import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 
 public class GameGUI extends GUI {
     /**
@@ -45,11 +37,6 @@ public class GameGUI extends GUI {
 
     private int mapWidth;
     private int mapHeight;
-
-    private AStarNode[][] map;
-    private Mouse mouse = new Mouse();
-
-    private AStarNode target;
 
     private int renderX = 0, renderY = 0;
     private String name = "";
@@ -85,49 +72,58 @@ public class GameGUI extends GUI {
     private int selX = 0, selY = 0; // selected point
     
     private GraphicsContext gContext = null;
+    private GameMap map;
+    //private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
 
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
 
-        name = playerName;
+        name = playerName;        
 
         inv = new InventoryGUI();
         st = new StatsGUI(name);
+        
+        this.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {}
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                inv.setLocation(GameGUI.this.getX()+640, GameGUI.this.getY()+22);
+                st.setLocation(GameGUI.this.getX(), GameGUI.this.getY()+22);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+            }
+            @Override
+            public void componentHidden(ComponentEvent e) {}
+        });
+        
+        // only for testing, not for release
+        /*this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                addActionRequest(new ActionRequest(Action.SAVE, player.name));
+            }
+        });*/
+        
+        client = new UDPClient(ip, 55555, new ServerResponseParser());
+        client.send(new DataPacket("LOGIN_PLAYER," + name));
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         this.addKeyListener(new Keyboard());
-        this.addMouseListener(mouse);
-        //this.addMouseMotionListener(mouse);
-
-        List<String> lines = Resources.getText("map1.txt");
-
-        mapHeight = lines.size();
-        mapWidth = lines.get(0).length();
-
-        map = new AStarNode[mapWidth][mapHeight];
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (int j = 0; j < line.length(); j++) {
-                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
-            }
-        }
-
-        client = new UDPClient(ip, 55555, new ServerResponseParser());
-        client.send(new DataPacket("CREATE_PLAYER," + name));
+        this.addMouseListener(new Mouse());
 
         chat.setLayout(null);
         chat.setBounds(5, 720 - 53, 1280 - 25, 20);
-        chat.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String chatText = e.getActionCommand();
-                if (!chatText.isEmpty()) {
-                    addActionRequest(new ActionRequest(Action.CHAT, player.name, chatText));
-                    chat.setText("");
-                }
+        chat.addActionListener(e -> {
+            String chatText = e.getActionCommand();
+            if (!chatText.isEmpty()) {
+                addActionRequest(new ActionRequest(Action.CHAT, player.name, map.name + "," + chatText));
+                chat.setText("");
             }
         });
         chat.addKeyListener(new KeyListener() {
@@ -161,6 +157,24 @@ public class GameGUI extends GUI {
     class ServerResponseParser extends ServerPacketParser {
         @Override
         public void parseServerPacket(DataPacket packet) {
+            if (packet.stringData.startsWith("LOGIN_OK")) {
+                String data = packet.stringData;
+                
+                String mapName = data.split(",")[1];    // exception check
+                map = ObjectManager.getMapByName(mapName);
+                
+                mapHeight = map.height;
+                mapWidth = map.width;
+                
+                /*List<String> lines = Resources.getText(mapName);
+
+                mapHeight = lines.size();
+                mapWidth = lines.get(0).length();*/
+                
+                selX = Integer.parseInt(data.split(",")[2]);
+                selY = Integer.parseInt(data.split(",")[3]);
+            }
+            
             if (packet.multipleObjectData instanceof Player[]) {
                 update((Player[]) packet.multipleObjectData);
             }
@@ -200,14 +214,6 @@ public class GameGUI extends GUI {
             if (currentPlayer != null) {
                 player = currentPlayer; // synch from server
 
-                // TODO: consider something better
-                if (once) {
-                    selX = player.getX();
-                    selY = player.getY();
-                    once = false;
-                }
-
-
                 updateGameClient();
 
                 // update other windows
@@ -227,9 +233,7 @@ public class GameGUI extends GUI {
         private void update(Chest[] sChests) {
             chests.clear();
             for (Chest ch : sChests) {
-                if (!ch.isOpened()) {   // server has already checked, remove this line at some point
-                    chests.add(ch);
-                }
+                chests.add(ch);
             }
 
             tmpChests = new ArrayList<Chest>(chests);   // for drawing chests
@@ -265,19 +269,16 @@ public class GameGUI extends GUI {
         
         if (gContext != null)
             gContext.setRenderOffset(renderX, renderY);
+        
+        int moveToX = (selX/40)*40;
+        int moveToY = (selY/40)*40;
 
-        if ((selX/40)*40 != player.getX() || (selY/40)*40 != player.getY()) {
-            target = map[selX/40][selY/40];
-            addActionRequest(new ActionRequest(Action.MOVE, player.name, target.getX()*40, target.getY()*40));
+        if (moveToX != player.getX() || moveToY != player.getY()) {
+            addActionRequest(new ActionRequest(Action.MOVE, player.name, map.name, moveToX, moveToY));
         }
-        else {
-            target = null;
-        }
 
-        checkRuntimeID();
-
-        if (targetRuntimeID != 0) {
-            addActionRequest(new ActionRequest(Action.ATTACK, player.name, targetRuntimeID));
+        if ((targetRuntimeID = checkRuntimeID()) != 0) {
+            addActionRequest(new ActionRequest(Action.ATTACK, player.name, map.name, targetRuntimeID));
         }
 
         if (!stop) {
@@ -299,53 +300,32 @@ public class GameGUI extends GUI {
         if (gContext == null)
             gContext = new GraphicsContext(g);
         
+        // draw background / clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
 
+        // draw map
         if (player != null) {
             int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
             int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
 
             int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
             int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-            g.drawImage(Resources.getImage("map1.png"),
+            g.drawImage(Resources.getImage(Resource.Image.MAP1),    // in future mapname will be used
                     dx, dy, dx1, dy1,
                     sx, sy, sx1, sy1, this);
         }
 
-        g.setColor(Color.YELLOW);
-
-        for (Chest ch : tmpChests) {
-            g.drawImage(Resources.getImage("chest.png"), 0 + ch.x - renderX, 0 + 10 + ch.y - renderY, this);
+        for (Chest chest : tmpChests) {
+            chest.draw(gContext);
         }
 
         for (Enemy e : tmpEnemies) {
-            g.drawImage(Resources.getImage(e.spriteName),
-                    e.getX() - renderX, e.getY() - renderY, e.getX() - renderX+40, e.getY() - renderY+40,
-                    e.place*40, e.getRow()*40, e.place*40+40, e.getRow()*40+40, this);
-
-            g.setFont(AnimationUtils.DEFAULT_FONT);
-            g.setColor(AnimationUtils.DEFAULT_COLOR);
-            
-            g.drawString(e.name + " " + e.getHP() + "", e.getX() - renderX, 50 + e.getY() - renderY);
+            e.draw(gContext);
         }
 
         for (Player p : tmpPlayers) {
-            FontMetrics fm = g.getFontMetrics(g.getFont());
-            int width = fm.stringWidth(p.name);
-
-            g.drawImage(Resources.getImage("player1.png"),
-                    p.getX() - renderX, p.getY() - renderY, p.getX() - renderX+40, p.getY() - renderY+40,
-                    p.place*40, p.getRow()*40, p.place*40+40, p.getRow()*40+40, this);
-
-            g.setFont(AnimationUtils.DEFAULT_FONT);
-            g.setColor(AnimationUtils.DEFAULT_COLOR);
-            
-            g.drawString(p.name, p.getX() - renderX + 20 - (width/2), p.getY() + 5 + 40 - renderY);
-        }
-
-        if (target != null) {
-            g.drawImage(Resources.getImage("target.png"), target.getX()*40 - renderX, target.getY()*40 - renderY, this);
+            p.draw(gContext);
         }
 
         for (Animation a : tmpAnims) {
@@ -385,8 +365,10 @@ public class GameGUI extends GUI {
         @Override
         public void keyTyped(KeyEvent e) {
             input = e.getKeyChar();
-            if (input >= '1' && input <= '9')
+            if (input >= '1' && input <= '9') {
                 choosingTarget = true;
+                setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            }
 
 
             // once skill is clicked cursor changes
@@ -395,8 +377,16 @@ public class GameGUI extends GUI {
         }
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_UP) {
-                chat.requestFocusInWindow();
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    chat.requestFocusInWindow();
+                    break;
+                case KeyEvent.VK_I:
+                    inv.setVisible(!inv.isVisible());
+                    break;
+                case KeyEvent.VK_S:
+                    st.setVisible(!st.isVisible());
+                    break;
             }
         }
         @Override
@@ -454,10 +444,10 @@ public class GameGUI extends GUI {
                         return;
                     }
                 }
-
+                
+                // if no enemy in that selection
+                // drop target, then move player to that cell
                 targetRuntimeID = 0;
-
-                // if no enemy in that selection then move player to that cell
 
                 selX = mouseX + renderX;
                 selY = mouseY + renderY;
@@ -465,10 +455,12 @@ public class GameGUI extends GUI {
             }
             else {
                 choosingTarget = false;
+                setCursor(walkCursor);
                 for (Enemy enemy : tmpEnemies) {
                     Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
                     if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
-                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
+                        addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
+                                map.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;
                     }
                 }
@@ -506,11 +498,20 @@ public class GameGUI extends GUI {
         return currentPlayer;
     }*/
 
-    private void checkRuntimeID() {
+    /**
+     * This check is needed to see if target runtimeID
+     * still exists in the world
+     * 
+     * @return
+     *          target's runtimeID or 0 if invalid
+     */
+    private int checkRuntimeID() {
+        if (targetRuntimeID == 0) return 0;
+        
         for (Enemy e : tmpEnemies) {
             if (e.getRuntimeID() == targetRuntimeID)
-                return;
+                return targetRuntimeID;
         }
-        targetRuntimeID = 0;
+        return 0;
     }
 }

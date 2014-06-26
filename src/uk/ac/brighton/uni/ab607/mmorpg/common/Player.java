@@ -1,7 +1,11 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
@@ -65,11 +69,17 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             LEFT_HAND = 4;
 
     private EquippableItem[] equip = new EquippableItem[5];
+    
+    public String ip; 
+    public int port;
 
-    public Player(String name, GameCharacterClass charClass, int x, int y) {
+    public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
         this.x = x;
         this.y = y;
+        this.ip = ip;
+        this.port = port;
+        this.spriteName = "player1.png";
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
@@ -279,5 +289,23 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
     @Override
     public int getY() {
         return y;
+    }
+    
+    @Override
+    public void draw(GraphicsContext gContext) {
+        super.draw(gContext);
+        Graphics2D g = gContext.getGraphics();
+        // draw hp/sp empty bars
+        g.setColor(Color.BLACK);
+        g.drawRect(x - gContext.getRenderX(), y + 50 - gContext.getRenderY(), 40, 5);
+        g.drawRect(x - gContext.getRenderX(), y + 55 - gContext.getRenderY(), 40, 5);
+        
+        // draw hp
+        g.setColor(Color.RED);
+        g.fillRect(x + 1 - gContext.getRenderX(), y + 51 - gContext.getRenderY(), (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
+        
+        // draw sp
+        g.setColor(Color.BLUE);
+        g.fillRect(x + 1 - gContext.getRenderX(), y + 56 - gContext.getRenderY(), (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
     }
 }

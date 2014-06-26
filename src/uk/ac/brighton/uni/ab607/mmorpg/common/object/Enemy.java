@@ -1,8 +1,5 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.awt.image.BufferedImage;
-
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
@@ -32,8 +29,6 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
     private Element element;
 
     private DroppableItem[] drops;
-
-    public final String spriteName;
 
     /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);

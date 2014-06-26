@@ -32,7 +32,6 @@ public abstract class GUI extends JFrame {
         this.setSize(w, h);
         this.setResizable(false);
         this.setLayout(null);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     public void addActionRequest(ActionRequest action) {

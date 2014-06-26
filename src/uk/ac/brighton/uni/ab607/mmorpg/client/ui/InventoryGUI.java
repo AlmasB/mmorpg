@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -45,10 +43,13 @@ public class InventoryGUI extends GUI {
 
     public InventoryGUI() {
         super(640, 304, "Inventory Window");
-        this.setLocation(640, 720);
+        this.setUndecorated(true);
+        this.setAlwaysOnTop(true);
+        this.setFocusableWindowState(false);
+        this.setLocation(640, 44);
 
         itemInfoLabel.setBounds(200, 0, 225, 304);
-        itemInfoLabel.setFocusable(false);  // need that ?
+        //itemInfoLabel.setFocusable(false);
         itemInfoLabel.setVerticalAlignment(SwingConstants.TOP);
         this.add(itemInfoLabel);
 
@@ -62,13 +63,11 @@ public class InventoryGUI extends GUI {
             });
         });
         
-        
         this.add(infoButton);
 
         this.addMouseListener(mouse);
         this.addMouseMotionListener(mouse);
 
-        setVisible(true);
     }
 
     public void update(Player p) {
