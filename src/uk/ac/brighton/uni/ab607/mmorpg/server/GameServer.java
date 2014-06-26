@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
@@ -36,8 +38,6 @@ public class GameServer {
     private ServerActionHandler actionHandler;
     
     private ArrayList<GameMap> maps = new ArrayList<GameMap>();
-    
-    private long start = 0, upTime;
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
@@ -55,6 +55,9 @@ public class GameServer {
         spawnChest(new Chest(1000, 680, 1000, 
                 ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
                 ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
+        
+        // call save state to db every 5 mins
+        new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
     }
 
     class ClientQueryParser extends ClientPacketParser {
@@ -87,7 +90,7 @@ public class GameServer {
                         GameAccount.addAccount("Almas", "", "test@mail.com");    // created new account
                         
                         server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
-                        loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
+                        //loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -170,6 +173,30 @@ public class GameServer {
             }*/
         }
     }
+    
+    class ServerLoop implements Runnable {
+        @Override
+        public void run() {
+            long start;
+            
+            while (true) {
+                start = System.currentTimeMillis();
+
+                for (GameMap map : maps)
+                    map.update(server);
+   
+                long delay = System.currentTimeMillis() - start;
+                try {
+                    if (delay < 20) {
+                        Thread.sleep(20 - delay);
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     /**
      *
@@ -199,37 +226,6 @@ public class GameServer {
      */
     /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id, String mapName) {
         return getMapByName(mapName).getEnemyByRuntimeID(id);
-    }
-
-    class ServerLoop implements Runnable {
-        @Override
-        public void run() {
-
-            start = System.currentTimeMillis();
-            
-            while (true) {
-                
-
-                for (GameMap map : maps)
-                    map.update(server);
-                
-
-                upTime = System.currentTimeMillis() - start;
-                if (upTime > 10000) {
-                    //saveState();
-                    //System.exit(0);
-                }
-                
-                try {
-
-                    // add delay calculation
-                    Thread.sleep(20);   // maybe even 10
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
     
     /*package-private*/ GameMap getMapByName(String name) {
@@ -270,29 +266,6 @@ public class GameServer {
 
         closed = logic.getPath(grid, startN, targetNode, busy);
 
-        /*if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
-            return;
-
-        targetNode = map[x][y];
-        AStarNode startN = map[ch.getX()/40][ch.getY() / 40];
-
-        for (int i = 0; i < mapWidth; i++)
-            for (int j = 0; j < mapHeight; j++)
-                map[i][j].setHCost(Math.abs(x - i) + Math.abs(y - j));
-
-
-        ArrayList<AStarNode> busyNodes = new ArrayList<AStarNode>();
-        // find "busy" nodes
-        for (Enemy e : enemies) {
-            busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
-        }
-
-        AStarNode[] busy = new AStarNode[busyNodes.size()];
-        for (int i = 0; i < busyNodes.size(); i++)
-            busy[i] = busyNodes.get(i);
-
-        closed = logic.getPath(map, startN, targetNode, busy);*/
-
         if (closed.size() > 0) {
             n = closed.get(0);
 
@@ -311,15 +284,6 @@ public class GameServer {
             ch.ySpeed = 0;
         }
     }
-
-    private void loginPlayer(String mapName, String name, int x, int y, String ip, int port) {
-        Player p = new Player(name, GameCharacterClass.NOVICE, x, y, ip ,port);
-        p.setRuntimeID(playerRuntimeID++);
-        GameMap m = getMapByName(mapName);
-        m.addPlayer(p);
-        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID()
-                + " Map: " + m.name);
-    }
     
     private void loginPlayer(String mapName, Player p) {
         p.setRuntimeID(playerRuntimeID++);
@@ -329,58 +293,20 @@ public class GameServer {
                 + " Map: " + m.name);
     }
 
-    /**
-     * Spawns an enemy with given ID at x, y
-     * Also assigns runtimeID to that enemy
-     *
-     * @param id
-     *           ID of enemy to spawn
-     * @param x
-     *          x coord
-     * @param y
-     *          y coord
-     */
-    /*private Enemy spawnEnemy(String id, int x, int y) {
-        Enemy e = ObjectManager.getEnemyByID(id);
-        e.setRuntimeID(runtimeID++);
-        e.setX(x);
-        e.setY(y);
-        enemies.add(e);
-        return e;
-    }*/
-
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
-        //chests.add(chest);
         getMapByName(mapName).chests.add(chest);
         return chest;
     }
     
     /*package-private*/ void addAnimation(Animation a, String mapName) {
-        //animations.add(a);
         getMapByName(mapName).animations.add(a);
     }
 
     private void initGameMaps() {
-        /*List<String> lines = Resources.getText("map1.txt");
-
-        mapHeight = lines.size();
-        mapWidth = lines.get(0).length();
-
-        map = new AStarNode[mapWidth][mapHeight];
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (int j = 0; j < line.length(); j++) {
-                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
-            }
-        }*/
-        
         maps.add(ObjectManager.getMapByName("map1.txt"));
     }
     
     public void saveState() {
-        Out.debug("Server::shutdown()");
-        
         for (GameMap m : maps) {
             for (Player p : m.getPlayers()) {
                 GameAccount acc = GameAccount.getAccountByUserName(p.name);
