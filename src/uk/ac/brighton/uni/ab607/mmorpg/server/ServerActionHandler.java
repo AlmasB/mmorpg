@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
+import java.awt.Point;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
@@ -144,8 +145,9 @@ public class ServerActionHandler {
                     target.atkTime = 0;
                     if (player.getHP() <= 0) {
                         //player.onDeath();
-                        player.setX(GameServer.STARTING_X);
-                        player.setY(GameServer.STARTING_Y);
+                        Point p = server.getMapByName(req.data).getRandomFreePos();
+                        player.setX(p.x);
+                        player.setY(p.y);
                     }
                 }
             }

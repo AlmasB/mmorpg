@@ -19,15 +19,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 
 public class GameServer {
-    private AStarLogic logic = new AStarLogic();
-    private List<AStarNode> closed = new ArrayList<AStarNode>();
-    private AStarNode n = null;
-
-    private AStarNode targetNode;
-
     /*package-private*/ static final int ATK_INTERVAL = 50;
-    /*package-private*/ static final int STARTING_X = 25*40;
-    /*package-private*/ static final int STARTING_Y = 15*40;
 
     private int playerRuntimeID = 1000;
 
@@ -246,7 +238,7 @@ public class GameServer {
         
         AStarNode[][] grid = m.getGrid();
 
-        targetNode = grid[x][y];
+        AStarNode targetNode = grid[x][y];
         AStarNode startN = grid[ch.getX()/40][ch.getY() / 40];
 
         for (int i = 0; i < m.width; i++)
@@ -264,10 +256,10 @@ public class GameServer {
         for (int i = 0; i < busyNodes.size(); i++)
             busy[i] = busyNodes.get(i);
 
-        closed = logic.getPath(grid, startN, targetNode, busy);
+        List<AStarNode> closed = new AStarLogic().getPath(grid, startN, targetNode, busy);
 
         if (closed.size() > 0) {
-            n = closed.get(0);
+            AStarNode n = closed.get(0);
 
             if (ch.getX() > n.getX() * 40)
                 ch.xSpeed = -5;
@@ -335,5 +327,4 @@ public class GameServer {
     /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
-
 }

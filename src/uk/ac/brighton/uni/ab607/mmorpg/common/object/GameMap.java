@@ -60,7 +60,7 @@ public class GameMap {
             ArrayList<Enemy> list = new ArrayList<Enemy>();
             for (int i = 0; i < sp.number; i++) {
                 Enemy e = ObjectManager.getEnemyByID(sp.enemyID);
-                Point p = getRandomPos();
+                Point p = getRandomFreePos();
                 e.setX(p.x);
                 e.setY(p.y);
                 e.setRuntimeID(enemyRuntimeID++);
@@ -106,7 +106,7 @@ public class GameMap {
             ArrayList<Enemy> list = enemies.get(j);
             for (int i = 0; i < spawnInfo[j].number - list.size(); i++) {
                 Enemy e = ObjectManager.getEnemyByID(spawnInfo[j].enemyID);
-                Point p = getRandomPos();
+                Point p = getRandomFreePos();
                 e.setX(p.x);
                 e.setY(p.y);
                 e.setRuntimeID(enemyRuntimeID++);
@@ -188,7 +188,12 @@ public class GameMap {
         return players;
     }
     
-    private Point getRandomPos() {
+    /**
+     * 
+     * @return
+     *          x, y coords of random unoccupied cell
+     */
+    public Point getRandomFreePos() {
         int x, y;
         do {
             x = GameMath.random(width) - 1;
