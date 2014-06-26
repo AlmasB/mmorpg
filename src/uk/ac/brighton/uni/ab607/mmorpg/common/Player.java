@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
@@ -21,7 +20,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
  * @author Almas Baimagambetov
  *
  */
-public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget {
+public class Player extends GameCharacter implements PseudoHTML {
     /**
      *
      */

@@ -3,13 +3,11 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 
-public class Enemy extends GameCharacter implements AgentGoalTarget {
+public class Enemy extends GameCharacter {
 
     /**
      *
@@ -22,19 +20,16 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
 
     public final EnemyType type;
 
-    public AgentBehaviour AI;
-
     public final int experience;
 
     private Element element;
 
     private DroppableItem[] drops;
 
-    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, AgentBehaviour AI, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
         this.type = type;
-        this.AI = AI;
         this.element = element;
         this.baseLevel = level;
         this.experience = baseXP;
@@ -43,7 +38,7 @@ public class Enemy extends GameCharacter implements AgentGoalTarget {
     }
 
     /*package-private*/ Enemy(Enemy copy) {
-        this(copy.id, copy.name, copy.description, copy.type, copy.AI, copy.element, copy.baseLevel, copy.experience, copy.spriteName, copy.drops);
+        this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel, copy.experience, copy.spriteName, copy.drops);
     }
 
     public Chest onDeath() {

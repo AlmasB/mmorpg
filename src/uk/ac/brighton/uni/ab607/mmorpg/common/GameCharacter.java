@@ -12,7 +12,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
@@ -537,13 +536,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     @Override
     public String toString() {
         return id + "," + name;
-    }
-
-    public boolean canSee(AgentGoalTarget ch) {
-        return ch.getX() >= getX() - 240
-                && ch.getX() <= getX() + 240
-                && ch.getY() >= getY() - 240
-                && ch.getY() <= getY() + 240;
     }
 
     // For Drawing/Moving screen stuff
