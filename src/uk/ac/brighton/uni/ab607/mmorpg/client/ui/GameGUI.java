@@ -7,11 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,6 +79,23 @@ public class GameGUI extends GUI {
 
         inv = new InventoryGUI();
         st = new StatsGUI(name);
+        
+        this.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {}
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                inv.setLocation(GameGUI.this.getX()+640, GameGUI.this.getY()+22);
+                st.setLocation(GameGUI.this.getX(), GameGUI.this.getY()+22);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+            }
+            @Override
+            public void componentHidden(ComponentEvent e) {}
+        });
         
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket("LOGIN_PLAYER," + name));
@@ -349,8 +362,16 @@ public class GameGUI extends GUI {
         }
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_UP) {
-                chat.requestFocusInWindow();
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    chat.requestFocusInWindow();
+                    break;
+                case KeyEvent.VK_I:
+                    inv.setVisible(!inv.isVisible());
+                    break;
+                case KeyEvent.VK_S:
+                    st.setVisible(!st.isVisible());
+                    break;
             }
         }
         @Override

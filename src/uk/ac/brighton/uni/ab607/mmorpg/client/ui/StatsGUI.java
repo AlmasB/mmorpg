@@ -2,9 +2,6 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,9 +11,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
-
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
@@ -43,7 +38,10 @@ public class StatsGUI extends GUI {
     
     public StatsGUI(final String playerName) {
         super(640, 304, "Char Stats/Skills Window");
-        this.setLocation(0, 720);
+        this.setUndecorated(true);
+        this.setAlwaysOnTop(true);
+        this.setFocusableWindowState(false);
+        this.setLocation(0, 44);
 
         attributes.setBounds(0, 0, 320, 304);
         stats.setBounds(320, 0, 320, 304);
@@ -95,8 +93,6 @@ public class StatsGUI extends GUI {
         classChangeButton.setBounds(500, 5, 125, 30);
         classChangeButton.setVisible(false);
         this.add(classChangeButton);
-        
-        setVisible(true);
     }
     
     private boolean equal(Player p) {

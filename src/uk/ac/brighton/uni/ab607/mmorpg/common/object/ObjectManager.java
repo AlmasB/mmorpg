@@ -648,13 +648,15 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 int dmg1 = caster.attack(target);
                 int dmg2 = caster.attack(target);
+                boolean stun = false;
                 if (GameMath.checkChance(level*5)) {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
+                    stun = true;
                 }
                 useResult = new SkillUseResult(Target.ENEMY, 0, 
                         new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, "x2", TextAnimationType.FADE)); 
+                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE)); 
             }
         });
 
@@ -785,9 +787,15 @@ public class ObjectManager {
                     dmg += level * 15;
                 }
 
-                caster.dealPhysicalDamage(target, dmg);
-                caster.dealPhysicalDamage(target, dmg);
-                caster.dealPhysicalDamage(target, dmg);
+                int dmg1 = caster.dealPhysicalDamage(target, dmg);
+                int dmg2 = caster.dealPhysicalDamage(target, dmg);
+                int dmg3 = caster.dealPhysicalDamage(target, dmg);
+                
+                useResult = new SkillUseResult(Target.ENEMY, 0, 
+                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX() + 40, target.getY()+40, dmg3 + "", TextAnimationType.DAMAGE_PLAYER),
+                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));
             }
         });
 
