@@ -187,6 +187,10 @@ public class GameMap {
         return null;
     }
     
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+    
     private Point getRandomPos() {
         int x, y;
         do {

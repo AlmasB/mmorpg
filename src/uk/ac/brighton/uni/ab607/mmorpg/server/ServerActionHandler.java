@@ -49,6 +49,7 @@ public class ServerActionHandler {
         actions.put(Action.UNEQUIP,   this::serverActionUnequip);
         actions.put(Action.USE_ITEM,  this::serverActionUseItem);
         actions.put(Action.CHANGE_CLASS, this::serverActionChangeClass);
+        actions.put(Action.SAVE, this::serverActionSave);
     }
     
     public void process(ActionRequest[] requests) {
@@ -192,6 +193,10 @@ public class ServerActionHandler {
     
     public void serverActionChangeClass(Player p, ActionRequest req) {
         p.changeClass(GameCharacterClass.valueOf(req.data));
+    }
+    
+    public void serverActionSave(Player p, ActionRequest req) {
+        server.saveState();
     }
     
     public void serverActionNone(Player p, ActionRequest req) {

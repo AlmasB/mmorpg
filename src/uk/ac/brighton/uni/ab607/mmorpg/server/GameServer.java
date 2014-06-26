@@ -50,12 +50,7 @@ class Point implements java.io.Serializable, AgentGoalTarget {
 }
 
 public class GameServer {
-
-    //private int mapWidth;
-    //private int mapHeight;
-
     private AStarLogic logic = new AStarLogic();
-    //private AStarNode[][] map;
     private List<AStarNode> closed = new ArrayList<AStarNode>();
     private AStarNode n = null;
 
@@ -70,10 +65,6 @@ public class GameServer {
     private UDPServer server = null;
 
     //private ArrayList<Player> players = new ArrayList<Player>();
-    //private ArrayList<Chest> chests = new ArrayList<Chest>();
-    //private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-    
-    //private ArrayList<Animation> animations = new ArrayList<Animation>();
 
     private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
     private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
@@ -81,6 +72,8 @@ public class GameServer {
     private ServerActionHandler actionHandler;
     
     private ArrayList<GameMap> maps = new ArrayList<GameMap>();
+    
+    private long start = 0, upTime;
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
@@ -95,6 +88,7 @@ public class GameServer {
         // start main server loop
         new Thread(new ServerLoop()).start();
         
+        // test
         spawnChest(new Chest(1000, 680, 1000, 
                 ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
                 ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
@@ -127,6 +121,9 @@ public class GameServer {
                     // this is purely for debugging when using local connection
                     // in release launch at this point wrong user name passed
                     try {
+                        // test
+                        GameAccount.addAccount("Almas", "", "test@mail.com");    // created new account
+                        
                         server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
                         loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
                     }
@@ -251,6 +248,8 @@ public class GameServer {
         public void run() {
             //List<Player> tmpPlayers = new ArrayList<Player>();
 
+            start = System.currentTimeMillis();
+            
             while (true) {
                 /*tmpPlayers = new ArrayList<Player>(players);
 
@@ -337,6 +336,12 @@ public class GameServer {
                     map.update(server);
                 
 
+                upTime = System.currentTimeMillis() - start;
+                if (upTime > 10000) {
+                    //saveState();
+                    //System.exit(0);
+                }
+                
                 try {
 
                     // add delay calculation
@@ -530,6 +535,21 @@ public class GameServer {
         }*/
         
         maps.add(ObjectManager.getMapByName("map1.txt"));
+    }
+    
+    public void saveState() {
+        Out.debug("Server::shutdown()");
+        
+        for (GameMap m : maps) {
+            for (Player p : m.getPlayers()) {
+                GameAccount acc = GameAccount.getAccountByUserName(p.name);
+                acc.setPlayer(p);
+                acc.setMapName(m.name);
+                acc.setXY(p.getX(), p.getY());
+            }
+        }
+        
+        DBAccess.saveDB();
     }
 
     private void initAI() {
