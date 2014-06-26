@@ -100,14 +100,6 @@ public class GameGUI extends GUI {
             public void componentHidden(ComponentEvent e) {}
         });
         
-        // only for testing, not for release
-        /*this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                addActionRequest(new ActionRequest(Action.SAVE, player.name));
-            }
-        });*/
-        
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket("LOGIN_PLAYER," + name));
 
