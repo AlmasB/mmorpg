@@ -16,7 +16,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
-import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
 /**
  * Essentially alive game object
