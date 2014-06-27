@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
@@ -265,12 +266,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         return jobLevel;
     }
 
-    /*
-    @Override
-    public boolean equals(Object o) {
-        return o != null && (o instanceof Player && ((Player) o).name.equals(this.name) || name.equals(o));
-    }*/
-
     @Override
     public String toPseudoHTML() {
         return "pseudo";
@@ -290,32 +285,30 @@ public class Player extends GameCharacter implements PseudoHTML {
                 + "ASPD: " + BLUE + aspd + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
     }
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
     
     @Override
     public void draw(GraphicsContext gContext) {
         super.draw(gContext);
         Graphics2D g = gContext.getGraphics();
-        // draw hp/sp empty bars
+        int tmpX = x - gContext.getRenderX();
+        int tmpY = y - gContext.getRenderY();
+        
+        // draw hp/sp/xp empty bars
         g.setColor(Color.BLACK);
-        g.drawRect(x - gContext.getRenderX(), y + 50 - gContext.getRenderY(), 40, 5);
-        g.drawRect(x - gContext.getRenderX(), y + 55 - gContext.getRenderY(), 40, 5);
+        g.drawRect(tmpX, tmpY + 50, 40, 5);
+        g.drawRect(tmpX, tmpY + 55, 40, 5);
+        g.drawRect(tmpX, tmpY + 60, 40, 5);
         
         // draw hp
         g.setColor(Color.RED);
-        g.fillRect(x + 1 - gContext.getRenderX(), y + 51 - gContext.getRenderY(), (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
         
         // draw sp
         g.setColor(Color.BLUE);
-        g.fillRect(x + 1 - gContext.getRenderX(), y + 56 - gContext.getRenderY(), (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
+        
+        // draw xp
+        g.setColor(AnimationUtils.COLOR_GOLD);
+        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (gainedBaseExperience*1.0f/EXP_NEEDED[baseLevel-1])) - 1, 3);
     }
 }
