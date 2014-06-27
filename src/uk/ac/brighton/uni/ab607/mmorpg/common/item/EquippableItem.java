@@ -3,9 +3,9 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 import java.util.ArrayList;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Essence;
 
 public abstract class EquippableItem extends GameItem {

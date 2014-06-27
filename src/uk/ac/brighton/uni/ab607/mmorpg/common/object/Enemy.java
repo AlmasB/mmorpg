@@ -2,10 +2,10 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 public class Enemy extends GameCharacter {
 

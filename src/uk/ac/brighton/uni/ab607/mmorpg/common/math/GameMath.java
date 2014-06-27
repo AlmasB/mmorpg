@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common;
+package uk.ac.brighton.uni.ab607.mmorpg.common.math;
 
 /**
  * Handles everything to do with math and calculations

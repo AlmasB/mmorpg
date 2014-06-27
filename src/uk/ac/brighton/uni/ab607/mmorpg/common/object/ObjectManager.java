@@ -10,7 +10,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAni
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -19,6 +18,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
