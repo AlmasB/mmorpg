@@ -123,11 +123,14 @@ public class ServerActionHandler {
             if (target != null && target.isAlive()
                     && server.distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
-                if (++player.atkTime >= GameServer.ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                if (player.canAttack()) {
                     int dmg = player.attack(target);
                     server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER), req.data);
-                    player.atkTime = 0;
+
                     if (target.getHP() <= 0) {
+                        server.addAnimation(new TextAnimation(target.getX(), target.getY(),
+                                target.experience + " XP", TextAnimationType.FADE), req.data);
+                        
                         if (player.gainBaseExperience(target.experience))
                             server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
                         
@@ -137,11 +140,9 @@ public class ServerActionHandler {
                     }
                 }
 
-                if (++target.atkTime >= GameServer.ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
-                        && !target.hasStatusEffect(Status.STUNNED)) {
+                if (target.canAttack() && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
                     server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
-                    target.atkTime = 0;
                     if (player.getHP() <= 0) {
                         //player.onDeath();
                         Point p = server.getMapByName(req.data).getRandomFreePos();

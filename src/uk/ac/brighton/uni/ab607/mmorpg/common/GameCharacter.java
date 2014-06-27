@@ -16,6 +16,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
+import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
 /**
  * Essentially alive game object
@@ -97,10 +98,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     private ArrayList<StatusEffect> statuses = new ArrayList<StatusEffect>();
     private ArrayList<Effect> effects = new ArrayList<Effect>();
 
-    protected int baseLevel = 1,
+    protected int baseLevel = 1, atkTick = 0,
             hp = 0, sp = 0; // these are current hp/sp
-
-    public int atkTime = 0;
 
     /**
      * Signifies whether character is alive
@@ -358,6 +357,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
             regenTick = 0.0f;
         }
+        
+        if (!canAttack()) atkTick++;
 
         // skill cooldowns
 
@@ -378,6 +379,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         updateStatusEffects();
 
         calculateStats();
+    }
+    
+    public boolean canAttack() {
+        return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)/100.0f);
     }
 
     /**
@@ -402,6 +407,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      *          damage dealt
      */
     public int attack(GameCharacter target) {
+        atkTick = 0;
         return dealPhysicalDamage(target, this.getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel), this.getWeaponElement());
     }
 

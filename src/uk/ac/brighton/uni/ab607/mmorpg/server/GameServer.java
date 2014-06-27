@@ -119,6 +119,23 @@ public class GameServer {
                 
                 loginPlayer(acc.getMapName(), p);
             }
+            else {
+                // purely for local debugging when db/accounts.db has been deleted
+                Out.debug("Account not found, using new");
+                
+                GameAccount.addAccount("Almas", "pass", "test@mail.com");
+                GameAccount a = GameAccount.getAccountByUserName("Almas");
+                Player p = a.getPlayer();
+                p.ip = packet.getIP();
+                p.port = packet.getPort();
+                
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", a.getMapName(),
+                        p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                
+                loginPlayer(a.getMapName(), p);
+                
+                saveState();
+            }
         }
         
         private void actionLogoff(DataPacket packet, QueryRequest req) {

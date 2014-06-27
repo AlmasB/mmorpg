@@ -161,6 +161,15 @@ public class Player extends GameCharacter implements PseudoHTML {
         if (skills[skillCode].levelUp())
             skillPoints--;
     }
+    
+    @Override
+    public boolean canAttack() {
+        Weapon w1 = (Weapon) this.getEquip(RIGHT_HAND);
+        Weapon w2 = (Weapon) this.getEquip(LEFT_HAND);
+        
+        return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)
+                *w1.type.aspdFactor*w2.type.aspdFactor/100.0f);
+    }
 
     public int getMoney() {
         return money;
@@ -268,6 +277,8 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public String statsToPseudoHTML() {
+        int aspd = (int)(getTotalStat(ASPD) * ((Weapon)getEquip(RIGHT_HAND)).type.aspdFactor * ((Weapon)getEquip(LEFT_HAND)).type.aspdFactor);
+        
         return HTML_START
                 + B + this.name + B_END + BR
                 + "Class: " + BLUE + charClass.toString() + FBR
@@ -276,7 +287,7 @@ public class Player extends GameCharacter implements PseudoHTML {
                 + "ATK: " + BLUE + (int)getTotalStat(ATK) + FONT_END + " MATK: " + BLUE + (int)getTotalStat(MATK) + FBR
                 + "DEF: " + BLUE + (int)getTotalStat(DEF) + FONT_END + " MDEF: " + BLUE + (int)getTotalStat(MDEF) + FBR
                 + "ARM: " + BLUE + (int)getTotalStat(ARM) + "%" + FONT_END + " MARM: " + BLUE + (int)getTotalStat(MARM) + "%" + FBR
-                + "ASPD: " + BLUE + (int)getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
+                + "ASPD: " + BLUE + aspd + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
     }
 
