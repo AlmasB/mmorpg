@@ -27,6 +27,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 public class GameGUI extends GUI {
     /**
@@ -100,7 +103,7 @@ public class GameGUI extends GUI {
         });
         
         client = new UDPClient(ip, 55555, new ServerResponseParser());
-        client.send(new DataPacket("LOGIN_PLAYER," + name));
+        client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -148,22 +151,15 @@ public class GameGUI extends GUI {
     class ServerResponseParser extends ServerPacketParser {
         @Override
         public void parseServerPacket(DataPacket packet) {
-            if (packet.stringData.startsWith("LOGIN_OK")) {
-                String data = packet.stringData;
+            if (packet.objectData instanceof ServerResponse) {
+                ServerResponse res = (ServerResponse) packet.objectData;
                 
-                String mapName = data.split(",")[1];    // exception check
-                map = ObjectManager.getMapByName(mapName);
-                
+                map = ObjectManager.getMapByName(res.data);
                 mapHeight = map.height;
                 mapWidth = map.width;
                 
-                /*List<String> lines = Resources.getText(mapName);
-
-                mapHeight = lines.size();
-                mapWidth = lines.get(0).length();*/
-                
-                selX = Integer.parseInt(data.split(",")[2]);
-                selY = Integer.parseInt(data.split(",")[3]);
+                selX = res.value1;
+                selY = res.value2;
             }
             
             if (packet.multipleObjectData instanceof Player[]) {

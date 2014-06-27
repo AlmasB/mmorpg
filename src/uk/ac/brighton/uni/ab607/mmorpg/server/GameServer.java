@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 public class GameServer {
     /*package-private*/ static final int ATK_INTERVAL = 50;
@@ -52,87 +56,78 @@ public class GameServer {
         // call save state to db every 5 mins
         new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
     }
+    
+    interface QueryAction {
+        public void execute(DataPacket packet, QueryRequest req) throws IOException;
+    }
 
     class ClientQueryParser extends ClientPacketParser {
+        private HashMap<Query, QueryAction> actions = new HashMap<Query, QueryAction>();
+        
+        public ClientQueryParser() {
+            actions.put(Query.CHECK,  this::actionCheck);
+            actions.put(Query.LOGIN,  this::actionLogin);
+            actions.put(Query.LOGOFF, this::actionLogoff);
+        }
+        
         @Override
         public void parseClientPacket(DataPacket packet) {
-            if (packet.stringData.startsWith("LOGIN_PLAYER")) {
-                String name = packet.stringData.split(",")[1];  // exception check ?
-                // get data from game account
-                GameAccount acc = GameAccount.getAccountByUserName(name);
-                if (acc != null) {
-                    int x = acc.getX(), y = acc.getY();
-                    
-                    try {
-                        server.send(new DataPacket("LOGIN_OK," + acc.getMapName() + "," + x + "," + y), packet.getIP(), packet.getPort());
-                        Player p = acc.getPlayer();
-                        p.ip = packet.getIP();
-                        p.port = packet.getPort();
-                        
-                        loginPlayer(acc.getMapName(), p);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else {
-                    // this is purely for debugging when using local connection
-                    // in release launch at this point wrong user name passed
-                    try {
-                        // test
-                        GameAccount.addAccount("Almas", "", "test@mail.com");    // created new account
-                        
-                        server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
-                        //loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            if (packet.stringData.startsWith("CHECK_PLAYER")) {
-                String[] data = new String(packet.byteData).split(",");
-
-                String user = data[0];
-                String pass = data[1];
-
-                if (GameAccount.getAccountByUserName(user) == null) {
-                    GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
-                    try {
-                        server.send(new DataPacket("New Account Created"), packet.getIP(), packet.getPort());
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return;
-                }
-
-                String response = "";
-
-                if (!playerNameExists(user) && GameAccount.validateLogin(user, pass)) {
-                    response = "CHECK_PLAYER_GOOD";
-                }
-                else {
-                    response = "CHECK_PLAYER_BAD";
-                }
-
+            if (packet.objectData instanceof QueryRequest) {
                 try {
-                    server.send(new DataPacket(response), packet.getIP(), packet.getPort());
+                    actions.getOrDefault(((QueryRequest)packet.objectData).query,
+                            this::actionNone).execute(packet, (QueryRequest)packet.objectData);
                 }
                 catch (IOException e) {
-                    e.printStackTrace();
+                    Out.err(e);
                 }
-            }
-
-            if (packet.stringData.startsWith("CLOSE")) {
-                closePlayerConnection(packet.stringData.split(",")[1]);
             }
 
             // handle action requests from clients
             if (packet.multipleObjectData instanceof ActionRequest[]) {
                 actionHandler.process((ActionRequest[]) packet.multipleObjectData);
             }
+        }
+        
+        private void actionCheck(DataPacket packet, QueryRequest req) throws IOException {
+            String user = req.value1;
+            String pass = req.value2;
+
+            if (GameAccount.getAccountByUserName(user) == null) {
+                GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
+                server.send(new DataPacket(new ServerResponse(Query.CHECK, false, "New Account Created", "")),
+                        packet.getIP(), packet.getPort());
+                
+                return;
+            }
+            
+            boolean ok = !playerNameExists(user) && GameAccount.validateLogin(user, pass);
+            server.send(new DataPacket(new ServerResponse(Query.CHECK, ok,
+                    ok ? "Login Accepted" : "Login Rejected", "")), packet.getIP(), packet.getPort());
+        }
+        
+        private void actionLogin(DataPacket packet, QueryRequest req) throws IOException {
+            String name = req.value1;
+            // get data from game account
+            GameAccount acc = GameAccount.getAccountByUserName(name);
+            if (acc != null) {                
+                Player p = acc.getPlayer();
+                p.ip = packet.getIP();
+                p.port = packet.getPort();
+                
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", acc.getMapName(),
+                        p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                
+                loginPlayer(acc.getMapName(), p);
+            }
+        }
+        
+        private void actionLogoff(DataPacket packet, QueryRequest req) {
+            // not implemented
+            //closePlayerConnection(req.value1);
+        }
+        
+        private void actionNone(DataPacket packet, QueryRequest req) {
+            Out.err("Invalid QueryRequest: " + req.query);
         }
 
         /**
@@ -157,14 +152,14 @@ public class GameServer {
          * @param playerName
          *                  name of the player to disconnect
          */
-        private void closePlayerConnection(String playerName) {
+        //private void closePlayerConnection(String playerName) {
             /*for (Iterator<Player> iter = players.iterator(); iter.hasNext(); ) {
                 if (iter.next().name.equals(playerName)) {
                     iter.remove();
                     break;
                 }
             }*/
-        }
+        //}
     }
     
     class ServerLoop implements Runnable {

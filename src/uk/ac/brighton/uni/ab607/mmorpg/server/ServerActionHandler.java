@@ -57,8 +57,7 @@ public class ServerActionHandler {
         for (ActionRequest req : requests) {
             try {
                 Player p = server.getPlayerByName(req.playerName);
-                actions.getOrDefault(req.action, (Player pl, ActionRequest r) 
-                        -> serverActionNone(pl, r)).execute(p, req);
+                actions.getOrDefault(req.action, this::serverActionNone).execute(p, req);
             }
             catch (BadActionRequestException e) {
                 Out.err(e);
