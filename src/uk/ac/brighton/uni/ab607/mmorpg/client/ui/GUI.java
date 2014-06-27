@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 
 /**
  * Abstract GUI to be subclassed by any game related windows

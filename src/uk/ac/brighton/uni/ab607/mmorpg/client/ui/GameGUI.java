@@ -19,14 +19,14 @@ import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 public class GameGUI extends GUI {
     /**

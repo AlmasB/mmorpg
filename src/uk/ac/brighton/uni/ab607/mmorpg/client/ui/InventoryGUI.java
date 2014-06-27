@@ -17,13 +17,13 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 public class InventoryGUI extends GUI {
     /**
