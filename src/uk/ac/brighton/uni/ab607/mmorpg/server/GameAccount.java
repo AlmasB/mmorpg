@@ -25,7 +25,6 @@ public class GameAccount extends Account {
      * and coordinates
      */
     private String mapName = "map1.txt";
-    private int x = 1000, y = 600;
     private Player player;
 
     /**
@@ -37,7 +36,7 @@ public class GameAccount extends Account {
      */
     private GameAccount(String username, String password, String key) {
         super(username, password, key);
-        player = new Player(getUserName(), GameCharacterClass.NOVICE, x, y, "" , 0);
+        player = new Player(getUserName(), GameCharacterClass.NOVICE, 1000, 600, "" , 0);
     }
 
     public static boolean addAccount(String username, String password, String email) {
@@ -76,14 +75,6 @@ public class GameAccount extends Account {
         return mapName;
     }
     
-    public int getX() {
-        return x;
-    }
-    
-    public int getY() {
-        return y;
-    }
-    
     public Player getPlayer() {
         return player;
     }
@@ -94,10 +85,5 @@ public class GameAccount extends Account {
     
     public void setMapName(String map) {
         mapName = map;
-    }
-    
-    public void setXY(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 }

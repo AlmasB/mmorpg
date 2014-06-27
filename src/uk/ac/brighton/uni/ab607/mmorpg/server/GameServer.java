@@ -300,7 +300,6 @@ public class GameServer {
                 GameAccount acc = GameAccount.getAccountByUserName(p.name);
                 acc.setPlayer(p);
                 acc.setMapName(m.name);
-                acc.setXY(p.getX(), p.getY());
             }
         }
         

@@ -79,11 +79,10 @@ public class GameGUI extends GUI {
 
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
+        this.setLocation(0, 0);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         name = playerName;        
-
-        inv = new InventoryGUI();
-        st = new StatsGUI(name);
         
         this.addComponentListener(new ComponentListener() {
             @Override
@@ -101,12 +100,6 @@ public class GameGUI extends GUI {
             @Override
             public void componentHidden(ComponentEvent e) {}
         });
-        
-        client = new UDPClient(ip, 55555, new ServerResponseParser());
-        client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
-
-        this.setLocation(0, 0);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         this.addKeyListener(new Keyboard());
         this.addMouseListener(new Mouse());
@@ -136,8 +129,15 @@ public class GameGUI extends GUI {
 
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
+        
+        inv = new InventoryGUI();
+        st = new StatsGUI(name);
+        
+        client = new UDPClient(ip, 55555, new ServerResponseParser());
+        client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
 
         setVisible(true);
+        this.requestFocusInWindow();
     }
 
     /**
