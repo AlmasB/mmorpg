@@ -47,10 +47,12 @@ public class Chest implements java.io.Serializable, Drawable {
         return items;
     }
 
+    @Override
     public int getX() {
         return x;
     }
 
+    @Override
     public int getY() {
         return y;
     }

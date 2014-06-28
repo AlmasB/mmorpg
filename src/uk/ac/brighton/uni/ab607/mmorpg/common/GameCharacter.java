@@ -580,10 +580,12 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     public Dir direction = Dir.DOWN;
 
+    @Override
     public int getX() {
         return x;
     }
 
+    @Override
     public int getY() {
         return y;
     }

@@ -293,9 +293,11 @@ public class GameGUI extends GUI {
                 sx, sy, sx1, sy1, this);
         
         synchronized(gameObjects) {
+            Rectangle playerVision = new Rectangle(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
                 for (Drawable obj : objects) {
-                    obj.draw(gContext);
+                    if (playerVision.contains(new Point(obj.getX(), obj.getY())))
+                        obj.draw(gContext);
                 }
             }
         }
