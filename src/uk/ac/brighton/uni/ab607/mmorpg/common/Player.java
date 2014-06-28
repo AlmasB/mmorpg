@@ -34,20 +34,28 @@ public class Player extends GameCharacter implements PseudoHTML {
             MAX_ATTRIBUTE = 100,
             ATTRIBUTE_POINTS_PER_LEVEL = 3,
             SKILL_POINTS_PER_LEVEL = 1,
-            EXP_NEEDED_BASE = 10;
+            EXP_NEEDED_FOR_LEVEL2 = 10;
 
     /**
      * By what value should experience needed for next level
      * increase per level
      */
-    private static final double EXP_NEEDED_INC = 1.1;
+    private static final float EXP_NEEDED_INC_BASE = 1.75f;
+    private static final float EXP_NEEDED_INC_STAT = 1.5f;
+    private static final float EXP_NEEDED_INC_JOB  = 1.25f;
 
-    private static final int[] EXP_NEEDED = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_BASE = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_STAT = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_JOB = new int[MAX_LEVEL];
 
     static {
-        EXP_NEEDED[0] = EXP_NEEDED_BASE;
-        for (int i = 1; i < EXP_NEEDED.length; i++) {
-            EXP_NEEDED[i] = (int) (EXP_NEEDED[i-1] * EXP_NEEDED_INC);
+        EXP_NEEDED_BASE[0] = EXP_NEEDED_FOR_LEVEL2;
+        EXP_NEEDED_STAT[0] = EXP_NEEDED_FOR_LEVEL2;
+        EXP_NEEDED_JOB[0]  = EXP_NEEDED_FOR_LEVEL2;
+        for (int i = 1; i < EXP_NEEDED_BASE.length; i++) {
+            EXP_NEEDED_BASE[i] = (int) (EXP_NEEDED_BASE[i-1] * EXP_NEEDED_INC_BASE) + 2 * i;
+            EXP_NEEDED_STAT[i] = (int) (EXP_NEEDED_STAT[i-1] * EXP_NEEDED_INC_STAT) + i;
+            EXP_NEEDED_JOB[i]  = (int) (EXP_NEEDED_JOB[i-1] * EXP_NEEDED_INC_JOB) + i / 2;
         }
     }
 
@@ -95,7 +103,7 @@ public class Player extends GameCharacter implements PseudoHTML {
      */
     public boolean gainBaseExperience(final int value) {
         gainedBaseExperience += value;
-        if (gainedBaseExperience >= EXP_NEEDED[baseLevel-1]) {
+        if (gainedBaseExperience >= EXP_NEEDED_BASE[baseLevel-1]) {
             baseLevelUp();
             gainedBaseExperience = 0;
             return true;
@@ -106,7 +114,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public void gainStatExperience(final int value) {
         gainedStatExperience += value;
-        if (gainedStatExperience >= EXP_NEEDED[statLevel-1]) {
+        if (gainedStatExperience >= EXP_NEEDED_STAT[statLevel-1]) {
             Out.println("Stat Level UP!");
             statLevelUp();
             gainedStatExperience = 0;
@@ -115,7 +123,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public void gainJobExperience(final int value) {
         gainedJobExperience += value;
-        if (gainedJobExperience >= EXP_NEEDED[jobLevel-1]) {
+        if (gainedJobExperience >= EXP_NEEDED_JOB[jobLevel-1]) {
             Out.println("Job Level UP!");
             jobLevelUp();
             gainedJobExperience = 0;
@@ -309,6 +317,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         
         // draw xp
         g.setColor(AnimationUtils.COLOR_GOLD);
-        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (gainedBaseExperience*1.0f/EXP_NEEDED[baseLevel-1])) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (gainedBaseExperience*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
 }
