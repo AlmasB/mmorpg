@@ -129,13 +129,12 @@ public class ServerActionHandler {
 
                     if (target.getHP() <= 0) {
                         server.addAnimation(new TextAnimation(target.getX(), target.getY(),
-                                target.experience + " XP", TextAnimationType.FADE), req.data);
+                                target.getXP().base + " XP", TextAnimationType.FADE), req.data);
                         
-                        if (player.gainBaseExperience(target.experience))
+                        if (player.gainXP(target.getXP())) {
                             server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
-                        
-                        player.gainJobExperience(target.experience);
-                        player.gainStatExperience(target.experience);
+                        }
+
                         server.spawnChest(target.onDeath(), req.data);
                     }
                 }
@@ -172,12 +171,15 @@ public class ServerActionHandler {
             else if (result.target == Target.SELF) {
                 server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
             }
-
+            
             if (skTarget.getHP() <= 0) {
-                if (player.gainBaseExperience(skTarget.experience))
+                server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(),
+                        skTarget.getXP().base + " XP", TextAnimationType.FADE), req.data);
+                
+                if (player.gainXP(skTarget.getXP())) {
                     server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
-                player.gainJobExperience(skTarget.experience);
-                player.gainStatExperience(skTarget.experience);
+                }
+
                 server.spawnChest(skTarget.onDeath(), req.data);
             }
         }

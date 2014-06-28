@@ -25,10 +25,17 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
  *
  */
 public abstract class GameCharacter implements java.io.Serializable, Drawable {
-    /**
-     *
-     */
     private static final long serialVersionUID = -4840633591092062960L;
+    
+    public static class Experience implements java.io.Serializable {
+        private static final long serialVersionUID = 2762180993708324531L;
+        public int base, stat, job;
+        public Experience(int base, int stat, int job) {
+            this.base = base;
+            this.stat = stat;
+            this.job = job;    
+        }
+    }
 
     /**
      * id - object ID in database
@@ -107,6 +114,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     protected boolean alive = true;
 
     protected GameCharacterClass charClass;
+    
+    protected Experience xp = new Experience(0, 0, 0);
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
         //this.id = id;

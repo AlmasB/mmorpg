@@ -61,10 +61,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     private int statLevel = 1, jobLevel = 1;
    
-    private int gainedBaseExperience = 0,
-            gainedStatExperience = 0,
-            gainedJobExperience = 0,
-            attributePoints = 0,
+    private int attributePoints = 0,
             skillPoints = 0;
 
     private int money = 0;
@@ -92,42 +89,34 @@ public class Player extends GameCharacter implements PseudoHTML {
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
     }
-
+    
     /**
-     * Increase player's base experience by given value
-     *
-     * @param value
-     *              base experience earned
-     * @return 
-     *          true if player gained new level, false otherwise
+     * Increases player's experience
+     * 
+     * @param gainedXP
+     * @return
+     *          true if player gained new base level
      */
-    public boolean gainBaseExperience(final int value) {
-        gainedBaseExperience += value;
-        if (gainedBaseExperience >= EXP_NEEDED_BASE[baseLevel-1]) {
-            baseLevelUp();
-            gainedBaseExperience = 0;
-            return true;
-        }
-        
-        return false;
-    }
-
-    public void gainStatExperience(final int value) {
-        gainedStatExperience += value;
-        if (gainedStatExperience >= EXP_NEEDED_STAT[statLevel-1]) {
+    public boolean gainXP(final Experience gainedXP) {
+        xp.stat += gainedXP.stat;
+        if (xp.stat >= EXP_NEEDED_STAT[statLevel-1]) {
             Out.println("Stat Level UP!");
             statLevelUp();
-            gainedStatExperience = 0;
+            xp.stat = 0;
         }
-    }
-
-    public void gainJobExperience(final int value) {
-        gainedJobExperience += value;
-        if (gainedJobExperience >= EXP_NEEDED_JOB[jobLevel-1]) {
+        xp.job += gainedXP.job;
+        if (xp.job >= EXP_NEEDED_JOB[jobLevel-1]) {
             Out.println("Job Level UP!");
             jobLevelUp();
-            gainedJobExperience = 0;
+            xp.job = 0;
         }
+        xp.base += gainedXP.base;
+        if (xp.base >= EXP_NEEDED_BASE[baseLevel-1]) {
+            baseLevelUp();
+            xp.base = 0;
+            return true;
+        }
+        return false;
     }
 
     public void baseLevelUp() {
@@ -317,6 +306,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         
         // draw xp
         g.setColor(AnimationUtils.COLOR_GOLD);
-        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (gainedBaseExperience*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
 }

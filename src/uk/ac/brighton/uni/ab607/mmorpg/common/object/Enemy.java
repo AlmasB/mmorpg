@@ -8,7 +8,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 public class Enemy extends GameCharacter {
-
     /**
      *
      */
@@ -20,25 +19,23 @@ public class Enemy extends GameCharacter {
 
     public final EnemyType type;
 
-    public final int experience;
-
     private Element element;
 
     private DroppableItem[] drops;
 
-    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, int baseXP, String spriteName, DroppableItem... drops) {
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, Experience xp, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
         this.type = type;
         this.element = element;
         this.baseLevel = level;
-        this.experience = baseXP;
+        this.xp = xp;
         this.spriteName = spriteName;
         this.drops = drops;
     }
 
     /*package-private*/ Enemy(Enemy copy) {
-        this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel, copy.experience, copy.spriteName, copy.drops);
+        this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel, copy.xp, copy.spriteName, copy.drops);
     }
 
     public Chest onDeath() {
@@ -52,14 +49,14 @@ public class Enemy extends GameCharacter {
         return drop;
     }
 
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
+    /**
+     * 
+     * @return
+     *          Experience object containing base/stat/job xp
+     *          for this enemy
+     */
+    public Experience getXP() {
+        return xp;
     }
 
     @Override
