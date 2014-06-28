@@ -44,6 +44,9 @@ public class Player extends GameCharacter implements PseudoHTML {
     private static final float EXP_NEEDED_INC_STAT = 1.5f;
     private static final float EXP_NEEDED_INC_JOB  = 1.25f;
 
+    /**
+     * Holds experience needed for each level
+     */
     private static final int[] EXP_NEEDED_BASE = new int[MAX_LEVEL];
     private static final int[] EXP_NEEDED_STAT = new int[MAX_LEVEL];
     private static final int[] EXP_NEEDED_JOB = new int[MAX_LEVEL];
@@ -98,19 +101,17 @@ public class Player extends GameCharacter implements PseudoHTML {
      *          true if player gained new base level
      */
     public boolean gainXP(final Experience gainedXP) {
-        xp.stat += gainedXP.stat;
+        xp.add(gainedXP);
         if (xp.stat >= EXP_NEEDED_STAT[statLevel-1]) {
             Out.println("Stat Level UP!");
             statLevelUp();
             xp.stat = 0;
         }
-        xp.job += gainedXP.job;
         if (xp.job >= EXP_NEEDED_JOB[jobLevel-1]) {
             Out.println("Job Level UP!");
             jobLevelUp();
             xp.job = 0;
         }
-        xp.base += gainedXP.base;
         if (xp.base >= EXP_NEEDED_BASE[baseLevel-1]) {
             baseLevelUp();
             xp.base = 0;

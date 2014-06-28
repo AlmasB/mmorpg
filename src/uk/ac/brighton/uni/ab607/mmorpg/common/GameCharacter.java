@@ -5,6 +5,7 @@ import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
@@ -34,6 +35,11 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             this.base = base;
             this.stat = stat;
             this.job = job;    
+        }
+        public void add(Experience xp) {
+            this.base += xp.base;
+            this.stat += xp.stat;
+            this.job += xp.job;
         }
     }
 
@@ -123,9 +129,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.description = description;
         this.charClass = charClass;
         this.skills = charClass.skills;
-
-        for (int i = STR; i <= LUC; i++)    // set all attributes to 1, that's the minimum
-            attributes[i] = 1;
+        
+        Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
         calculateStats();
         setHP((int)(stats[MAX_HP] + bStats[MAX_HP]));   // set current hp/sp to max

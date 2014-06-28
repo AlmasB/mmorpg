@@ -31,16 +31,15 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
+/**
+ * Main game window
+ * 
+ * @author Almas Baimagambetov
+ *
+ */
 public class GameGUI extends GUI {
-    /**
-     *
-     */
     private static final long serialVersionUID = -3086068923466302200L;
 
-    private int mapWidth;
-    private int mapHeight;
-
-    private int renderX = 0, renderY = 0;
     private String name = "";
 
     private UDPClient client = null;
@@ -61,8 +60,7 @@ public class GameGUI extends GUI {
 
     private boolean stop = false;
 
-    private Player player;
-    private Player currentPlayer;
+    private Player player = null;
 
     private JTextField chat = new JTextField();
 
@@ -72,6 +70,7 @@ public class GameGUI extends GUI {
     private Cursor walkCursor = null;
 
     private int selX = 0, selY = 0; // selected point
+    private int renderX = 0, renderY = 0;   // render offset
     
     private GraphicsContext gContext = null;
     private GameMap map;
@@ -135,9 +134,6 @@ public class GameGUI extends GUI {
         
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
-
-        setVisible(true);
-        this.requestFocusInWindow();
     }
 
     /**
@@ -155,11 +151,17 @@ public class GameGUI extends GUI {
                 ServerResponse res = (ServerResponse) packet.objectData;
                 
                 map = ObjectManager.getMapByName(res.data);
-                mapHeight = map.height;
-                mapWidth = map.width;
                 
                 selX = res.value1;
                 selY = res.value2;
+            }
+            
+            if (packet.objectData instanceof Player) {
+                player = (Player) packet.objectData;
+                // login complete, all set, we can now show GUI
+                // and start drawing
+                setVisible(true);
+                requestFocusInWindow();
             }
             
             if (packet.multipleObjectData instanceof Player[]) {
@@ -179,8 +181,6 @@ public class GameGUI extends GUI {
             }
         }
 
-        boolean once = true;
-
         /**
          * Update info about players
          *
@@ -190,23 +190,18 @@ public class GameGUI extends GUI {
         private void update(Player[] sPlayers) {
             players.clear();
             for (Player p : sPlayers) {
-                if (p != null) {
-                    players.add(p);
-                    if (p.name.equals(name)) {   // find "this client's" player
-                        currentPlayer = p;
-                    }
+                players.add(p);
+                if (p.name.equals(name)) {   // find "this client's" player
+                    player = p; // synch from server
                 }
             }
 
-            if (currentPlayer != null) {
-                player = currentPlayer; // synch from server
+            // update main window
+            updateGameClient();
 
-                updateGameClient();
-
-                // update other windows
-                inv.update(currentPlayer);
-                st.update(currentPlayer);
-            }
+            // update other windows
+            inv.update(player);
+            st.update(player);
 
             tmpPlayers = new ArrayList<Player>(players);    // for drawing game client
         }
@@ -292,16 +287,14 @@ public class GameGUI extends GUI {
         g.fillRect(0, 0, 1280, 690);
 
         // draw map
-        if (player != null) {
-            int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, mapWidth*40);
-            int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, mapHeight*40);
+        int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, map.width*40);
+        int sy = Math.max(player.getY() - 360, 0), sy1 = Math.min(player.getY() + 360, map.height*40);
 
-            int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
-            int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-            g.drawImage(Resources.getImage(Resource.Image.MAP1),    // in future mapname will be used
-                    dx, dy, dx1, dy1,
-                    sx, sy, sx1, sy1, this);
-        }
+        int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
+        int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
+        g.drawImage(Resources.getImage(Resource.Image.MAP1),    // in future mapname will be used
+                dx, dy, dx1, dy1,
+                sx, sy, sx1, sy1, this);
 
         for (Chest chest : tmpChests) {
             chest.draw(gContext);
@@ -320,8 +313,8 @@ public class GameGUI extends GUI {
         }
         
         // debug full grid drawing
-        /*for (int i = 0; i < mapHeight; i++) {
-            for (int j = 0; j < mapWidth; j++) {
+        /*for (int i = 0; i < map.height; i++) {
+            for (int j = 0; j < map.width; j++) {
                 g.setColor(Color.YELLOW);
                 g.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
             }
@@ -476,14 +469,6 @@ public class GameGUI extends GUI {
             mouseY = e.getY();
         }
     }
-
-    /*public Player getPlayer() {
-        return player;
-    }
-
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }*/
 
     /**
      * This check is needed to see if target runtimeID

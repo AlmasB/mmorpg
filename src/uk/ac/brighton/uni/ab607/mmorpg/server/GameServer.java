@@ -24,11 +24,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 public class GameServer {
-    /*package-private*/ static final int ATK_INTERVAL = 50;
+    private UDPServer server = null;
 
     private int playerRuntimeID = 1000;
-
-    private UDPServer server = null;
 
     //private ArrayList<Player> players = new ArrayList<Player>();
     
@@ -116,6 +114,7 @@ public class GameServer {
                 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", acc.getMapName(),
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                server.send(new DataPacket(p)); // send player so client can init 
                 
                 loginPlayer(acc.getMapName(), p);
             }
@@ -131,6 +130,7 @@ public class GameServer {
                 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", a.getMapName(),
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                server.send(new DataPacket(p)); // send player for init
                 
                 loginPlayer(a.getMapName(), p);
                 
@@ -154,7 +154,7 @@ public class GameServer {
          * @return
          *          true if player name exists on server, false otherwise
          */
-        private boolean playerNameExists(String name) {
+        private boolean playerNameExists(String name) { // is player online
             /*for (Player p : players)
                 if (p.name.equals(name))
                     return true;*/
