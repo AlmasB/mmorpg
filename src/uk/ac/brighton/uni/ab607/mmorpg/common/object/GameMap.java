@@ -162,10 +162,11 @@ public class GameMap {
         
         for (Player p : tmpPlayers) {
             try {
-                server.send(new DataPacket(toSend), p.ip, p.port);
+                
                 server.send(new DataPacket(chestsToSend), p.ip, p.port);
                 server.send(new DataPacket(enemyToSend), p.ip, p.port);
                 server.send(new DataPacket(animsToSend), p.ip, p.port);
+                server.send(new DataPacket(toSend), p.ip, p.port);
             }
             catch (Exception e) {
                 e.printStackTrace();

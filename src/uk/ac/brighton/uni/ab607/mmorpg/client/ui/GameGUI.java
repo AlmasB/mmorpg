@@ -11,6 +11,8 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JTextField;
 
@@ -24,7 +26,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
@@ -44,17 +45,8 @@ public class GameGUI extends GUI {
 
     private UDPClient client = null;
 
-    private ArrayList<Player> players = new ArrayList<Player>();
-    private ArrayList<Player> tmpPlayers = new ArrayList<Player>();
-
-    private ArrayList<Chest> chests = new ArrayList<Chest>();
-    private ArrayList<Chest> tmpChests = new ArrayList<Chest>();
-
     private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     private ArrayList<Enemy> tmpEnemies = new ArrayList<Enemy>();
-
-    private ArrayList<Animation> anims = new ArrayList<Animation>();
-    private ArrayList<Animation> tmpAnims = new ArrayList<Animation>();
 
     private int targetRuntimeID = 0;    // this is for attacking
 
@@ -74,8 +66,14 @@ public class GameGUI extends GUI {
     
     private GraphicsContext gContext = null;
     private GameMap map;
-    //private ArrayList<Drawable> gameObjects = new ArrayList<Drawable>();
 
+    private List<Drawable[]> gameObjects = Collections.synchronizedList(new ArrayList<Drawable[]>(5));
+    
+    private static final int INDEX_ANIMATIONS = 0,
+            INDEX_CHESTS = 1,
+            INDEX_ENEMIES = 2,
+            INDEX_PLAYERS = 3;
+    
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
         this.setLocation(0, 0);
@@ -134,6 +132,12 @@ public class GameGUI extends GUI {
         
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
+        
+        // placeholders
+        gameObjects.add(new Drawable[]{ });
+        gameObjects.add(new Drawable[]{ });
+        gameObjects.add(new Drawable[]{ });
+        gameObjects.add(new Drawable[]{ });
     }
 
     /**
@@ -188,13 +192,14 @@ public class GameGUI extends GUI {
          *                 players from server
          */
         private void update(Player[] sPlayers) {
-            players.clear();
             for (Player p : sPlayers) {
-                players.add(p);
-                if (p.name.equals(name)) {   // find "this client's" player
-                    player = p; // synch from server
+                if (p.name.equals(name)) {
+                    player = p;
+                    break;
                 }
             }
+            
+            gameObjects.set(INDEX_PLAYERS, sPlayers);
 
             // update main window
             updateGameClient();
@@ -202,8 +207,6 @@ public class GameGUI extends GUI {
             // update other windows
             inv.update(player);
             st.update(player);
-
-            tmpPlayers = new ArrayList<Player>(players);    // for drawing game client
         }
 
         /**
@@ -213,12 +216,7 @@ public class GameGUI extends GUI {
          *                  chests from server
          */
         private void update(Chest[] sChests) {
-            chests.clear();
-            for (Chest ch : sChests) {
-                chests.add(ch);
-            }
-
-            tmpChests = new ArrayList<Chest>(chests);   // for drawing chests
+            gameObjects.set(INDEX_CHESTS, sChests);
         }
 
         /**
@@ -232,16 +230,14 @@ public class GameGUI extends GUI {
             for (Enemy e : sEnemies) {
                 enemies.add(e);
             }
+            
+            gameObjects.set(INDEX_ENEMIES, sEnemies);
 
-            tmpEnemies = new ArrayList<Enemy>(enemies);   // for drawing enemies
+            tmpEnemies = new ArrayList<Enemy>(enemies);
         }
 
         private void update(Animation[] sAnimations) {
-            anims.clear();
-            for (Animation a : sAnimations)
-                anims.add(a);
-
-            tmpAnims = new ArrayList<Animation>(anims);
+            gameObjects.set(INDEX_ANIMATIONS, sAnimations);
         }
     }
 
@@ -292,26 +288,18 @@ public class GameGUI extends GUI {
 
         int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
         int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-        g.drawImage(Resources.getImage(Resource.Image.MAP1),    // in future mapname will be used
+        g.drawImage(Resources.getImage(map.spriteName),
                 dx, dy, dx1, dy1,
                 sx, sy, sx1, sy1, this);
-
-        for (Chest chest : tmpChests) {
-            chest.draw(gContext);
-        }
-
-        for (Enemy e : tmpEnemies) {
-            e.draw(gContext);
-        }
-
-        for (Player p : tmpPlayers) {
-            p.draw(gContext);
-        }
-
-        for (Animation a : tmpAnims) {
-            a.draw(gContext);
-        }
         
+        synchronized(gameObjects) {
+            for (Drawable[] objects : gameObjects) {
+                for (Drawable obj : objects) {
+                    obj.draw(gContext);
+                }
+            }
+        }
+
         // debug full grid drawing
         /*for (int i = 0; i < map.height; i++) {
             for (int j = 0; j < map.width; j++) {

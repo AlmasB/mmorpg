@@ -1,6 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 
 /**
  * Any visible image/text/object that may or may not
@@ -9,7 +9,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
  * @author Almas Baimagambetov
  * @version 1.1
  */
-public abstract class Animation implements java.io.Serializable {
+public abstract class Animation implements java.io.Serializable, Drawable {
     /**
      * 
      */
@@ -40,7 +40,6 @@ public abstract class Animation implements java.io.Serializable {
     }
     
     protected abstract void updateImpl(float completed);
-    public abstract void draw(GraphicsContext gContext);
     
     public boolean hasFinished() {
         return currentDuration >= maxDuration;
