@@ -127,8 +127,8 @@ public class GameGUI extends GUI {
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
         
-        inv = new InventoryGUI();
-        st = new StatsGUI(name);
+        //inv = new InventoryGUI();
+        //st = new StatsGUI(name);
         
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
@@ -164,6 +164,9 @@ public class GameGUI extends GUI {
                 player = (Player) packet.objectData;
                 // login complete, all set, we can now show GUI
                 // and start drawing
+                inv = new InventoryGUI(player);
+                st = new StatsGUI(player);
+                
                 setVisible(true);
                 requestFocusInWindow();
             }

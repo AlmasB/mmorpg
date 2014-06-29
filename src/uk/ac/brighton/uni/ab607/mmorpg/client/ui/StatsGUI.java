@@ -21,9 +21,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 public class StatsGUI extends GUI {
-    /**
-     * 
-     */
     private static final long serialVersionUID = -5781436876701869521L;
     
     private JLabel attributes = new JLabel();
@@ -36,12 +33,14 @@ public class StatsGUI extends GUI {
     
     private Player player;
     
-    public StatsGUI(final String playerName) {
+    public StatsGUI(Player p) {
         super(640, 304, "Char Stats/Skills Window");
         this.setUndecorated(true);
         this.setAlwaysOnTop(true);
         this.setFocusableWindowState(false);
         this.setLocation(0, 44);
+        
+        player = p;
 
         attributes.setBounds(0, 0, 320, 304);
         stats.setBounds(320, 0, 320, 304);
@@ -64,7 +63,7 @@ public class StatsGUI extends GUI {
             buttons[i].setBounds(125, 3 + 30 * i, 45, 28);
             buttons[i].setFont(new Font("Courier", Font.PLAIN, 18));
             buttons[i].addActionListener(e 
-                    -> addActionRequest(new ActionRequest(Action.ATTR_UP, playerName, attr)));
+                    -> addActionRequest(new ActionRequest(Action.ATTR_UP, player.name, attr)));
             add(buttons[i]);
         }
 
@@ -78,13 +77,11 @@ public class StatsGUI extends GUI {
             skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
             skillButtons[i].setEnabled(false);
             skillButtons[i].addActionListener(e
-                    -> addActionRequest(new ActionRequest(Action.SKILL_UP, playerName, skillValue)));
+                    -> addActionRequest(new ActionRequest(Action.SKILL_UP, player.name, skillValue)));
             this.add(skillButtons[i]);
         }
 
         classChangeButton.addActionListener(event -> {
-            if (player == null) return;
-            
             GameCharacterClass[] options = GameCharacterClassChanger.getAscensionClasses(player);
             GameCharacterClass chosen = (GameCharacterClass) this.showInputDialog("Choose your class", "Ascension", (Object[]) options);
             if (chosen != null)
@@ -100,24 +97,22 @@ public class StatsGUI extends GUI {
     }
 
     public void update(final Player p) {
-        if (p != null) {
-            player = p;
+        player = p;
+        
+        Skill[] skills = p.getSkills();
+        for (int i = 0; i < skills.length; i++) {
+            skillButtons[i].setToolTipText("<html><b>" + skills[i].name + "</b><br>"
+                    + "Level: <font color=green><b>" + skills[i].getLevel() + "</b></font><br>"
+                    + skills[i].description + "</html>");
             
-            Skill[] skills = p.getSkills();
-            for (int i = 0; i < skills.length; i++) {
-                skillButtons[i].setToolTipText("<html><b>" + skills[i].name + "</b><br>"
-                        + "Level: <font color=green><b>" + skills[i].getLevel() + "</b></font><br>"
-                        + skills[i].description + "</html>");
-                
-                if (skills[i].getLevel() < Skill.MAX_LEVEL) {
-                    skillButtons[i].setEnabled(p.hasSkillPoints());
-                }
+            if (skills[i].getLevel() < Skill.MAX_LEVEL) {
+                skillButtons[i].setEnabled(p.hasSkillPoints());
             }
-            
-            classChangeButton.setVisible(GameCharacterClassChanger.canChangeClass(p));
         }
+        
+        classChangeButton.setVisible(GameCharacterClassChanger.canChangeClass(p));
 
-        if (p == null || equal(p))
+        if (equal(p))
             return;
 
         if (!p.hasAttributePoints()) {
