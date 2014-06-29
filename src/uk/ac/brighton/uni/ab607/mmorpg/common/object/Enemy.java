@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
@@ -23,7 +24,7 @@ public class Enemy extends GameCharacter {
 
     private DroppableItem[] drops;
 
-    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, Experience xp, String spriteName, DroppableItem... drops) {
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, AttributeInfo attrs, Experience xp, String spriteName, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
         this.type = type;
@@ -32,10 +33,28 @@ public class Enemy extends GameCharacter {
         this.xp = xp;
         this.spriteName = spriteName;
         this.drops = drops;
+        attributes[STR] = attrs.str;
+        attributes[VIT] = attrs.vit;
+        attributes[DEX] = attrs.dex;
+        attributes[AGI] = attrs.agi;
+        attributes[INT] = attrs.int_;
+        attributes[WIS] = attrs.wis;
+        attributes[WIL] = attrs.wil;
+        attributes[PER] = attrs.per;
+        attributes[LUC] = attrs.luc;
     }
 
     /*package-private*/ Enemy(Enemy copy) {
-        this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel, copy.xp, copy.spriteName, copy.drops);
+        this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel,
+                new AttributeInfo().str(copy.getBaseAttribute(STR))
+                    .vit(copy.getBaseAttribute(VIT))
+                    .dex(copy.getBaseAttribute(DEX))
+                    .agi(copy.getBaseAttribute(AGI))
+                    .int_(copy.getBaseAttribute(INT))
+                    .wis(copy.getBaseAttribute(WIS))
+                    .wil(copy.getBaseAttribute(WIL))
+                    .per(copy.getBaseAttribute(PER))
+                    .luc(copy.getBaseAttribute(LUC)), copy.xp, copy.spriteName, copy.drops);
     }
 
     public Chest onDeath() {
