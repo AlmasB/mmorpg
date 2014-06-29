@@ -17,13 +17,15 @@ public class Weapon extends EquippableItem implements PseudoHTML {
     private static final long serialVersionUID = 2639185454495196264L;
 
     public enum WeaponType {
-        ONE_H_SWORD(2), ONE_H_AXE(2), DAGGER(1), SPEAR(3), MACE(2), ROD(5), SHIELD(0),   // 1H, shield only left-hand
-        TWO_H_SWORD(2), TWO_H_AXE(2), KATAR(1), BOW(5);    // 2H
+        ONE_H_SWORD(2, 0.85f), ONE_H_AXE(2, 0.95f), DAGGER(1, 1.25f), SPEAR(3, 0.85f), MACE(2, 1.0f), ROD(5, 0.9f), SHIELD(0, 0.9f),   // 1H, shield only left-hand
+        TWO_H_SWORD(2, 0.7f), TWO_H_AXE(2, 0.65f), KATAR(1, 0.85f), BOW(5, 0.75f);    // 2H
 
         public final int range;
+        public final float aspdFactor;
 
-        private WeaponType(int range) {
+        private WeaponType(int range, float aspdFactor) {
             this.range = range;
+            this.aspdFactor = aspdFactor;
         }
     }
 

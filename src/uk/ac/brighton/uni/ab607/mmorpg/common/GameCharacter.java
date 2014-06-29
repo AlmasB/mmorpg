@@ -5,6 +5,7 @@ import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
@@ -12,8 +13,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 
@@ -25,10 +26,22 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
  *
  */
 public abstract class GameCharacter implements java.io.Serializable, Drawable {
-    /**
-     *
-     */
     private static final long serialVersionUID = -4840633591092062960L;
+    
+    public static class Experience implements java.io.Serializable {
+        private static final long serialVersionUID = 2762180993708324531L;
+        public int base, stat, job;
+        public Experience(int base, int stat, int job) {
+            this.base = base;
+            this.stat = stat;
+            this.job = job;    
+        }
+        public void add(Experience xp) {
+            this.base += xp.base;
+            this.stat += xp.stat;
+            this.job += xp.job;
+        }
+    }
 
     /**
      * id - object ID in database
@@ -97,10 +110,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     private ArrayList<StatusEffect> statuses = new ArrayList<StatusEffect>();
     private ArrayList<Effect> effects = new ArrayList<Effect>();
 
-    protected int baseLevel = 1,
+    protected int baseLevel = 1, atkTick = 0,
             hp = 0, sp = 0; // these are current hp/sp
-
-    public int atkTime = 0;
 
     /**
      * Signifies whether character is alive
@@ -109,6 +120,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     protected boolean alive = true;
 
     protected GameCharacterClass charClass;
+    
+    protected Experience xp = new Experience(0, 0, 0);
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
         //this.id = id;
@@ -116,13 +129,12 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.description = description;
         this.charClass = charClass;
         this.skills = charClass.skills;
-
-        for (int i = STR; i <= LUC; i++)    // set all attributes to 1, that's the minimum
-            attributes[i] = 1;
+        
+        Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
         calculateStats();
-        setHP((int)(stats[MAX_HP] + bStats[MAX_HP]));   // set current hp/sp to max
-        setSP((int)(stats[MAX_SP] + bStats[MAX_SP]));
+        setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
+        setSP((int)getTotalStat(MAX_SP));
     }
 
     public int getBaseAttribute(int attr) {
@@ -169,15 +181,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      * call to this method
      */
     public final void calculateStats() {
-        int strength    = attributes[STR] + bAttributes[STR];   // calculate totals first
-        int vitality    = attributes[VIT] + bAttributes[VIT];
-        int dexterity   = attributes[DEX] + bAttributes[DEX];
-        int agility     = attributes[AGI] + bAttributes[AGI];
-        int intellect   = attributes[INT] + bAttributes[INT];
-        int wisdom      = attributes[WIS] + bAttributes[WIS];
-        int willpower   = attributes[WIL] + bAttributes[WIL];
-        int perception  = attributes[PER] + bAttributes[PER];
-        int luck        = attributes[LUC] + bAttributes[LUC];
+        int strength    = getTotalAttribute(STR);   // calculate totals first
+        int vitality    = getTotalAttribute(VIT);
+        int dexterity   = getTotalAttribute(DEX);
+        int agility     = getTotalAttribute(AGI);
+        int intellect   = getTotalAttribute(INT);
+        int wisdom      = getTotalAttribute(WIS);
+        int willpower   = getTotalAttribute(WIL);
+        int perception  = getTotalAttribute(PER);
+        int luck        = getTotalAttribute(LUC);
 
         // None of these formulae are finalised yet and need to be checked for game balance
         // only calculate "native" base stats
@@ -328,7 +340,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     protected void updateEffects() {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
-            e.reduceDuration(0.05f);
+            e.reduceDuration(0.02f);
             if (e.getDuration() <= 0) {
                 e.onEnd(this);
                 it.remove();
@@ -340,7 +352,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     private void updateStatusEffects() {
         for (Iterator<StatusEffect> it = statuses.iterator(); it.hasNext(); ) {
             StatusEffect e = it.next();
-            e.reduceDuration(0.05f);
+            e.reduceDuration(0.02f);
             if (e.getDuration() <= 0) {
                 it.remove();
             }
@@ -354,10 +366,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         regenTick += 0.02f;
 
         if (regenTick >= 2.0f) {    // 2 secs
-            hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
-            sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            if (!hasStatusEffect(Status.POISONED)) {   
+                hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
+                sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            }
             regenTick = 0.0f;
         }
+        
+        if (!canAttack()) atkTick++;
 
         // skill cooldowns
 
@@ -378,6 +394,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         updateStatusEffects();
 
         calculateStats();
+    }
+    
+    /**
+     * @return
+     *          if character is ready to perform basic attack
+     *          based on his ASPD
+     */
+    public boolean canAttack() {
+        return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)/100.0f);
     }
 
     /**
@@ -402,6 +427,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      *          damage dealt
      */
     public int attack(GameCharacter target) {
+        atkTick = 0;
         return dealPhysicalDamage(target, this.getTotalStat(ATK) + 1.25f * GameMath.random(baseLevel), this.getWeaponElement());
     }
 
@@ -499,7 +525,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      * @return
      */
     public SkillUseResult useSkill(int skillCode, GameCharacter target) {
-        if (skillCode >= skills.length)
+        if (skillCode >= skills.length || hasStatusEffect(Status.SILENCED))
             return SkillUseResult.DEFAULT_FALSE;
 
         Skill sk = skills[skillCode];
@@ -539,13 +565,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         return id + "," + name;
     }
 
-    public boolean canSee(AgentGoalTarget ch) {
-        return ch.getX() >= getX() - 240
-                && ch.getX() <= getX() + 240
-                && ch.getY() >= getY() - 240
-                && ch.getY() <= getY() + 240;
-    }
-
     // For Drawing/Moving screen stuff
     protected int x, y;
 
@@ -568,10 +587,12 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     public Dir direction = Dir.DOWN;
 
+    @Override
     public int getX() {
         return x;
     }
 
+    @Override
     public int getY() {
         return y;
     }

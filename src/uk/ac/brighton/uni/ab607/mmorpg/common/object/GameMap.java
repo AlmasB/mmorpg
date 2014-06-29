@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.UDPServer;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
@@ -14,12 +13,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 public class GameMap {
 
@@ -63,7 +60,7 @@ public class GameMap {
             ArrayList<Enemy> list = new ArrayList<Enemy>();
             for (int i = 0; i < sp.number; i++) {
                 Enemy e = ObjectManager.getEnemyByID(sp.enemyID);
-                Point p = getRandomPos();
+                Point p = getRandomFreePos();
                 e.setX(p.x);
                 e.setY(p.y);
                 e.setRuntimeID(enemyRuntimeID++);
@@ -109,7 +106,7 @@ public class GameMap {
             ArrayList<Enemy> list = enemies.get(j);
             for (int i = 0; i < spawnInfo[j].number - list.size(); i++) {
                 Enemy e = ObjectManager.getEnemyByID(spawnInfo[j].enemyID);
-                Point p = getRandomPos();
+                Point p = getRandomFreePos();
                 e.setX(p.x);
                 e.setY(p.y);
                 e.setRuntimeID(enemyRuntimeID++);
@@ -165,10 +162,11 @@ public class GameMap {
         
         for (Player p : tmpPlayers) {
             try {
-                server.send(new DataPacket(toSend), p.ip, p.port);
+                
                 server.send(new DataPacket(chestsToSend), p.ip, p.port);
                 server.send(new DataPacket(enemyToSend), p.ip, p.port);
                 server.send(new DataPacket(animsToSend), p.ip, p.port);
+                server.send(new DataPacket(toSend), p.ip, p.port);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -191,7 +189,12 @@ public class GameMap {
         return players;
     }
     
-    private Point getRandomPos() {
+    /**
+     * 
+     * @return
+     *          x, y coords of random unoccupied cell
+     */
+    public Point getRandomFreePos() {
         int x, y;
         do {
             x = GameMath.random(width) - 1;

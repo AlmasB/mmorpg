@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client;
 
+import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
@@ -8,6 +9,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
 
 public class ClientMain {
     public static void main(String[] args) {
+        Out.println("Version: " + Resources.getText("system/version.txt").get(0));
+        
         boolean local = true;
 
         ObjectManager.load();

@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
@@ -21,7 +21,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
  * @author Almas Baimagambetov
  *
  */
-public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget {
+public class Player extends GameCharacter implements PseudoHTML {
     /**
      *
      */
@@ -34,29 +34,37 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             MAX_ATTRIBUTE = 100,
             ATTRIBUTE_POINTS_PER_LEVEL = 3,
             SKILL_POINTS_PER_LEVEL = 1,
-            EXP_NEEDED_BASE = 10;
+            EXP_NEEDED_FOR_LEVEL2 = 10;
 
     /**
      * By what value should experience needed for next level
      * increase per level
      */
-    private static final double EXP_NEEDED_INC = 1.1;
+    private static final float EXP_NEEDED_INC_BASE = 1.75f;
+    private static final float EXP_NEEDED_INC_STAT = 1.5f;
+    private static final float EXP_NEEDED_INC_JOB  = 1.25f;
 
-    private static final int[] EXP_NEEDED = new int[MAX_LEVEL];
+    /**
+     * Holds experience needed for each level
+     */
+    private static final int[] EXP_NEEDED_BASE = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_STAT = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_JOB = new int[MAX_LEVEL];
 
     static {
-        EXP_NEEDED[0] = EXP_NEEDED_BASE;
-        for (int i = 1; i < EXP_NEEDED.length; i++) {
-            EXP_NEEDED[i] = (int) (EXP_NEEDED[i-1] * EXP_NEEDED_INC);
+        EXP_NEEDED_BASE[0] = EXP_NEEDED_FOR_LEVEL2;
+        EXP_NEEDED_STAT[0] = EXP_NEEDED_FOR_LEVEL2;
+        EXP_NEEDED_JOB[0]  = EXP_NEEDED_FOR_LEVEL2;
+        for (int i = 1; i < EXP_NEEDED_BASE.length; i++) {
+            EXP_NEEDED_BASE[i] = (int) (EXP_NEEDED_BASE[i-1] * EXP_NEEDED_INC_BASE) + 2 * i;
+            EXP_NEEDED_STAT[i] = (int) (EXP_NEEDED_STAT[i-1] * EXP_NEEDED_INC_STAT) + i;
+            EXP_NEEDED_JOB[i]  = (int) (EXP_NEEDED_JOB[i-1] * EXP_NEEDED_INC_JOB) + i / 2;
         }
     }
 
     private int statLevel = 1, jobLevel = 1;
    
-    private int gainedBaseExperience = 0,
-            gainedStatExperience = 0,
-            gainedJobExperience = 0,
-            attributePoints = 0,
+    private int attributePoints = 0,
             skillPoints = 0;
 
     private int money = 0;
@@ -84,42 +92,32 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
     }
-
+    
     /**
-     * Increase player's base experience by given value
-     *
-     * @param value
-     *              base experience earned
-     * @return 
-     *          true if player gained new level, false otherwise
+     * Increases player's experience
+     * 
+     * @param gainedXP
+     * @return
+     *          true if player gained new base level
      */
-    public boolean gainBaseExperience(final int value) {
-        gainedBaseExperience += value;
-        if (gainedBaseExperience >= EXP_NEEDED[baseLevel-1]) {
-            baseLevelUp();
-            gainedBaseExperience = 0;
-            return true;
-        }
-        
-        return false;
-    }
-
-    public void gainStatExperience(final int value) {
-        gainedStatExperience += value;
-        if (gainedStatExperience >= EXP_NEEDED[statLevel-1]) {
+    public boolean gainXP(final Experience gainedXP) {
+        xp.add(gainedXP);
+        if (xp.stat >= EXP_NEEDED_STAT[statLevel-1]) {
             Out.println("Stat Level UP!");
             statLevelUp();
-            gainedStatExperience = 0;
+            xp.stat = 0;
         }
-    }
-
-    public void gainJobExperience(final int value) {
-        gainedJobExperience += value;
-        if (gainedJobExperience >= EXP_NEEDED[jobLevel-1]) {
+        if (xp.job >= EXP_NEEDED_JOB[jobLevel-1]) {
             Out.println("Job Level UP!");
             jobLevelUp();
-            gainedJobExperience = 0;
+            xp.job = 0;
         }
+        if (xp.base >= EXP_NEEDED_BASE[baseLevel-1]) {
+            baseLevelUp();
+            xp.base = 0;
+            return true;
+        }
+        return false;
     }
 
     public void baseLevelUp() {
@@ -161,6 +159,15 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
 
         if (skills[skillCode].levelUp())
             skillPoints--;
+    }
+    
+    @Override
+    public boolean canAttack() {
+        Weapon w1 = (Weapon) this.getEquip(RIGHT_HAND);
+        Weapon w2 = (Weapon) this.getEquip(LEFT_HAND);
+        
+        return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)
+                *w1.type.aspdFactor*w2.type.aspdFactor/100.0f);
     }
 
     public int getMoney() {
@@ -257,18 +264,14 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
         return jobLevel;
     }
 
-    /*
-    @Override
-    public boolean equals(Object o) {
-        return o != null && (o instanceof Player && ((Player) o).name.equals(this.name) || name.equals(o));
-    }*/
-
     @Override
     public String toPseudoHTML() {
         return "pseudo";
     }
 
     public String statsToPseudoHTML() {
+        int aspd = (int)(getTotalStat(ASPD) * ((Weapon)getEquip(RIGHT_HAND)).type.aspdFactor * ((Weapon)getEquip(LEFT_HAND)).type.aspdFactor);
+        
         return HTML_START
                 + B + this.name + B_END + BR
                 + "Class: " + BLUE + charClass.toString() + FBR
@@ -277,35 +280,33 @@ public class Player extends GameCharacter implements PseudoHTML, AgentGoalTarget
                 + "ATK: " + BLUE + (int)getTotalStat(ATK) + FONT_END + " MATK: " + BLUE + (int)getTotalStat(MATK) + FBR
                 + "DEF: " + BLUE + (int)getTotalStat(DEF) + FONT_END + " MDEF: " + BLUE + (int)getTotalStat(MDEF) + FBR
                 + "ARM: " + BLUE + (int)getTotalStat(ARM) + "%" + FONT_END + " MARM: " + BLUE + (int)getTotalStat(MARM) + "%" + FBR
-                + "ASPD: " + BLUE + (int)getTotalStat(ASPD) + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
+                + "ASPD: " + BLUE + aspd + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
-    }
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
     }
     
     @Override
     public void draw(GraphicsContext gContext) {
         super.draw(gContext);
         Graphics2D g = gContext.getGraphics();
-        // draw hp/sp empty bars
+        int tmpX = x - gContext.getRenderX();
+        int tmpY = y - gContext.getRenderY();
+        
+        // draw hp/sp/xp empty bars
         g.setColor(Color.BLACK);
-        g.drawRect(x - gContext.getRenderX(), y + 50 - gContext.getRenderY(), 40, 5);
-        g.drawRect(x - gContext.getRenderX(), y + 55 - gContext.getRenderY(), 40, 5);
+        g.drawRect(tmpX, tmpY + 50, 40, 5);
+        g.drawRect(tmpX, tmpY + 55, 40, 5);
+        g.drawRect(tmpX, tmpY + 60, 40, 5);
         
         // draw hp
         g.setColor(Color.RED);
-        g.fillRect(x + 1 - gContext.getRenderX(), y + 51 - gContext.getRenderY(), (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
         
         // draw sp
         g.setColor(Color.BLUE);
-        g.fillRect(x + 1 - gContext.getRenderX(), y + 56 - gContext.getRenderY(), (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
+        
+        // draw xp
+        g.setColor(AnimationUtils.COLOR_GOLD);
+        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
 }

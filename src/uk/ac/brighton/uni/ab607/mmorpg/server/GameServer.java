@@ -4,83 +4,41 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentGoalTarget;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentRule;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-
-class Point implements java.io.Serializable, AgentGoalTarget {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5721555806534123308L;
-    private int x, y;
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-}
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 public class GameServer {
-    private AStarLogic logic = new AStarLogic();
-    private List<AStarNode> closed = new ArrayList<AStarNode>();
-    private AStarNode n = null;
-
-    private AStarNode targetNode;
-
-    /*package-private*/ static final int ATK_INTERVAL = 50;
-    /*package-private*/ static final int STARTING_X = 25*40;
-    /*package-private*/ static final int STARTING_Y = 15*40;
+    private UDPServer server = null;
 
     private int playerRuntimeID = 1000;
 
-    private UDPServer server = null;
-
     //private ArrayList<Player> players = new ArrayList<Player>();
-
-    private ArrayList<AgentRule> aiRules = new ArrayList<AgentRule>();
-    private HashMap<Point, Float> locationFacts = new HashMap<Point, Float>();
     
     private ServerActionHandler actionHandler;
     
     private ArrayList<GameMap> maps = new ArrayList<GameMap>();
-    
-    private long start = 0, upTime;
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
         
         // init world
         initGameMaps();
-        initAI();
 
         // init server connection
         server = new UDPServer(55555, new ClientQueryParser());
@@ -92,89 +50,101 @@ public class GameServer {
         spawnChest(new Chest(1000, 680, 1000, 
                 ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
                 ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
+        
+        // call save state to db every 5 mins
+        new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
+    }
+    
+    interface QueryAction {
+        public void execute(DataPacket packet, QueryRequest req) throws IOException;
     }
 
     class ClientQueryParser extends ClientPacketParser {
+        private HashMap<Query, QueryAction> actions = new HashMap<Query, QueryAction>();
+        
+        public ClientQueryParser() {
+            actions.put(Query.CHECK,  this::actionCheck);
+            actions.put(Query.LOGIN,  this::actionLogin);
+            actions.put(Query.LOGOFF, this::actionLogoff);
+        }
+        
         @Override
         public void parseClientPacket(DataPacket packet) {
-            if (packet.stringData.startsWith("LOGIN_PLAYER")) {
-                String name = packet.stringData.split(",")[1];  // exception check ?
-                // get data from game account
-                GameAccount acc = GameAccount.getAccountByUserName(name);
-                if (acc != null) {
-                    int x = acc.getX(), y = acc.getY();
-                    
-                    try {
-                        server.send(new DataPacket("LOGIN_OK," + acc.getMapName() + "," + x + "," + y), packet.getIP(), packet.getPort());
-                        //loginPlayer(acc.getMapName(), name, x, y, packet.getIP(), packet.getPort());
-                        Player p = acc.getPlayer();
-                        p.ip = packet.getIP();
-                        p.port = packet.getPort();
-                        
-                        loginPlayer(acc.getMapName(), p);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else {
-                    // this is purely for debugging when using local connection
-                    // in release launch at this point wrong user name passed
-                    try {
-                        // test
-                        GameAccount.addAccount("Almas", "", "test@mail.com");    // created new account
-                        
-                        server.send(new DataPacket("LOGIN_OK," + "map1.txt" + "," + 1000 + "," + 600), packet.getIP(), packet.getPort());
-                        loginPlayer("map1.txt", name, 1000, 600, packet.getIP(), packet.getPort());
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            if (packet.stringData.startsWith("CHECK_PLAYER")) {
-                String[] data = new String(packet.byteData).split(",");
-
-                String user = data[0];
-                String pass = data[1];
-
-                if (GameAccount.getAccountByUserName(user) == null) {
-                    GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
-                    try {
-                        server.send(new DataPacket("New Account Created"), packet.getIP(), packet.getPort());
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return;
-                }
-
-                String response = "";
-
-                if (!playerNameExists(user) && GameAccount.validateLogin(user, pass)) {
-                    response = "CHECK_PLAYER_GOOD";
-                }
-                else {
-                    response = "CHECK_PLAYER_BAD";
-                }
-
+            if (packet.objectData instanceof QueryRequest) {
                 try {
-                    server.send(new DataPacket(response), packet.getIP(), packet.getPort());
+                    actions.getOrDefault(((QueryRequest)packet.objectData).query,
+                            this::actionNone).execute(packet, (QueryRequest)packet.objectData);
                 }
                 catch (IOException e) {
-                    e.printStackTrace();
+                    Out.err(e);
                 }
-            }
-
-            if (packet.stringData.startsWith("CLOSE")) {
-                closePlayerConnection(packet.stringData.split(",")[1]);
             }
 
             // handle action requests from clients
             if (packet.multipleObjectData instanceof ActionRequest[]) {
                 actionHandler.process((ActionRequest[]) packet.multipleObjectData);
             }
+        }
+        
+        private void actionCheck(DataPacket packet, QueryRequest req) throws IOException {
+            String user = req.value1;
+            String pass = req.value2;
+
+            if (GameAccount.getAccountByUserName(user) == null) {
+                GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
+                server.send(new DataPacket(new ServerResponse(Query.CHECK, false, "New Account Created", "")),
+                        packet.getIP(), packet.getPort());
+                
+                return;
+            }
+            
+            boolean ok = !playerNameExists(user) && GameAccount.validateLogin(user, pass);
+            server.send(new DataPacket(new ServerResponse(Query.CHECK, ok,
+                    ok ? "Login Accepted" : "Login Rejected", "")), packet.getIP(), packet.getPort());
+        }
+        
+        private void actionLogin(DataPacket packet, QueryRequest req) throws IOException {
+            String name = req.value1;
+            // get data from game account
+            GameAccount acc = GameAccount.getAccountByUserName(name);
+            if (acc != null) {                
+                Player p = acc.getPlayer();
+                p.ip = packet.getIP();
+                p.port = packet.getPort();
+                
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", acc.getMapName(),
+                        p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                server.send(new DataPacket(p)); // send player so client can init 
+                
+                loginPlayer(acc.getMapName(), p);
+            }
+            else {
+                // purely for local debugging when db/accounts.db has been deleted
+                Out.debug("Account not found, using new");
+                
+                GameAccount.addAccount("Almas", "pass", "test@mail.com");
+                GameAccount a = GameAccount.getAccountByUserName("Almas");
+                Player p = a.getPlayer();
+                p.ip = packet.getIP();
+                p.port = packet.getPort();
+                
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", a.getMapName(),
+                        p.getX(), p.getY())), packet.getIP(), packet.getPort());
+                server.send(new DataPacket(p)); // send player for init
+                
+                loginPlayer(a.getMapName(), p);
+                
+                saveState();
+            }
+        }
+        
+        private void actionLogoff(DataPacket packet, QueryRequest req) {
+            // not implemented
+            //closePlayerConnection(req.value1);
+        }
+        
+        private void actionNone(DataPacket packet, QueryRequest req) {
+            Out.err("Invalid QueryRequest: " + req.query);
         }
 
         /**
@@ -184,7 +154,7 @@ public class GameServer {
          * @return
          *          true if player name exists on server, false otherwise
          */
-        private boolean playerNameExists(String name) {
+        private boolean playerNameExists(String name) { // is player online
             /*for (Player p : players)
                 if (p.name.equals(name))
                     return true;*/
@@ -199,13 +169,37 @@ public class GameServer {
          * @param playerName
          *                  name of the player to disconnect
          */
-        private void closePlayerConnection(String playerName) {
+        //private void closePlayerConnection(String playerName) {
             /*for (Iterator<Player> iter = players.iterator(); iter.hasNext(); ) {
                 if (iter.next().name.equals(playerName)) {
                     iter.remove();
                     break;
                 }
             }*/
+        //}
+    }
+    
+    class ServerLoop implements Runnable {
+        @Override
+        public void run() {
+            long start;
+            
+            while (true) {
+                start = System.currentTimeMillis();
+
+                for (GameMap map : maps)
+                    map.update(server);
+   
+                long delay = System.currentTimeMillis() - start;
+                try {
+                    if (delay < 20) {
+                        Thread.sleep(20 - delay);
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -236,159 +230,7 @@ public class GameServer {
      *          or null if ID doesn't exist
      */
     /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id, String mapName) {
-        /*for (Enemy e : enemies)
-            if (e.getRuntimeID() == id)
-                return e;
-        return null;*/
         return getMapByName(mapName).getEnemyByRuntimeID(id);
-    }
-
-    class ServerLoop implements Runnable {
-        @Override
-        public void run() {
-            //List<Player> tmpPlayers = new ArrayList<Player>();
-
-            start = System.currentTimeMillis();
-            
-            while (true) {
-                /*tmpPlayers = new ArrayList<Player>(players);
-
-                // process animations
-                for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
-                    Animation a = it.next();
-                    a.update(0.02f);    // that's how much we sleep
-                    if (a.hasFinished())
-                        it.remove();
-                }
-
-                // process AI
-                for (Iterator<Enemy> it = enemies.iterator(); it.hasNext(); ) {
-                    Enemy e = it.next();
-                    if (e.isAlive()) {
-                        AgentBehaviour ai = e.AI;
-                        for (AgentRule rule : aiRules) {
-                            if (rule.matches(ai.type, ai.currentGoal, ai.currentMode)) {
-                                //rule.execute(e, ai.currentTarget);
-                            }
-                        }
-                        e.update();
-                    }
-                    else {
-                        it.remove();
-                    }
-                }
-
-                // process players
-                for (Player p : tmpPlayers) {
-                    if (locationFacts.size() == 0) {
-                        locationFacts.put(new Point(p.getX(), p.getY()), 0.1f);
-                    }
-
-                    p.update();
-
-                    // player - chest interaction
-                    for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
-                        Chest c = it.next();
-                        if (c.isOpened()) {
-                            it.remove();
-                        }
-                        else {
-                            if (distanceBetween(p, c) < 1) {
-                                if (p.getInventory().getSize() + c.getItems().size()
-                                        <= Inventory.MAX_SIZE) {
-                                    c.open();
-                                    c.getItems().forEach(p.getInventory()::addItem);
-                                    p.incMoney(c.money);
-                                    addAnimation(new TextAnimation(c.getX(), c.getY(), c.money + " G", TextAnimationType.FADE));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // fuzzy stuff
-                Iterator<Entry<Point, Float>> iter = locationFacts.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry<Point, Float> pairs = (Map.Entry<Point, Float>)iter.next();
-                    pairs.setValue((float) (pairs.getValue() - 0.01));
-                    if (pairs.getValue() < 0)
-                        iter.remove();
-                }
-
-                // all objects to send
-                Player[] toSend = new Player[tmpPlayers.size()];
-                for (int i = 0; i < tmpPlayers.size(); i++)
-                    toSend[i] = tmpPlayers.get(i);
-
-                Chest[] chestsToSend = new Chest[chests.size()];
-                for (int i = 0; i < chests.size(); i++)
-                    chestsToSend[i] = chests.get(i);
-
-                Enemy[] eneToSend = new Enemy[enemies.size()];
-                for (int i = 0; i < enemies.size(); i++)
-                    eneToSend[i] = enemies.get(i);
-
-                Animation[] animsToSend = new Animation[animations.size()];
-                for (int i = 0; i < animations.size(); i++)
-                    animsToSend[i] = animations.get(i);*/
-
-                for (GameMap map : maps)
-                    map.update(server);
-                
-
-                upTime = System.currentTimeMillis() - start;
-                if (upTime > 10000) {
-                    //saveState();
-                    //System.exit(0);
-                }
-                
-                try {
-
-                    // add delay calculation
-                    Thread.sleep(20);   // maybe even 10
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private AgentGoalTarget getLastKnownLocation() {
-        return locationFacts.keySet().stream()
-                .max((Point o1, Point o2) -> (int)(10*(locationFacts.get(o1)-locationFacts.get(o2))))
-                .orElse(null);
-    }
-
-    private void processBasicAttack(GameCharacter agent, AgentGoalTarget target) {
-        if (agent != null && target != null && agent instanceof GameCharacter && target instanceof GameCharacter) {
-            GameCharacter chAgent = (GameCharacter)agent;
-            GameCharacter chTarget = (GameCharacter)target;
-            if (distanceBetween(chAgent, chTarget) > 2) {
-                //moveObject(chAgent, chTarget.getX(), chTarget.getY());
-            }
-            else
-                processBasicAttack((GameCharacter)agent, (GameCharacter)target);
-        }
-        else {
-            if (agent != null && agent instanceof GameCharacter && target != null && target instanceof Point) {
-                GameCharacter chAgent = (GameCharacter)agent;
-                //moveObject(chAgent, target.getX(), target.getY());  // use that maybe for all?
-            }
-        }
-    }
-
-    private void processBasicAttack(GameCharacter attacker, GameCharacter target) {
-        if (distanceBetween(attacker, target) > 2)
-            return;
-
-
-        if (++attacker.atkTime >= ATK_INTERVAL / (1 + attacker.getTotalStat(GameCharacter.ASPD)/100.0)) {
-            int dmg = attacker.attack(target);
-            //addAnimation(new TextAnimation(attacker.getX(), attacker.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY));
-            //addAnimation(new ImageAnimation());
-            attacker.atkTime = 0;
-        }
     }
     
     /*package-private*/ GameMap getMapByName(String name) {
@@ -409,7 +251,7 @@ public class GameServer {
         
         AStarNode[][] grid = m.getGrid();
 
-        targetNode = grid[x][y];
+        AStarNode targetNode = grid[x][y];
         AStarNode startN = grid[ch.getX()/40][ch.getY() / 40];
 
         for (int i = 0; i < m.width; i++)
@@ -427,33 +269,10 @@ public class GameServer {
         for (int i = 0; i < busyNodes.size(); i++)
             busy[i] = busyNodes.get(i);
 
-        closed = logic.getPath(grid, startN, targetNode, busy);
-
-        /*if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
-            return;
-
-        targetNode = map[x][y];
-        AStarNode startN = map[ch.getX()/40][ch.getY() / 40];
-
-        for (int i = 0; i < mapWidth; i++)
-            for (int j = 0; j < mapHeight; j++)
-                map[i][j].setHCost(Math.abs(x - i) + Math.abs(y - j));
-
-
-        ArrayList<AStarNode> busyNodes = new ArrayList<AStarNode>();
-        // find "busy" nodes
-        for (Enemy e : enemies) {
-            busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
-        }
-
-        AStarNode[] busy = new AStarNode[busyNodes.size()];
-        for (int i = 0; i < busyNodes.size(); i++)
-            busy[i] = busyNodes.get(i);
-
-        closed = logic.getPath(map, startN, targetNode, busy);*/
+        List<AStarNode> closed = new AStarLogic().getPath(grid, startN, targetNode, busy);
 
         if (closed.size() > 0) {
-            n = closed.get(0);
+            AStarNode n = closed.get(0);
 
             if (ch.getX() > n.getX() * 40)
                 ch.xSpeed = -5;
@@ -470,15 +289,6 @@ public class GameServer {
             ch.ySpeed = 0;
         }
     }
-
-    private void loginPlayer(String mapName, String name, int x, int y, String ip, int port) {
-        Player p = new Player(name, GameCharacterClass.NOVICE, x, y, ip ,port);
-        p.setRuntimeID(playerRuntimeID++);
-        GameMap m = getMapByName(mapName);
-        m.addPlayer(p);
-        Out.println(name + " has joined the game. RuntimeID: " + p.getRuntimeID()
-                + " Map: " + m.name);
-    }
     
     private void loginPlayer(String mapName, Player p) {
         p.setRuntimeID(playerRuntimeID++);
@@ -488,171 +298,29 @@ public class GameServer {
                 + " Map: " + m.name);
     }
 
-    /**
-     * Spawns an enemy with given ID at x, y
-     * Also assigns runtimeID to that enemy
-     *
-     * @param id
-     *           ID of enemy to spawn
-     * @param x
-     *          x coord
-     * @param y
-     *          y coord
-     */
-    /*private Enemy spawnEnemy(String id, int x, int y) {
-        Enemy e = ObjectManager.getEnemyByID(id);
-        e.setRuntimeID(runtimeID++);
-        e.setX(x);
-        e.setY(y);
-        enemies.add(e);
-        return e;
-    }*/
-
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
-        //chests.add(chest);
         getMapByName(mapName).chests.add(chest);
         return chest;
     }
     
     /*package-private*/ void addAnimation(Animation a, String mapName) {
-        //animations.add(a);
         getMapByName(mapName).animations.add(a);
     }
 
     private void initGameMaps() {
-        /*List<String> lines = Resources.getText("map1.txt");
-
-        mapHeight = lines.size();
-        mapWidth = lines.get(0).length();
-
-        map = new AStarNode[mapWidth][mapHeight];
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (int j = 0; j < line.length(); j++) {
-                map[j][i] = new AStarNode(j, i, 0, line.charAt(j) == '1' ? 1 : 0);
-            }
-        }*/
-        
         maps.add(ObjectManager.getMapByName("map1.txt"));
     }
     
     public void saveState() {
-        Out.debug("Server::shutdown()");
-        
         for (GameMap m : maps) {
             for (Player p : m.getPlayers()) {
                 GameAccount acc = GameAccount.getAccountByUserName(p.name);
                 acc.setPlayer(p);
                 acc.setMapName(m.name);
-                acc.setXY(p.getX(), p.getY());
             }
         }
         
         DBAccess.saveDB();
-    }
-
-    private void initAI() {
-        AgentRule rule = new AgentRule(AgentType.GUARD, AgentGoal.GUARD_OBJECT, AgentMode.PATROL) {
-            @Override
-            public void execute(Enemy agent, AgentGoalTarget target) {
-                if (target == null) // nothing to guard, just chill
-                    return;
-
-                aiPatrol(agent, target);
-
-                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
-                for (Player p : tmpPlayers) {
-                    if (distanceBetween(p, target) < 2) {   // if any player comes close
-                        agent.AI.setGoal(AgentGoal.KILL_OBJECT);    // change state
-                        agent.AI.setTarget(p);
-                        break;
-                    }
-                }*/
-            }
-        };
-
-        AgentRule rule2 = new AgentRule(AgentType.GUARD, AgentGoal.KILL_OBJECT, AgentMode.PATROL) {
-            @Override
-            public void execute(Enemy agent, AgentGoalTarget target) {
-                if (target == null)
-                    return;
-
-                if (agent.canSee(target)) {
-                    processBasicAttack(agent, target);
-                }
-
-            }
-        };
-
-        AgentRule rule3 = new AgentRule(AgentType.SCOUT, AgentGoal.FIND_OBJECT, AgentMode.PASSIVE) {
-            @Override
-            public void execute(Enemy agent, AgentGoalTarget target) {
-                AgentGoalTarget t = getLastKnownLocation();
-                //if (t != null && !agent.canSee(t))
-                   // moveObject(agent, t.getX(), t.getY());
-
-
-                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
-                for (Player p : tmpPlayers) {
-                    if (agent.canSee(p)) {
-                        locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
-                        if (p.getHP() / p.getTotalStat(Stat.MAX_HP) < 0.05) {
-                            agent.AI.setGoal(AgentGoal.KILL_OBJECT);
-                            agent.AI.setMode(AgentMode.AGGRESSIVE);
-                            agent.AI.setTarget(p);
-                        }
-                        break;
-                    }
-                }*/
-            }
-        };
-
-        AgentRule rule4 = new AgentRule(AgentType.SCOUT, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE) {
-            @Override
-            public void execute(Enemy agent, AgentGoalTarget target) {
-                if (target == null)
-                    return;
-
-                processBasicAttack(agent, target);
-            }
-        };
-
-        AgentRule rule5 = new AgentRule(AgentType.ASSASSIN, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE) {
-            @Override
-            public void execute(Enemy agent, AgentGoalTarget target) {
-                if (target == null)
-                    agent.AI.currentTarget = getLastKnownLocation();
-
-
-                /*List<Player> tmpPlayers = new ArrayList<Player>(players);
-                for (Player p : tmpPlayers) {
-                    if (agent.canSee(p)) {
-                        locationFacts.put(new Point(p.getX(), p.getY()), 1.0f);
-                        target = p;
-                        break;
-                    }
-                }*/
-
-                if (target != null)
-                    processBasicAttack(agent, target);
-
-                if (target != null && distanceBetween(agent, target) < 1)
-                    agent.AI.currentTarget = getLastKnownLocation();
-            }
-        };
-
-        aiRules.add(rule);
-        aiRules.add(rule2);
-        aiRules.add(rule3);
-        aiRules.add(rule4);
-        aiRules.add(rule5);
-    }
-
-    private void aiPatrol(Enemy agent, AgentGoalTarget target) {
-        if (distanceBetween(agent, target) > 3) {
-            //moveObject(agent, target.getX(), target.getY());
-        }
     }
 
     /**
@@ -669,10 +337,6 @@ public class GameServer {
     }
 
     /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
-    }
-
-    /*package-private*/ int distanceBetween(GameCharacter ch, AgentGoalTarget c) {
         return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

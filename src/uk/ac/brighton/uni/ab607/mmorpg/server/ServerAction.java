@@ -1,7 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 
 public interface ServerAction {
 

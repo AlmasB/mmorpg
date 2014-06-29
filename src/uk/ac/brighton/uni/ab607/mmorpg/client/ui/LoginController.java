@@ -8,6 +8,9 @@ import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -143,12 +146,9 @@ public class LoginController extends AnchorPane implements Initializable {
                 return;
             }
 
-            // client is OK
-            String data = user + "," + pass;
-            DataPacket packet = new DataPacket("CHECK_PLAYER", data.getBytes());
-
+            // client is OK, ask server if user/pass are valid
             try {
-                client.send(packet);
+                client.send(new DataPacket(new QueryRequest(Query.CHECK, user, pass)));
             }
             catch (IOException e) {
                 Out.err(e);
@@ -221,12 +221,10 @@ public class LoginController extends AnchorPane implements Initializable {
 
         @Override
         public void parseServerPacket(final DataPacket packet) {
-            if (packet.stringData.equals("CHECK_PLAYER_GOOD")) {
-                playerAccepted = true;
-            }
-
-            if (!packet.stringData.isEmpty()) {
-                Platform.runLater(() -> errorMessage.setText(packet.stringData));
+            if (packet.objectData instanceof ServerResponse) {
+                ServerResponse res = (ServerResponse) packet.objectData;
+                playerAccepted = (res.query == Query.CHECK && res.ok);
+                setErrorMessage(res.message);
             }
         }
     }

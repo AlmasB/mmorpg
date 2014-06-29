@@ -17,18 +17,15 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 public class InventoryGUI extends GUI {
-    /**
-     *
-     */
     private static final long serialVersionUID = 4657910668634504112L;
 
     private static final String INFO_ON = "info: on", INFO_OFF = "info: off";
@@ -41,15 +38,17 @@ public class InventoryGUI extends GUI {
 
     private Mouse mouse = new Mouse();
 
-    public InventoryGUI() {
+    public InventoryGUI(Player p) {
         super(640, 304, "Inventory Window");
         this.setUndecorated(true);
         this.setAlwaysOnTop(true);
         this.setFocusableWindowState(false);
         this.setLocation(640, 44);
+        
+        player = p;
 
         itemInfoLabel.setBounds(200, 0, 225, 304);
-        //itemInfoLabel.setFocusable(false);
+        itemInfoLabel.setFocusable(false);
         itemInfoLabel.setVerticalAlignment(SwingConstants.TOP);
         this.add(itemInfoLabel);
 
@@ -67,11 +66,10 @@ public class InventoryGUI extends GUI {
 
         this.addMouseListener(mouse);
         this.addMouseMotionListener(mouse);
-
     }
 
     public void update(Player p) {
-        if (player == null || !player.getInventory().toString().equals(p.getInventory().toString())
+        if (!player.getInventory().toString().equals(p.getInventory().toString())
                 || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
             player = p;
             repaint();
@@ -92,13 +90,12 @@ public class InventoryGUI extends GUI {
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 203, 304);
 
-        if (player != null) {
-            drawItem(player.getEquip(Player.RIGHT_HAND), g, 45, 130);
-            drawItem(player.getEquip(Player.LEFT_HAND),  g, 135, 130);
-            drawItem(player.getEquip(Player.BODY),       g, 90, 130);
-            drawItem(player.getEquip(Player.HELM),       g, 90, 85);
-            drawItem(player.getEquip(Player.SHOES),      g, 90, 180);
-        }
+        // draws the left inventory panel
+        drawItem(player.getEquip(Player.RIGHT_HAND), g, 45, 130);
+        drawItem(player.getEquip(Player.LEFT_HAND),  g, 135, 130);
+        drawItem(player.getEquip(Player.BODY),       g, 90, 130);
+        drawItem(player.getEquip(Player.HELM),       g, 90, 85);
+        drawItem(player.getEquip(Player.SHOES),      g, 90, 180);
 
         g.drawImage(Resources.getImage("inv.png"), 2, 27, this);
     }
@@ -107,25 +104,18 @@ public class InventoryGUI extends GUI {
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 205, 304);
 
-        if (player != null) {
-            ArrayList<GameItem> items = player.getInventory().getItems();
+        // draws the right inventory panel
+        ArrayList<GameItem> items = player.getInventory().getItems();
 
-            int x = 0, y = 0;
-            for (int i = 0; i < items.size(); i++) {
-                drawItem(items.get(i), g, 2 + x*40, 29 + y*40);
-
-                if (++x == 5) {
-                    x = 0;
-                    y++;
-                }
-            }
-
-            g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
-
-            g.setColor(Color.YELLOW);
-            g.setFont(new Font("Courier", Font.PLAIN, 20));
-            g.drawString(player.getMoney() + " G", 90, 287);
+        for (int i = 0; i < items.size(); i++) {
+            drawItem(items.get(i), g, 2 + (i%5)*40, 29 + (i/5)*40);
         }
+
+        g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
+
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Courier", Font.PLAIN, 20));
+        g.drawString(player.getMoney() + " G", 90, 287);
     }
 
     /**

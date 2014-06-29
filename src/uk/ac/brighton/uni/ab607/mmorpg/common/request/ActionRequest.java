@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common;
+package uk.ac.brighton.uni.ab607.mmorpg.common.request;
 
 /**
  * A container for commands/actions requested by the game client

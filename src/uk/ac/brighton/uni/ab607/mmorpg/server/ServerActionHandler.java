@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
+import java.awt.Point;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
@@ -8,11 +9,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -22,6 +21,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 /**
  * Processes all client action requests
@@ -56,8 +57,7 @@ public class ServerActionHandler {
         for (ActionRequest req : requests) {
             try {
                 Player p = server.getPlayerByName(req.playerName);
-                actions.getOrDefault(req.action, (Player pl, ActionRequest r) 
-                        -> serverActionNone(pl, r)).execute(p, req);
+                actions.getOrDefault(req.action, this::serverActionNone).execute(p, req);
             }
             catch (BadActionRequestException e) {
                 Out.err(e);
@@ -123,29 +123,30 @@ public class ServerActionHandler {
             if (target != null && target.isAlive()
                     && server.distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
-                if (++player.atkTime >= GameServer.ATK_INTERVAL / (1 + player.getTotalStat(GameCharacter.ASPD)/100.0)) {
+                if (player.canAttack()) {
                     int dmg = player.attack(target);
                     server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER), req.data);
-                    player.atkTime = 0;
+
                     if (target.getHP() <= 0) {
-                        if (player.gainBaseExperience(target.experience))
-                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
+                        server.addAnimation(new TextAnimation(target.getX(), target.getY(),
+                                target.getXP().base + " XP", TextAnimationType.FADE), req.data);
                         
-                        player.gainJobExperience(target.experience);
-                        player.gainStatExperience(target.experience);
+                        if (player.gainXP(target.getXP())) {
+                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
+                        }
+
                         server.spawnChest(target.onDeath(), req.data);
                     }
                 }
 
-                if (++target.atkTime >= GameServer.ATK_INTERVAL / (1 + target.getTotalStat(GameCharacter.ASPD)/100.0)
-                        && !target.hasStatusEffect(Status.STUNNED)) {
+                if (target.canAttack() && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
                     server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
-                    target.atkTime = 0;
                     if (player.getHP() <= 0) {
                         //player.onDeath();
-                        player.setX(GameServer.STARTING_X);
-                        player.setY(GameServer.STARTING_Y);
+                        Point p = server.getMapByName(req.data).getRandomFreePos();
+                        player.setX(p.x);
+                        player.setY(p.y);
                     }
                 }
             }
@@ -170,12 +171,15 @@ public class ServerActionHandler {
             else if (result.target == Target.SELF) {
                 server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
             }
-
+            
             if (skTarget.getHP() <= 0) {
-                if (player.gainBaseExperience(skTarget.experience))
+                server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(),
+                        skTarget.getXP().base + " XP", TextAnimationType.FADE), req.data);
+                
+                if (player.gainXP(skTarget.getXP())) {
                     server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
-                player.gainJobExperience(skTarget.experience);
-                player.gainStatExperience(skTarget.experience);
+                }
+
                 server.spawnChest(skTarget.onDeath(), req.data);
             }
         }

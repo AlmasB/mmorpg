@@ -4,30 +4,28 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
+import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Experience;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour;
-import uk.ac.brighton.uni.ab607.mmorpg.common.ai.AgentBehaviour.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
-
 
 public class ObjectManager {
 
@@ -807,16 +805,16 @@ public class ObjectManager {
         // ENEMIES
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
-                EnemyType.NORMAL, new AgentBehaviour(AgentType.SCOUT, AgentGoal.FIND_OBJECT, AgentMode.PASSIVE),
-                Element.FIRE, 1, 5, Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
+                new Experience(5, 5, 5), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
-                EnemyType.NORMAL, new AgentBehaviour(AgentType.ASSASSIN, AgentGoal.KILL_OBJECT, AgentMode.AGGRESSIVE),
-                Element.EARTH, 1, 5, Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo().vit(4),
+                new Experience(7, 4, 3), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
-                EnemyType.NORMAL, new AgentBehaviour(AgentType.GUARD, AgentGoal.GUARD_OBJECT, AgentMode.PATROL),
-                Element.WATER, 1, 5, Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
+                new Experience(4, 2, 6), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
