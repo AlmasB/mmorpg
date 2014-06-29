@@ -24,7 +24,7 @@ public class GameAccount extends Account {
      * name of the map where current account's player is last seen
      * and coordinates
      */
-    private String mapName = "map1.txt";
+    private String mapName;
     private Player player;
 
     /**
@@ -37,6 +37,7 @@ public class GameAccount extends Account {
     private GameAccount(String username, String password, String key) {
         super(username, password, key);
         player = new Player(getUserName(), GameCharacterClass.NOVICE, 1000, 600, "" , 0);
+        mapName = "map1.txt";
     }
 
     public static boolean addAccount(String username, String password, String email) {
@@ -59,8 +60,18 @@ public class GameAccount extends Account {
         DBAccess.getAccounts().put(username, new GameAccount(username, encryptedPass, passkey));
         return true;
     }
+    
+    /**
+     * @param username
+     * @return
+     *          true if account with @param username exists
+     *          false otherwise
+     */
+    public static boolean exists(String username) {
+        return DBAccess.getAccounts().containsKey(username);
+    }
 
-    public static GameAccount getAccountByUserName(String username) {
+    private static GameAccount getAccountByUserName(String username) {
         return DBAccess.getAccounts().get(username);
     }
 
@@ -71,19 +82,19 @@ public class GameAccount extends Account {
         return PasswordManager.isValid(acc, pass);
     }
     
-    public String getMapName() {
-        return mapName;
+    public static String getMapName(String username) {
+        return getAccountByUserName(username).mapName;
     }
     
-    public Player getPlayer() {
-        return player;
+    public static Player getPlayer(String username) {
+        return getAccountByUserName(username).player;
     }
     
-    public void setPlayer(Player p) {
-        player = p;
+    public static void setPlayer(Player p, String username) {
+        getAccountByUserName(username).player = p;
     }
     
-    public void setMapName(String map) {
-        mapName = map;
+    public static void setMapName(String map, String username) {
+        getAccountByUserName(username).mapName = map;
     }
 }

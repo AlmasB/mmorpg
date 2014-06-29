@@ -257,7 +257,8 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public void onDeath() {
-        alive = false;
+        hp = (int)(0.25f*getTotalStat(MAX_HP));
+        sp = (int)(0.25f*getTotalStat(MAX_SP));
     }
     
     public int getJobLevel() {
