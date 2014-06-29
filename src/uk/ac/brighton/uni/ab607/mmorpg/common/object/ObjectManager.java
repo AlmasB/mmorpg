@@ -311,7 +311,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((5.0f),
+                caster.addEffect(new Effect((5.0f), ID.Skill.Warrior.ROAR,
                         new Rune[] {
                         new Rune(Attribute.STRENGTH, level*2),
                         new Rune(Attribute.VITALITY, level*2)
@@ -334,7 +334,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((20.0f),
+                caster.addEffect(new Effect((20.0f), ID.Skill.Warrior.LAST_STAND,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
@@ -356,7 +356,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((20.0f),
+                target.addEffect(new Effect((20.0f), ID.Skill.Warrior.SHATTER_ARMOR,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ARM, -2*level)
@@ -443,7 +443,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((15.0f),
+                caster.addEffect(new Effect((15.0f), ID.Skill.Mage.AMPLIFY_MAGIC,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.MATK, 10*level)
@@ -563,7 +563,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((25.0f),
+                caster.addEffect(new Effect((25.0f), ID.Skill.Mage.MAGIC_SHIELD,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, 5*level)
@@ -626,7 +626,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((10.0f),
+                target.addEffect(new Effect((10.0f), ID.Skill.Scout.PINPOINT_WEAKNESS,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, -2*level)

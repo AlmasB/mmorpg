@@ -287,15 +287,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      *          false otherwise
      */
     public boolean hasStatusEffect(Status status) {
-        synchronized (statuses) {
-            for (StatusEffect e : statuses) {
-                if (e.getStatus() == status) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return statuses.contains(status);
     }
 
     /**
@@ -323,18 +315,22 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public abstract Element getArmorElement();
 
     public void addEffect(Effect e) {
-        // we should do synchronized
-        synchronized (effects) {
-            e.onBegin(this);
-            effects.add(e);
-            calculateStats();
+        for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
+            Effect eff = it.next();
+            if (eff.sourceID.equals(e.sourceID)) {
+                eff.onEnd(this);
+                it.remove();
+                break;
+            }
         }
+            
+        e.onBegin(this);
+        effects.add(e);
+        calculateStats();
     }
 
     public void addStatusEffect(StatusEffect e) {
-        synchronized (statuses) {
-            statuses.add(e);
-        }
+        statuses.add(e);
     }
 
     protected void updateEffects() {
