@@ -133,8 +133,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
         calculateStats();
-        setHP((int)(stats[MAX_HP] + bStats[MAX_HP]));   // set current hp/sp to max
-        setSP((int)(stats[MAX_SP] + bStats[MAX_SP]));
+        setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
+        setSP((int)getTotalStat(MAX_SP));
     }
 
     public int getBaseAttribute(int attr) {
@@ -181,15 +181,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      * call to this method
      */
     public final void calculateStats() {
-        int strength    = attributes[STR] + bAttributes[STR];   // calculate totals first
-        int vitality    = attributes[VIT] + bAttributes[VIT];
-        int dexterity   = attributes[DEX] + bAttributes[DEX];
-        int agility     = attributes[AGI] + bAttributes[AGI];
-        int intellect   = attributes[INT] + bAttributes[INT];
-        int wisdom      = attributes[WIS] + bAttributes[WIS];
-        int willpower   = attributes[WIL] + bAttributes[WIL];
-        int perception  = attributes[PER] + bAttributes[PER];
-        int luck        = attributes[LUC] + bAttributes[LUC];
+        int strength    = getTotalAttribute(STR);   // calculate totals first
+        int vitality    = getTotalAttribute(VIT);
+        int dexterity   = getTotalAttribute(DEX);
+        int agility     = getTotalAttribute(AGI);
+        int intellect   = getTotalAttribute(INT);
+        int wisdom      = getTotalAttribute(WIS);
+        int willpower   = getTotalAttribute(WIL);
+        int perception  = getTotalAttribute(PER);
+        int luck        = getTotalAttribute(LUC);
 
         // None of these formulae are finalised yet and need to be checked for game balance
         // only calculate "native" base stats
@@ -340,7 +340,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     protected void updateEffects() {
         for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
             Effect e = it.next();
-            e.reduceDuration(0.05f);
+            e.reduceDuration(0.02f);
             if (e.getDuration() <= 0) {
                 e.onEnd(this);
                 it.remove();
@@ -352,7 +352,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     private void updateStatusEffects() {
         for (Iterator<StatusEffect> it = statuses.iterator(); it.hasNext(); ) {
             StatusEffect e = it.next();
-            e.reduceDuration(0.05f);
+            e.reduceDuration(0.02f);
             if (e.getDuration() <= 0) {
                 it.remove();
             }
@@ -366,8 +366,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         regenTick += 0.02f;
 
         if (regenTick >= 2.0f) {    // 2 secs
-            hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
-            sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            if (!hasStatusEffect(Status.POISONED)) {   
+                hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
+                sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
+            }
             regenTick = 0.0f;
         }
         
@@ -394,6 +396,11 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         calculateStats();
     }
     
+    /**
+     * @return
+     *          if character is ready to perform basic attack
+     *          based on his ASPD
+     */
     public boolean canAttack() {
         return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)/100.0f);
     }
@@ -518,7 +525,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      * @return
      */
     public SkillUseResult useSkill(int skillCode, GameCharacter target) {
-        if (skillCode >= skills.length)
+        if (skillCode >= skills.length || hasStatusEffect(Status.SILENCED))
             return SkillUseResult.DEFAULT_FALSE;
 
         Skill sk = skills[skillCode];

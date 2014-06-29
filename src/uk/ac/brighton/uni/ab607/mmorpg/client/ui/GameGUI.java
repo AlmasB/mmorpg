@@ -127,9 +127,6 @@ public class GameGUI extends GUI {
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
         
-        //inv = new InventoryGUI();
-        //st = new StatsGUI(name);
-        
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
         

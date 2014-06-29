@@ -107,14 +107,8 @@ public class InventoryGUI extends GUI {
         // draws the right inventory panel
         ArrayList<GameItem> items = player.getInventory().getItems();
 
-        int x = 0, y = 0;
         for (int i = 0; i < items.size(); i++) {
-            drawItem(items.get(i), g, 2 + x*40, 29 + y*40);
-
-            if (++x == 5) {
-                x = 0;
-                y++;
-            }
+            drawItem(items.get(i), g, 2 + (i%5)*40, 29 + (i/5)*40);
         }
 
         g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
