@@ -1,0 +1,23 @@
+MAX_LEVEL = 100, 100, 60
+
+lvl (base, stat, job)
+
+                    skill points start here
+       (10, 10, 10) |       (40, 45, 30)             (90, 90, 60)
+                    |
+Novice              -> Warrior        -> Crusader     -> Paladin
+                                      -> Gladiator    -> Knight
+                    -> Scout          -> Rogue        -> Assassin
+                                      -> Ranger       -> Hunter
+                    -> Mage           -> Wizard       -> Archmage
+                                      -> Enchanter    -> Sage
+                                      
+when class changes to tier 1
+players get reduced skill set ~4 skills of their class
+once they change to tier 2 jobs they get the rest ~5 skills
+tier 3 jobs don't offer new skills but better attributes/stats bonuses
+
+skills in total = 3*4 + 6*5 = 12 + 30 = 42
+currently we've got 27
+
+we now need to reallocate skills properly and add new ones

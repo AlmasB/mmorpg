@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 
@@ -128,7 +130,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.name = name;
         this.description = description;
         this.charClass = charClass;
-        this.skills = charClass.skills;
+        this.skills = new Skill[charClass.skillIDs.length];
+        
+        for (int i = 0; i < skills.length; i++)
+            skills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
         
         Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
@@ -357,6 +362,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     protected float regenTick = 0.0f;
 
+    /**
+     * With current server settings this update
+     * is called every 0.02 seconds
+     */
     public void update() {
         // HP/SP regen
         regenTick += 0.02f;
@@ -409,7 +418,23 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      */
     public void changeClass(GameCharacterClass cl) {
         this.charClass = cl;
-        this.skills = cl.skills;
+        Skill[] tmpSkills = new Skill[charClass.skillIDs.length];
+        
+        for (int i = 0; i < tmpSkills.length; i++)
+            tmpSkills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
+        
+        // to retain level info about each skill
+        // in new skill tree
+        for (Skill sk : skills) {
+            for (Skill tmpSk : tmpSkills) {
+                if (sk.id.equals(tmpSk.id)) {
+                    tmpSk.setLevel(sk.getLevel());
+                    break;
+                }
+            }
+        }
+        
+        this.skills = tmpSkills;
         calculateStats();
     }
 
@@ -646,8 +671,16 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         g.setColor(AnimationUtils.DEFAULT_COLOR);
         
         FontMetrics fm = g.getFontMetrics(g.getFont());
-        int width = fm.stringWidth(name);
+        int width = fm.stringWidth(name + " Lv " + baseLevel);
         
-        g.drawString(name, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
+        g.drawString(name + " Lv " + baseLevel, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
+        
+        // draw hp empty bar
+        g.setColor(Color.BLACK);
+        g.drawRect(tmpX, tmpY + 50, 40, 5);
+        
+        // draw hp
+        g.setColor(Color.RED);
+        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
     }
 }

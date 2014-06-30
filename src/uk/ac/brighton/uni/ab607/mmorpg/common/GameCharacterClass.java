@@ -1,8 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 
 /**
  * A game character will have one of these classes
@@ -20,13 +18,15 @@ public enum GameCharacterClass {
 
     public final int hp;
     public final int sp;
-    public final Skill[] skills;
+    public final String[] skillIDs;
 
     private GameCharacterClass(int hp, int sp, String... IDs) {
         this.hp = hp;
         this.sp = sp;
-        this.skills = new Skill[IDs.length];
+        this.skillIDs = IDs;
+        
+        /*this.skills = new Skill[IDs.length];
         for (int i = 0; i < skills.length; i++)
-            skills[i] = ObjectManager.getSkillByID(IDs[i]);
+            skills[i] = ObjectManager.getSkillByID(IDs[i]);*/
     }
 }

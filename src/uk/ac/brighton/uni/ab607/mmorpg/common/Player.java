@@ -30,10 +30,11 @@ public class Player extends GameCharacter implements PseudoHTML {
     /**
      * Gameplay constants
      */
-    private static final int MAX_LEVEL = 100,
+    private static final int MAX_LEVEL_BASE = 100,
+            MAX_LEVEL_STAT = 100,
+            MAX_LEVEL_JOB = 60,
             MAX_ATTRIBUTE = 100,
             ATTRIBUTE_POINTS_PER_LEVEL = 3,
-            SKILL_POINTS_PER_LEVEL = 1,
             EXP_NEEDED_FOR_LEVEL2 = 10;
 
     /**
@@ -42,14 +43,14 @@ public class Player extends GameCharacter implements PseudoHTML {
      */
     private static final float EXP_NEEDED_INC_BASE = 1.75f;
     private static final float EXP_NEEDED_INC_STAT = 1.5f;
-    private static final float EXP_NEEDED_INC_JOB  = 1.25f;
+    private static final float EXP_NEEDED_INC_JOB  = 2.25f;
 
     /**
      * Holds experience needed for each level
      */
-    private static final int[] EXP_NEEDED_BASE = new int[MAX_LEVEL];
-    private static final int[] EXP_NEEDED_STAT = new int[MAX_LEVEL];
-    private static final int[] EXP_NEEDED_JOB = new int[MAX_LEVEL];
+    private static final int[] EXP_NEEDED_BASE = new int[MAX_LEVEL_BASE];
+    private static final int[] EXP_NEEDED_STAT = new int[MAX_LEVEL_STAT];
+    private static final int[] EXP_NEEDED_JOB = new int[MAX_LEVEL_JOB];
 
     static {
         EXP_NEEDED_BASE[0] = EXP_NEEDED_FOR_LEVEL2;
@@ -57,8 +58,12 @@ public class Player extends GameCharacter implements PseudoHTML {
         EXP_NEEDED_JOB[0]  = EXP_NEEDED_FOR_LEVEL2;
         for (int i = 1; i < EXP_NEEDED_BASE.length; i++) {
             EXP_NEEDED_BASE[i] = (int) (EXP_NEEDED_BASE[i-1] * EXP_NEEDED_INC_BASE) + 2 * i;
-            EXP_NEEDED_STAT[i] = (int) (EXP_NEEDED_STAT[i-1] * EXP_NEEDED_INC_STAT) + i;
-            EXP_NEEDED_JOB[i]  = (int) (EXP_NEEDED_JOB[i-1] * EXP_NEEDED_INC_JOB) + i / 2;
+            
+            if (i < EXP_NEEDED_STAT.length)
+                EXP_NEEDED_STAT[i] = (int) (EXP_NEEDED_STAT[i-1] * EXP_NEEDED_INC_STAT) + i;
+            
+            if (i < EXP_NEEDED_JOB.length)
+                EXP_NEEDED_JOB[i]  = (int) (EXP_NEEDED_JOB[i-1] * EXP_NEEDED_INC_JOB) + 3 * i;
         }
     }
 
@@ -133,8 +138,8 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public void jobLevelUp() {
-        jobLevel++;
-        skillPoints += SKILL_POINTS_PER_LEVEL;
+        if (++jobLevel > 1) // 10
+            skillPoints++;
     }
 
     public boolean hasAttributePoints() {
@@ -292,15 +297,10 @@ public class Player extends GameCharacter implements PseudoHTML {
         int tmpX = x - gContext.getRenderX();
         int tmpY = y - gContext.getRenderY();
         
-        // draw hp/sp/xp empty bars
+        // draw sp/xp empty bars
         g.setColor(Color.BLACK);
-        g.drawRect(tmpX, tmpY + 50, 40, 5);
         g.drawRect(tmpX, tmpY + 55, 40, 5);
         g.drawRect(tmpX, tmpY + 60, 40, 5);
-        
-        // draw hp
-        g.setColor(Color.RED);
-        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
         
         // draw sp
         g.setColor(Color.BLUE);
