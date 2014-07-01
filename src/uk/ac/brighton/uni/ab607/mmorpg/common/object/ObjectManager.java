@@ -218,7 +218,7 @@ public class ObjectManager {
             }
         });*/
 
-        addSkill(new Skill(ID.Skill.Warrior.BLOODLUST, "Bloodlust", Desc.Skill.Warrior.BLOODLUST, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.BLOODLUST, "Bloodlust", Desc.Skill.Gladiator.BLOODLUST, false, 0.0f) {
             /**
              *
              */
@@ -240,7 +240,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.BASH, "Bash", Desc.Skill.Warrior.BASH, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.BASH, "Bash", Desc.Skill.Gladiator.BASH, true, 15.0f) {
             /**
              *
              */
@@ -279,7 +279,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.DOUBLE_EDGE, "Double Edge", Desc.Skill.Warrior.DOUBLE_EDGE, true, 0.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.DOUBLE_EDGE, "Double Edge", Desc.Skill.Gladiator.DOUBLE_EDGE, true, 0.0f) {
             /**
              *
              */
@@ -321,7 +321,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.LAST_STAND, "Last Stand", Desc.Skill.Warrior.LAST_STAND, true, 60.0f) {
+        addSkill(new Skill(ID.Skill.Crusader.LAST_STAND, "Last Stand", Desc.Skill.Crusader.LAST_STAND, true, 60.0f) {
             /**
              *
              */
@@ -334,7 +334,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((20.0f), ID.Skill.Warrior.LAST_STAND,
+                caster.addEffect(new Effect((20.0f), ID.Skill.Crusader.LAST_STAND,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
@@ -343,7 +343,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Warrior.SHATTER_ARMOR, true, 30.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Gladiator.SHATTER_ARMOR, true, 30.0f) {
             /**
              *
              */
@@ -356,7 +356,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((20.0f), ID.Skill.Warrior.SHATTER_ARMOR,
+                target.addEffect(new Effect((20.0f), ID.Skill.Gladiator.SHATTER_ARMOR,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ARM, -2*level)
@@ -386,7 +386,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.WARRIOR_HEART, "Heart of a warrior", Desc.Skill.Warrior.WARRIOR_HEART, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.WARRIOR_HEART, "Heart of a Warrior", Desc.Skill.Warrior.WARRIOR_HEART, false, 0.0f) {
             /**
              *
              */
@@ -806,15 +806,15 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(5, 5, 5), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(10, 10, 10), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
-                EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo().vit(4),
-                new Experience(7, 4, 3), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
+                new Experience(10, 10, 10), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(4, 2, 6), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(10, 10, 10), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES

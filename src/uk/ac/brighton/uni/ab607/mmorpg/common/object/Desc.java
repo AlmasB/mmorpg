@@ -37,15 +37,26 @@ public class Desc {
         public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";*/
 
         public class Warrior {
-            public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
             public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
-            public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
             public static final String ROAR = "Increases STR and VIT for the duration";
-            public static final String SHATTER_ARMOR = "Decreases target's armor for the duration";
-            public static final String LAST_STAND = "Deals double base damage for the duration";
             public static final String WARRIOR_HEART = "Passively increases max HP";
             public static final String ARMOR_MASTERY = "Increases armor rating";
+        }
+        
+        public class Crusader {
+            public static final String HOLY_LIGHT = "Heals and increases VIT for the duration";
+            public static final String FAITH = "Further increases bonus given by Heart of a Warrior skill";
+            public static final String DIVINE_ARMOR = "Further increases bonus give by Armor Mastery skill";
+            public static final String PRECISION_STRIKE = "Deals armor ignoring damage based on STR";
+            public static final String LAST_STAND = "Deals double base damage for the duration";
+        }
+        
+        public class Gladiator {
             public static final String BLOODLUST = "Increases ATK based on the missing % HP";
+            public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
+            public static final String SHATTER_ARMOR = "Decreases target's armor for the duration";
+            public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
+            public static final String ENDURANCE = "Takes less damage and regenerates HP faster for the duration";
         }
 
         public class Mage {

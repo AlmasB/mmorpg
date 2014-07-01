@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
@@ -418,21 +419,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      */
     public void changeClass(GameCharacterClass cl) {
         this.charClass = cl;
-        Skill[] tmpSkills = new Skill[charClass.skillIDs.length];
+        Skill[] tmpSkills = new Skill[skills.length + charClass.skillIDs.length];
         
-        for (int i = 0; i < tmpSkills.length; i++)
-            tmpSkills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
+        int j = 0;
+        for (j = 0; j < skills.length; j++)
+            tmpSkills[j] = skills[j];
         
-        // to retain level info about each skill
-        // in new skill tree
-        for (Skill sk : skills) {
-            for (Skill tmpSk : tmpSkills) {
-                if (sk.id.equals(tmpSk.id)) {
-                    tmpSk.setLevel(sk.getLevel());
-                    break;
-                }
-            }
-        }
+        for (int i = 0; i < charClass.skillIDs.length; i++)
+            tmpSkills[j++] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
         
         this.skills = tmpSkills;
         calculateStats();

@@ -13,6 +13,8 @@ import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
@@ -296,6 +298,8 @@ public class GameServer {
         m.addPlayer(p);
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
+        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", TextAnimationType.NFADE), m.name);
+        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", TextAnimationType.SFADE), m.name);
     }
 
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {

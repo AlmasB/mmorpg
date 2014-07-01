@@ -39,15 +39,26 @@ public class ID {
         }
 
         public class Warrior {
-            public static final String BASH = "7010";
-            public static final String MIGHTY_SWING = "7011";
-            public static final String DOUBLE_EDGE = "7012";
-            public static final String ROAR = "7013";
-            public static final String SHATTER_ARMOR = "7014";
-            public static final String LAST_STAND = "7015";
-            public static final String WARRIOR_HEART = "7016";
-            public static final String ARMOR_MASTERY = "7017";
-            public static final String BLOODLUST = "7018";
+            public static final String MIGHTY_SWING = "7010";
+            public static final String ROAR = "7011";
+            public static final String WARRIOR_HEART = "7012";
+            public static final String ARMOR_MASTERY = "7013";
+        }
+        
+        public class Crusader {
+            public static final String HOLY_LIGHT = "7110";
+            public static final String FAITH = "7111";
+            public static final String DIVINE_ARMOR = "7112";
+            public static final String PRECISION_STRIKE = "7113";
+            public static final String LAST_STAND = "7114";
+        }
+        
+        public class Gladiator {
+            public static final String BASH = "7210";
+            public static final String ENDURANCE = "7211";
+            public static final String DOUBLE_EDGE = "7212";
+            public static final String BLOODLUST = "7213";
+            public static final String SHATTER_ARMOR = "7214";
         }
 
         public class Mage {
@@ -61,6 +72,14 @@ public class ID {
             public static final String MAGIC_MASTERY = "7027";
             public static final String ASTRAL_PROTECTION = "7028";
         }
+        
+        public class Wizard {
+            
+        }
+        
+        public class Enchanter {
+            
+        }
 
         public class Scout {
             public static final String PINPOINT_WEAKNESS = "7030";
@@ -72,6 +91,14 @@ public class ID {
             public static final String SHAMELESS = "7036";
             public static final String WEAPON_MASTERY = "7037";
             public static final String EXPERIENCED_FIGHTER = "7038";
+        }
+        
+        public class Rogue {
+            // parry
+        }
+        
+        public class Ranger {
+            
         }
     }
 

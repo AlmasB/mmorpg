@@ -21,3 +21,6 @@ skills in total = 3*4 + 6*5 = 12 + 30 = 42
 currently we've got 27
 
 we now need to reallocate skills properly and add new ones
+
+things like life steal, extra passives (more dmg if target hp <)
+can be done thru status effects and then check when attacking on server side

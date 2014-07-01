@@ -20,6 +20,9 @@ public class TextAnimation extends Animation {
         SKILL(AnimationUtils.DEFAULT_FONT, Color.BLUE, 1.0f),
         CHAT(AnimationUtils.DEFAULT_FONT, Color.WHITE, 2.0f),
         FADE(AnimationUtils.DEFAULT_FONT, Color.YELLOW, 1.5f),
+        // test
+        NFADE(new Font("Lucida Grande", Font.PLAIN, 24), Color.YELLOW, 6.5f),
+        SFADE(new Font("Lucida Grande", Font.PLAIN, 24), Color.YELLOW, 10.0f),
         NONE(AnimationUtils.DEFAULT_FONT, Color.WHITE, 1.0f);
         
         public final Font font;
@@ -47,6 +50,8 @@ public class TextAnimation extends Animation {
         //
         this.font = type.font;
     }
+    
+    //public TextAnimation(int x, int y, )
 
     @Override
     protected void updateImpl(float completed) {
@@ -63,6 +68,10 @@ public class TextAnimation extends Animation {
                 break;
             case SKILL:
                 font = new Font("Lucida Grande", Font.PLAIN, 13 + (int)(completed * 5));
+                break;
+            case NFADE:
+            case SFADE:
+                alpha = 1.0f - completed;
                 break;
             default:
                 break;
