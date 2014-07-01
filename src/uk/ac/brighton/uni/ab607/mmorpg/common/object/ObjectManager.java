@@ -12,6 +12,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Experience;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -430,7 +431,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.AMPLIFY_MAGIC, "Amplify Magic", Desc.Skill.Mage.AMPLIFY_MAGIC, true, 30.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.AMPLIFY_MAGIC, "Amplify Magic", Desc.Skill.Wizard.AMPLIFY_MAGIC, true, 30.0f) {
             /**
              *
              */
@@ -443,7 +444,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((15.0f), ID.Skill.Mage.AMPLIFY_MAGIC,
+                caster.addEffect(new Effect((15.0f), ID.Skill.Wizard.AMPLIFY_MAGIC,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.MATK, 10*level)
@@ -452,7 +453,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Mage.ASTRAL_PROTECTION, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Enchanter.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Enchanter.ASTRAL_PROTECTION, false, 0.0f) {
             /**
              *
              */
@@ -527,7 +528,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MAGIC_MASTERY, "Magic Mastery", Desc.Skill.Mage.MAGIC_MASTERY, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.MAGIC_MASTERY, "Magic Mastery", Desc.Skill.Wizard.MAGIC_MASTERY, false, 0.0f) {
             /**
              *
              */
@@ -550,7 +551,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MAGIC_SHIELD, "Magic Shield", Desc.Skill.Mage.MAGIC_SHIELD, true, 60.0f) {
+        addSkill(new Skill(ID.Skill.Enchanter.MAGIC_SHIELD, "Magic Shield", Desc.Skill.Enchanter.MAGIC_SHIELD, true, 60.0f) {
             /**
              *
              */
@@ -563,7 +564,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((25.0f), ID.Skill.Mage.MAGIC_SHIELD,
+                caster.addEffect(new Effect((25.0f), ID.Skill.Enchanter.MAGIC_SHIELD,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, 5*level)
@@ -572,7 +573,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MENTAL_STRIKE, "Mental Strike", Desc.Skill.Mage.MENTAL_STRIKE, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.MENTAL_STRIKE, "Mental Strike", Desc.Skill.Wizard.MENTAL_STRIKE, true, 20.0f) {
 
             /**
              *
@@ -593,7 +594,7 @@ public class ObjectManager {
 
         // SCOUT SKILL SET
 
-        addSkill(new Skill(ID.Skill.Scout.CRITICAL_STRIKE, "Critical Strike", Desc.Skill.Scout.CRITICAL_STRIKE, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.CRITICAL_STRIKE, "Critical Strike", Desc.Skill.Rogue.CRITICAL_STRIKE, true, 20.0f) {
             /**
              *
              */
@@ -613,7 +614,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.PINPOINT_WEAKNESS, "Pinpoint Weakness", Desc.Skill.Scout.PINPOINT_WEAKNESS, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Ranger.PINPOINT_WEAKNESS, "Pinpoint Weakness", Desc.Skill.Ranger.PINPOINT_WEAKNESS, true, 15.0f) {
             /**
              *
              */
@@ -626,7 +627,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((10.0f), ID.Skill.Scout.PINPOINT_WEAKNESS,
+                target.addEffect(new Effect((10.0f), ID.Skill.Ranger.PINPOINT_WEAKNESS,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, -2*level)
@@ -635,7 +636,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.DOUBLE_STRIKE, "Double Strike", Desc.Skill.Scout.DOUBLE_STRIKE, true, 8.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.DOUBLE_STRIKE, "Double Strike", Desc.Skill.Rogue.DOUBLE_STRIKE, true, 8.0f) {
             /**
              *
              */
@@ -685,7 +686,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.SHAMELESS, "Shameless", Desc.Skill.Scout.SHAMELESS, true, 0.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.SHAMELESS, "Shameless", Desc.Skill.Rogue.SHAMELESS, true, 0.0f) {
             /**
              *
              */
@@ -750,7 +751,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.THROW_DAGGER, "Throw Dagger", Desc.Skill.Scout.THROW_DAGGER, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Scout.TRICK_ATTACK, "Throw Dagger", Desc.Skill.Scout.TRICK_ATTACK, true, 20.0f) {
             /**
              *
              */
@@ -763,15 +764,15 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = caster.getTotalStat(Stat.ATK) + level * 20;
+                float dmg = caster.getTotalStat(Stat.ATK) + level * 2 * GameMath.random(5);
                 caster.dealPhysicalDamage(target, dmg);
-                if (GameMath.checkChance(level*2.5f)) {
-                    target.addStatusEffect(new StatusEffect(Status.POISONED, 5.0f));
+                if (caster instanceof Player) {
+                    ((Player)caster).incMoney((int)dmg);
                 }
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.TRIPLE_STRIKE, "Triple Strike", Desc.Skill.Scout.TRIPLE_STRIKE, true, 40.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.TRIPLE_STRIKE, "Triple Strike", Desc.Skill.Rogue.TRIPLE_STRIKE, true, 40.0f) {
             /**
              *
              */

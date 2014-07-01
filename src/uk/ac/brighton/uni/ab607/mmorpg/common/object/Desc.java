@@ -25,16 +25,12 @@ public class Desc {
 
     public class Skill {
         /*
-        public static final String HEAL = "Restores HP to target";
-        public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
+        
         public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
         public static final String PIERCING_TOUCH = "Deals physical damage based on target's armor. "
                 + "The more armor target has the greater the damage";
-        public static final String BULLSEYE = "Deals armor ignoring damage to target."
-                + "Target's defense is not ignored. "
-                + "Damage is based on caster's DEX";
-        public static final String CLAUDIUS = "Increases VIT, WIS, LUC. Decreases INT";
-        public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";*/
+        
+        */
 
         public class Warrior {
             public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
@@ -64,23 +60,47 @@ public class Desc {
             public static final String ICE_SHARD = "Deals magic damage with water element";
             public static final String AIR_SPEAR = "Deals magic damage with air element";
             public static final String EARTH_BOULDER = "Deals magic damage with earth element";
-            public static final String MENTAL_STRIKE = "Deals pure damage based on MATK";
-            public static final String AMPLIFY_MAGIC = "Increases MATK for the duration";
-            public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
-            public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
-            public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
         }
 
+        public class Wizard {
+            public static final String MENTAL_STRIKE = "Deals pure damage based on MATK";
+            public static final String AMPLIFY_MAGIC = "Increases MATK for the duration";
+            public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
+            public static final String THUNDERBOLT_FIRESTORM = "Deals magic damage with air and fire element";
+            public static final String ICICLE_AVALANCHE = "Deals magic damage with water and earth element";
+        }
+        
+        public class Enchanter {
+            public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
+            public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
+            public static final String MIND_BLAST = "Drains % of target's SP. Increases mana cost of all target's skills";
+            public static final String CURSE_OF_WITCHCRAFT = "Target cannot use skills for the duration";
+            public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
+        }
+        
         public class Scout {
-            public static final String PINPOINT_WEAKNESS = "Decreases target's armor rating for the duration";
-            public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
-            public static final String TRIPLE_STRIKE = "Quickly performs three attacks. Deals more damage if target is stunned";
-            public static final String THROW_DAGGER = "Throws a dagger dealing physical damage with a chance to poison the target";
-            public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
             public static final String POISON_ATTACK = "Attacks the target with high chance to poison him";
-            public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
+            public static final String TRICK_ATTACK = "Deals physical damage and steals gold equal to damage dealt";
             public static final String WEAPON_MASTERY = "Passively increases ATK";
             public static final String EXPERIENCED_FIGHTER = "Passively increases AGI and DEX";
+        }
+        
+        public class Rogue {
+            public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
+            public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
+            public static final String TRIPLE_STRIKE = "Quickly performs three attacks. Deals more damage if target is stunned";
+            public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
+            public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
+        }
+        
+        public class Ranger {
+            public static final String FAST_REFLEXES = "Increases ASPD for the duration";
+            public static final String ENCHANTED_ARROWS = "Increases ATK when BOW type weapon is equipped";
+            public static final String EAGLE = "Passively increases ATK based on DEX";
+            public static final String PINPOINT_WEAKNESS = "Decreases target's defense for the duration";
+            public static final String BULLSEYE = "Deals armor ignoring damage to target."
+                    + "Target's defense is not ignored. "
+                    + "Damage is based on caster's DEX";
         }
     }
 

@@ -26,13 +26,9 @@ public class ID {
 
     public class Skill {
         /* UNSORTED
-        public static final String HEAL = "7000";
-        public static final String MANA_BURN = "7001";
         public static final String FINAL_STRIKE = "7002";
         public static final String PIERCING_TOUCH = "7003";
-        public static final String BULLSEYE = "7004";
-        public static final String CLAUDIUS = "7005";
-        public static final String FIVE_FINGER_DEATH_PUNCH = "7006";*/
+        ;*/
 
         public class Novice {
 
@@ -66,39 +62,45 @@ public class ID {
             public static final String ICE_SHARD = "7021";
             public static final String AIR_SPEAR = "7022";
             public static final String EARTH_BOULDER = "7023";
-            public static final String MENTAL_STRIKE = "7024";
-            public static final String AMPLIFY_MAGIC = "7025";
-            public static final String MAGIC_SHIELD = "7026";
-            public static final String MAGIC_MASTERY = "7027";
-            public static final String ASTRAL_PROTECTION = "7028";
         }
         
         public class Wizard {
-            
+            public static final String MAGIC_MASTERY = "7120";
+            public static final String AMPLIFY_MAGIC = "7121";
+            public static final String MENTAL_STRIKE = "7122";
+            public static final String THUNDERBOLT_FIRESTORM = "7123";
+            public static final String ICICLE_AVALANCHE = "7124";
         }
         
         public class Enchanter {
-            
+            public static final String MAGIC_SHIELD = "7220";
+            public static final String ASTRAL_PROTECTION = "7221";
+            public static final String MIND_BLAST = "7222";
+            public static final String CURSE_OF_WITCHCRAFT = "7223";
+            public static final String MANA_BURN = "7224";
         }
 
         public class Scout {
-            public static final String PINPOINT_WEAKNESS = "7030";
-            public static final String DOUBLE_STRIKE = "7031";
-            public static final String TRIPLE_STRIKE = "7032";
-            public static final String THROW_DAGGER = "7033";
-            public static final String CRITICAL_STRIKE = "7034";
-            public static final String POISON_ATTACK = "7035";
-            public static final String SHAMELESS = "7036";
-            public static final String WEAPON_MASTERY = "7037";
-            public static final String EXPERIENCED_FIGHTER = "7038";
+            public static final String TRICK_ATTACK = "7030";
+            public static final String POISON_ATTACK = "7031";
+            public static final String WEAPON_MASTERY = "7032";
+            public static final String EXPERIENCED_FIGHTER = "7033";
         }
         
         public class Rogue {
-            // parry
+            public static final String SHAMELESS = "7130";
+            public static final String DOUBLE_STRIKE = "7131";
+            public static final String TRIPLE_STRIKE = "7132";
+            public static final String FIVE_FINGER_DEATH_PUNCH = "7133";
+            public static final String CRITICAL_STRIKE = "7134";
         }
         
         public class Ranger {
-            
+            public static final String PINPOINT_WEAKNESS = "7230";
+            public static final String BULLSEYE = "7231";
+            public static final String FAST_REFLEXES = "7232";
+            public static final String ENCHANTED_ARROWS = "7233";
+            public static final String EAGLE_EYE = "7234";
         }
     }
 
