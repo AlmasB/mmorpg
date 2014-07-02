@@ -21,3 +21,50 @@ skills in total = 3*4 + 6*5 = 12 + 30 = 42
 
 things like life steal, extra passives (more dmg if target hp <)
 can be done thru status effects and then check when attacking on server side
+
+         * Soul Slash - 7 consecutive attacks.
+         * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
+         * Deals 850% of your base ATK.
+         * Final hit is of type GHOST.
+         * Deals 200% of your total ATK
+         
+                /*
+
+
+        addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
+            private static final long serialVersionUID = 2091028246707933529L;
+
+            @Override
+            public int getManaCost() {
+                return 100 + level * 100;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float phys = (caster.getHP() - 1) * 0.003f + 250*level;
+                float mag  = caster.getSP() * 0.003f + 250*level;
+                caster.setHP(1);
+                caster.setSP(0);
+                caster.dealMagicalDamage(target, mag, Element.NEUTRAL);
+                caster.dealPhysicalDamage(target, phys, Element.NEUTRAL);
+            }
+        });
+
+        // PIERCING TOUCH
+        addSkill(new Skill(ID.Skill.PIERCING_TOUCH, "Piercing Touch", Desc.Skill.PIERCING_TOUCH, true, 9.0f) {
+            private static final long serialVersionUID = 1513947512801417510L;
+
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
+                caster.dealPhysicalDamage(target, dmg);
+            }
+        });
+
+        
+*/

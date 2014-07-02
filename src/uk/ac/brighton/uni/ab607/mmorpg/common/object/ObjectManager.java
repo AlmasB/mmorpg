@@ -103,47 +103,6 @@ public class ObjectManager {
 
         // SKILLS
 
-        /*
-
-
-        addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
-            private static final long serialVersionUID = 2091028246707933529L;
-
-            @Override
-            public int getManaCost() {
-                return 100 + level * 100;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float phys = (caster.getHP() - 1) * 0.003f + 250*level;
-                float mag  = caster.getSP() * 0.003f + 250*level;
-                caster.setHP(1);
-                caster.setSP(0);
-                caster.dealMagicalDamage(target, mag, Element.NEUTRAL);
-                caster.dealPhysicalDamage(target, phys, Element.NEUTRAL);
-            }
-        });
-
-        // PIERCING TOUCH
-        addSkill(new Skill(ID.Skill.PIERCING_TOUCH, "Piercing Touch", Desc.Skill.PIERCING_TOUCH, true, 9.0f) {
-            private static final long serialVersionUID = 1513947512801417510L;
-
-            @Override
-            public int getManaCost() {
-                return 25 + level * 30;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
-                caster.dealPhysicalDamage(target, dmg);
-            }
-        });
-
-        
-*/
-
         addSkill(new Skill(ID.Skill.Gladiator.BLOODLUST, "Bloodlust", Desc.Skill.Gladiator.BLOODLUST, false, 0.0f) {
             /**
              *
@@ -307,8 +266,15 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 caster.addBonusStat(Stat.ARM, -value);
-                //TODO: crusader DIVINE ARMOR
-                value = 2 * level;
+                float factor = 2.0f;
+                for (Skill skill : caster.getSkills()) {
+                    if (skill.id.equals(ID.Skill.Crusader.DIVINE_ARMOR)) {
+                        factor += 0.1f * skill.getLevel();
+                        break;
+                    }
+                }
+                        
+                value = (int)(factor * level);
                 caster.addBonusStat(Stat.ARM, value);
             }
         });
@@ -329,8 +295,16 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 caster.addBonusStat(Stat.MAX_HP, -value);
-                // TODO: crusader FAITH
-                value = Math.round(0.025f * level * caster.getBaseStat(Stat.MAX_HP));
+                float factor = 0.025f;
+                for (Skill skill : caster.getSkills()) {
+                    if (skill.id.equals(ID.Skill.Crusader.FAITH)) {
+                        factor += 0.01f * skill.getLevel();
+                        break;
+                    }
+                }
+                
+                
+                value = Math.round(factor * level * caster.getBaseStat(Stat.MAX_HP));
                 caster.addBonusStat(Stat.MAX_HP, value);
             }
         });
@@ -770,6 +744,40 @@ public class ObjectManager {
             }
         });
         
+        addSkill(new Skill(ID.Skill.Crusader.DIVINE_ARMOR, "Divine Armor", Desc.Skill.Crusader.DIVINE_ARMOR, false, 0.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -7936080589333242098L;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // impl is in ARMOR_MASTERY
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Crusader.FAITH, "Faith", Desc.Skill.Crusader.FAITH, false, 0.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 4325213967370795918L;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // impl is in WARRIOR_HEART
+            }
+        });
+        
         addSkill(new Skill(ID.Skill.Gladiator.ENDURANCE, "Endurance", Desc.Skill.Gladiator.ENDURANCE, true, 40.0f) {
             /**
              * 
@@ -918,7 +926,7 @@ public class ObjectManager {
             }
         });
         
-        addSkill(new Skill(ID.Skill.Ranger.EAGLE_EYE, "Eagle Eye", Desc.Skill.Ranger.EAGLE_EYE, false, 35.0f) {
+        addSkill(new Skill(ID.Skill.Ranger.EAGLE_EYE, "Eagle Eye", Desc.Skill.Ranger.EAGLE_EYE, false, 0.0f) {
             /**
              * 
              */
@@ -928,7 +936,7 @@ public class ObjectManager {
 
             @Override
             public int getManaCost() {
-                return 3 + level*4;
+                return 0;
             }
 
             @Override
@@ -982,38 +990,20 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(10, 10, 10), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
-                new Experience(10, 10, 10), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                new Experience(100, 100, 100), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(10, 10, 10), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
 
         addEssence(new Essence("Minor Fire Spirit Essence", Stat.ATK, 5));
-
-        /*
-         * Soul Slash - 7 consecutive attacks.
-         * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
-         * Deals 850% of your base ATK.
-         * Final hit is of type GHOST.
-         * Deals 200% of your total ATK
-         *
-         *
-         *  Cleanse
-         *
-         *
-         *
-         * Mind Blast
-         * Drains % of target's SP based on target's level.
-         * Increases cost of all skills by that % for 30s
-         *
-         * */
         
         // MAPS
         
