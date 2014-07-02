@@ -70,6 +70,10 @@ public abstract class Skill implements java.io.Serializable {
         }
         return false;
     }
+    
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public int getLevel() {
         return level;

@@ -12,6 +12,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Experience;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -102,123 +103,7 @@ public class ObjectManager {
 
         // SKILLS
 
-        /*addSkill(new Skill(ID.Skill.HEAL, "Heal", Desc.Skill.HEAL, true, 10.0f) {
-            private static final long serialVersionUID = 1379897406205500901L;
-
-            @Override
-            public int getManaCost() {
-                return level * 10;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                target.setHP(Math.min(target.getHP() + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP)));
-            }
-        });
-
-        addSkill(new Skill(ID.Skill.MANA_BURN, "Mana Burn", Desc.Skill.MANA_BURN, true, 10.0f) {
-            private static final long serialVersionUID = 7719535667188968500L;
-
-            @Override
-            public int getManaCost() {
-                return 50 + level * 25;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                int oldSP = target.getSP();
-                target.setSP(Math.max(oldSP - 50 * level, 0));
-                caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
-            }
-        });
-
-        addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
-            private static final long serialVersionUID = 2091028246707933529L;
-
-            @Override
-            public int getManaCost() {
-                return 100 + level * 100;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float phys = (caster.getHP() - 1) * 0.003f + 250*level;
-                float mag  = caster.getSP() * 0.003f + 250*level;
-                caster.setHP(1);
-                caster.setSP(0);
-                caster.dealMagicalDamage(target, mag, Element.NEUTRAL);
-                caster.dealPhysicalDamage(target, phys, Element.NEUTRAL);
-            }
-        });
-
-        // PIERCING TOUCH
-        addSkill(new Skill(ID.Skill.PIERCING_TOUCH, "Piercing Touch", Desc.Skill.PIERCING_TOUCH, true, 9.0f) {
-            private static final long serialVersionUID = 1513947512801417510L;
-
-            @Override
-            public int getManaCost() {
-                return 25 + level * 30;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
-                caster.dealPhysicalDamage(target, dmg);
-            }
-        });
-
-        // BULLSEYE
-        addSkill(new Skill(ID.Skill.BULLSEYE, "Bullseye", Desc.Skill.BULLSEYE, true, 60.0f) {
-            private static final long serialVersionUID = 6923525936384357867L;
-
-            @Override
-            public int getManaCost() {
-                return 5 + level * 10;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = 100 + level * 85 - target.getTotalStat(GameCharacter.DEF);
-                caster.dealPureDamage(target, dmg);
-            }
-        });
-
-        // CLAUDIUS
-        addSkill(new Skill(ID.Skill.CLAUDIUS, "Claudius", Desc.Skill.CLAUDIUS, true, 30.0f) {
-            private static final long serialVersionUID = 5612472865672733186L;
-
-            @Override
-            public int getManaCost() {
-                return 25 + level * 30;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addBonusAttribute(Attribute.VITALITY, 2*level);
-                target.addBonusAttribute(Attribute.WISDOM, 2*level);
-                target.addBonusAttribute(Attribute.LUCK, 2*level);
-                target.addBonusAttribute(Attribute.INTELLECT, -3*level);
-            }
-        });
-
-        // Five finger death punch
-        addSkill(new Skill(ID.Skill.FIVE_FINGER_DEATH_PUNCH, "Five Finger Death Punch", Desc.Skill.FIVE_FINGER_DEATH_PUNCH,
-                true, 30.0f) {
-            private static final long serialVersionUID = 168758926959802026L;
-
-            @Override
-            public int getManaCost() {
-                return 25 + level * 30;
-            }
-
-            @Override
-            public void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
-                caster.dealPhysicalDamage(target, dmg);
-            }
-        });*/
-
-        addSkill(new Skill(ID.Skill.Warrior.BLOODLUST, "Bloodlust", Desc.Skill.Warrior.BLOODLUST, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.BLOODLUST, "Bloodlust", Desc.Skill.Gladiator.BLOODLUST, false, 0.0f) {
             /**
              *
              */
@@ -240,7 +125,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.BASH, "Bash", Desc.Skill.Warrior.BASH, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.BASH, "Bash", Desc.Skill.Gladiator.BASH, true, 15.0f) {
             /**
              *
              */
@@ -279,7 +164,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.DOUBLE_EDGE, "Double Edge", Desc.Skill.Warrior.DOUBLE_EDGE, true, 0.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.DOUBLE_EDGE, "Double Edge", Desc.Skill.Gladiator.DOUBLE_EDGE, true, 0.0f) {
             /**
              *
              */
@@ -311,7 +196,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((5.0f),
+                caster.addEffect(new Effect((5.0f), ID.Skill.Warrior.ROAR,
                         new Rune[] {
                         new Rune(Attribute.STRENGTH, level*2),
                         new Rune(Attribute.VITALITY, level*2)
@@ -321,7 +206,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.LAST_STAND, "Last Stand", Desc.Skill.Warrior.LAST_STAND, true, 60.0f) {
+        addSkill(new Skill(ID.Skill.Crusader.LAST_STAND, "Last Stand", Desc.Skill.Crusader.LAST_STAND, true, 60.0f) {
             /**
              *
              */
@@ -334,7 +219,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((20.0f),
+                caster.addEffect(new Effect((20.0f), ID.Skill.Crusader.LAST_STAND,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
@@ -343,7 +228,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Warrior.SHATTER_ARMOR, true, 30.0f) {
+        addSkill(new Skill(ID.Skill.Gladiator.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Gladiator.SHATTER_ARMOR, true, 30.0f) {
             /**
              *
              */
@@ -356,7 +241,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((20.0f),
+                target.addEffect(new Effect((20.0f), ID.Skill.Gladiator.SHATTER_ARMOR,
                         new Rune[] {
                 }, new Essence[] {
                         new Essence(Stat.ARM, -2*level)
@@ -381,12 +266,20 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 caster.addBonusStat(Stat.ARM, -value);
-                value = 2 * level;
+                float factor = 2.0f;
+                for (Skill skill : caster.getSkills()) {
+                    if (skill.id.equals(ID.Skill.Crusader.DIVINE_ARMOR)) {
+                        factor += 0.1f * skill.getLevel();
+                        break;
+                    }
+                }
+                        
+                value = (int)(factor * level);
                 caster.addBonusStat(Stat.ARM, value);
             }
         });
 
-        addSkill(new Skill(ID.Skill.Warrior.WARRIOR_HEART, "Heart of a warrior", Desc.Skill.Warrior.WARRIOR_HEART, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Warrior.WARRIOR_HEART, "Heart of a Warrior", Desc.Skill.Warrior.WARRIOR_HEART, false, 0.0f) {
             /**
              *
              */
@@ -402,7 +295,16 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 caster.addBonusStat(Stat.MAX_HP, -value);
-                value = Math.round(0.025f * level * caster.getBaseStat(Stat.MAX_HP));
+                float factor = 0.025f;
+                for (Skill skill : caster.getSkills()) {
+                    if (skill.id.equals(ID.Skill.Crusader.FAITH)) {
+                        factor += 0.01f * skill.getLevel();
+                        break;
+                    }
+                }
+                
+                
+                value = Math.round(factor * level * caster.getBaseStat(Stat.MAX_HP));
                 caster.addBonusStat(Stat.MAX_HP, value);
             }
         });
@@ -430,7 +332,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.AMPLIFY_MAGIC, "Amplify Magic", Desc.Skill.Mage.AMPLIFY_MAGIC, true, 30.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.AMPLIFY_MAGIC, "Amplify Magic", Desc.Skill.Wizard.AMPLIFY_MAGIC, true, 30.0f) {
             /**
              *
              */
@@ -443,7 +345,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((15.0f),
+                caster.addEffect(new Effect((15.0f), ID.Skill.Wizard.AMPLIFY_MAGIC,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.MATK, 10*level)
@@ -452,7 +354,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Mage.ASTRAL_PROTECTION, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Enchanter.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Enchanter.ASTRAL_PROTECTION, false, 0.0f) {
             /**
              *
              */
@@ -527,7 +429,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MAGIC_MASTERY, "Magic Mastery", Desc.Skill.Mage.MAGIC_MASTERY, false, 0.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.MAGIC_MASTERY, "Magic Mastery", Desc.Skill.Wizard.MAGIC_MASTERY, false, 0.0f) {
             /**
              *
              */
@@ -550,7 +452,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MAGIC_SHIELD, "Magic Shield", Desc.Skill.Mage.MAGIC_SHIELD, true, 60.0f) {
+        addSkill(new Skill(ID.Skill.Enchanter.MAGIC_SHIELD, "Magic Shield", Desc.Skill.Enchanter.MAGIC_SHIELD, true, 60.0f) {
             /**
              *
              */
@@ -563,7 +465,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.addEffect(new Effect((25.0f),
+                caster.addEffect(new Effect((25.0f), ID.Skill.Enchanter.MAGIC_SHIELD,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, 5*level)
@@ -572,7 +474,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Mage.MENTAL_STRIKE, "Mental Strike", Desc.Skill.Mage.MENTAL_STRIKE, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Wizard.MENTAL_STRIKE, "Mental Strike", Desc.Skill.Wizard.MENTAL_STRIKE, true, 20.0f) {
 
             /**
              *
@@ -593,7 +495,7 @@ public class ObjectManager {
 
         // SCOUT SKILL SET
 
-        addSkill(new Skill(ID.Skill.Scout.CRITICAL_STRIKE, "Critical Strike", Desc.Skill.Scout.CRITICAL_STRIKE, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.CRITICAL_STRIKE, "Critical Strike", Desc.Skill.Rogue.CRITICAL_STRIKE, true, 20.0f) {
             /**
              *
              */
@@ -613,7 +515,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.PINPOINT_WEAKNESS, "Pinpoint Weakness", Desc.Skill.Scout.PINPOINT_WEAKNESS, true, 15.0f) {
+        addSkill(new Skill(ID.Skill.Ranger.PINPOINT_WEAKNESS, "Pinpoint Weakness", Desc.Skill.Ranger.PINPOINT_WEAKNESS, true, 15.0f) {
             /**
              *
              */
@@ -626,7 +528,7 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                target.addEffect(new Effect((10.0f),
+                target.addEffect(new Effect((10.0f), ID.Skill.Ranger.PINPOINT_WEAKNESS,
                         new Rune[] {},
                         new Essence[] {
                         new Essence(Stat.ARM, -2*level)
@@ -635,7 +537,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.DOUBLE_STRIKE, "Double Strike", Desc.Skill.Scout.DOUBLE_STRIKE, true, 8.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.DOUBLE_STRIKE, "Double Strike", Desc.Skill.Rogue.DOUBLE_STRIKE, true, 8.0f) {
             /**
              *
              */
@@ -685,7 +587,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.SHAMELESS, "Shameless", Desc.Skill.Scout.SHAMELESS, true, 0.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.SHAMELESS, "Shameless", Desc.Skill.Rogue.SHAMELESS, true, 0.0f) {
             /**
              *
              */
@@ -750,7 +652,7 @@ public class ObjectManager {
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.THROW_DAGGER, "Throw Dagger", Desc.Skill.Scout.THROW_DAGGER, true, 20.0f) {
+        addSkill(new Skill(ID.Skill.Scout.TRICK_ATTACK, "Throw Dagger", Desc.Skill.Scout.TRICK_ATTACK, true, 20.0f) {
             /**
              *
              */
@@ -763,15 +665,15 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                float dmg = caster.getTotalStat(Stat.ATK) + level * 20;
+                float dmg = caster.getTotalStat(Stat.ATK) + level * 2 * GameMath.random(5);
                 caster.dealPhysicalDamage(target, dmg);
-                if (GameMath.checkChance(level*2.5f)) {
-                    target.addStatusEffect(new StatusEffect(Status.POISONED, 5.0f));
+                if (caster instanceof Player) {
+                    ((Player)caster).incMoney((int)dmg);
                 }
             }
         });
 
-        addSkill(new Skill(ID.Skill.Scout.TRIPLE_STRIKE, "Triple Strike", Desc.Skill.Scout.TRIPLE_STRIKE, true, 40.0f) {
+        addSkill(new Skill(ID.Skill.Rogue.TRIPLE_STRIKE, "Triple Strike", Desc.Skill.Rogue.TRIPLE_STRIKE, true, 40.0f) {
             /**
              *
              */
@@ -800,44 +702,308 @@ public class ObjectManager {
                         new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));
             }
         });
+        
+        // NEWLY ADDED SKILLS
+        
+        addSkill(new Skill(ID.Skill.Crusader.HOLY_LIGHT, "Holy Light", Desc.Skill.Crusader.HOLY_LIGHT, true, 20.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 5685022402103377679L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                target.setHP(Math.min(target.getHP() + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP)));
+                target.addEffect(new Effect(20.0f, ID.Skill.Crusader.HOLY_LIGHT, new Rune[] {
+                        new Rune(Attribute.VITALITY, level*2)
+                        }, 
+                        new Essence[] {}));
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Crusader.PRECISION_STRIKE, "Precision Strike", Desc.Skill.Crusader.PRECISION_STRIKE, true, 20.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 2024648263069876L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.ATK) + (caster.getTotalAttribute(Attribute.STRENGTH) / 10) * level;
+                caster.dealPureDamage(target, dmg);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Crusader.DIVINE_ARMOR, "Divine Armor", Desc.Skill.Crusader.DIVINE_ARMOR, false, 0.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -7936080589333242098L;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // impl is in ARMOR_MASTERY
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Crusader.FAITH, "Faith", Desc.Skill.Crusader.FAITH, false, 0.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 4325213967370795918L;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // impl is in WARRIOR_HEART
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Gladiator.ENDURANCE, "Endurance", Desc.Skill.Gladiator.ENDURANCE, true, 40.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -7936080589333242098L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect(15.0f, ID.Skill.Gladiator.ENDURANCE, new Rune[] {},
+                        new Essence[] {
+                        new Essence(Stat.DEF, 2*level),
+                        new Essence(Stat.HP_REGEN, 2*level)
+                }));
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Wizard.THUNDERBOLT_FIRESTORM, "Thunderbolt Firestorm", Desc.Skill.Wizard.THUNDERBOLT_FIRESTORM, true, 40.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 4325213967370795918L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) * (1.0f + level*0.15f);
+                caster.dealMagicalDamage(target, dmg, Element.FIRE);
+                caster.dealMagicalDamage(target, dmg, Element.AIR);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Wizard.ICICLE_AVALANCHE, "Icicle Avalanche", Desc.Skill.Wizard.ICICLE_AVALANCHE, true, 40.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 6791451275759000638L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = caster.getTotalStat(Stat.MATK) * (1.0f + level*0.15f);
+                caster.dealMagicalDamage(target, dmg, Element.WATER);
+                caster.dealMagicalDamage(target, dmg, Element.EARTH);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Enchanter.MANA_BURN, "Mana Burn", Desc.Skill.Enchanter.MANA_BURN, true, 20.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1031700846462374399L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                int oldSP = target.getSP();
+                target.setSP(Math.max(oldSP - 50 * level, 0));
+                caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Enchanter.CURSE_OF_WITCHCRAFT, "Curse of Witchcraft", Desc.Skill.Enchanter.CURSE_OF_WITCHCRAFT, true, 20.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 8295208480454374043L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                target.addStatusEffect(new StatusEffect(Status.SILENCED, level*3));
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Enchanter.MIND_BLAST, "Mind Blast", Desc.Skill.Enchanter.MIND_BLAST, true, 20.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -3587620067204007562L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                // TODO: impl
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Rogue.FIVE_FINGER_DEATH_PUNCH, "Five Finger Death Punch", Desc.Skill.Rogue.FIVE_FINGER_DEATH_PUNCH, true, 35.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 9128637084476710269L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
+                caster.dealPhysicalDamage(target, dmg);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Ranger.BULLSEYE, "Bullseye", Desc.Skill.Ranger.BULLSEYE, true, 60.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 3498114139079315L;
+
+            @Override
+            public int getManaCost() {
+                return 5 + level * 10;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = 100 + 0.2f*level * caster.getTotalAttribute(Attribute.DEXTERITY) - target.getTotalStat(GameCharacter.DEF);
+                caster.dealPureDamage(target, dmg);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Ranger.EAGLE_EYE, "Eagle Eye", Desc.Skill.Ranger.EAGLE_EYE, false, 0.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 7005439875094828368L;
+            
+            private int value = 0;
+
+            @Override
+            public int getManaCost() {
+                return 0;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addBonusStat(Stat.ATK, -value);
+                value = (int)(caster.getTotalAttribute(Attribute.DEXTERITY) * level * 0.1f);
+                caster.addBonusStat(Stat.ATK, value);
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Ranger.ENCHANTED_ARROW, "Enchanted Arrows", Desc.Skill.Ranger.ENCHANTED_ARROW, true, 35.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 5416340917264724397L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                float duration = target.getTotalStat(Stat.ARM) * 0.1f;
+                target.addStatusEffect(new StatusEffect(Status.STUNNED, duration));
+            }
+        });
+        
+        addSkill(new Skill(ID.Skill.Ranger.FAST_REFLEXES, "Fast Reflexes", Desc.Skill.Ranger.FAST_REFLEXES, true, 35.0f) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 5766544471206156505L;
+
+            @Override
+            public int getManaCost() {
+                return 3 + level*4;
+            }
+
+            @Override
+            protected void useImpl(GameCharacter caster, GameCharacter target) {
+                caster.addEffect(new Effect(10.0f, ID.Skill.Ranger.FAST_REFLEXES, new Rune[] {},
+                        new Essence[] {
+                        new Essence(Stat.ASPD, level*2)
+                }));
+            }
+        });
 
 
         // ENEMIES
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(5, 5, 5), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
-                EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo().vit(4),
-                new Experience(7, 4, 3), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
+                new Experience(100, 100, 100), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(4, 2, 6), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
 
         addEssence(new Essence("Minor Fire Spirit Essence", Stat.ATK, 5));
-
-        /*
-         * Soul Slash - 7 consecutive attacks.
-         * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
-         * Deals 850% of your base ATK.
-         * Final hit is of type GHOST.
-         * Deals 200% of your total ATK
-         *
-         *
-         *  Cleanse
-         *
-         *
-         *
-         * Mind Blast
-         * Drains % of target's SP based on target's level.
-         * Increases cost of all skills by that % for 30s
-         *
-         * */
         
         // MAPS
         

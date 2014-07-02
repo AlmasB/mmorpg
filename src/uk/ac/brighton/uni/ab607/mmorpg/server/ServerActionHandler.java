@@ -143,7 +143,7 @@ public class ServerActionHandler {
                     int dmg = target.attack(player);
                     server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
                     if (player.getHP() <= 0) {
-                        //player.onDeath();
+                        player.onDeath();
                         Point p = server.getMapByName(req.data).getRandomFreePos();
                         player.setX(p.x);
                         player.setY(p.y);

@@ -13,6 +13,8 @@ import uk.ac.brighton.uni.ab607.libs.net.*;
 import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
 import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
@@ -90,7 +92,7 @@ public class GameServer {
             String user = req.value1;
             String pass = req.value2;
 
-            if (GameAccount.getAccountByUserName(user) == null) {
+            if (!GameAccount.exists(user)) {
                 GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
                 server.send(new DataPacket(new ServerResponse(Query.CHECK, false, "New Account Created", "")),
                         packet.getIP(), packet.getPort());
@@ -106,33 +108,33 @@ public class GameServer {
         private void actionLogin(DataPacket packet, QueryRequest req) throws IOException {
             String name = req.value1;
             // get data from game account
-            GameAccount acc = GameAccount.getAccountByUserName(name);
-            if (acc != null) {                
-                Player p = acc.getPlayer();
+            if (GameAccount.exists(name)) {                
+                Player p = GameAccount.getPlayer(name);
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
+                String mapName = GameAccount.getMapName(name);
                 
-                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", acc.getMapName(),
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
                 server.send(new DataPacket(p)); // send player so client can init 
                 
-                loginPlayer(acc.getMapName(), p);
+                loginPlayer(mapName, p);
             }
             else {
                 // purely for local debugging when db/accounts.db has been deleted
                 Out.debug("Account not found, using new");
                 
                 GameAccount.addAccount("Almas", "pass", "test@mail.com");
-                GameAccount a = GameAccount.getAccountByUserName("Almas");
-                Player p = a.getPlayer();
+                Player p = GameAccount.getPlayer("Almas");
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
+                String mapName = GameAccount.getMapName("Almas");
                 
-                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", a.getMapName(),
+                server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
                 server.send(new DataPacket(p)); // send player for init
                 
-                loginPlayer(a.getMapName(), p);
+                loginPlayer(mapName, p);
                 
                 saveState();
             }
@@ -296,6 +298,8 @@ public class GameServer {
         m.addPlayer(p);
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
+        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", TextAnimationType.NFADE), m.name);
+        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", TextAnimationType.SFADE), m.name);
     }
 
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
@@ -314,9 +318,8 @@ public class GameServer {
     public void saveState() {
         for (GameMap m : maps) {
             for (Player p : m.getPlayers()) {
-                GameAccount acc = GameAccount.getAccountByUserName(p.name);
-                acc.setPlayer(p);
-                acc.setMapName(m.name);
+                GameAccount.setPlayer(p, p.name);
+                GameAccount.setMapName(m.name, p.name);
             }
         }
         

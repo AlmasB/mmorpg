@@ -20,11 +20,17 @@ public class Effect implements java.io.Serializable {
     private Essence[] essences; // stat bonuses
 
     private float duration;
+    
+    /**
+     * ID of the skill that created this effect
+     */
+    public final String sourceID;
 
-    public Effect(float duration, Rune[] runes, Essence[] essences) {
+    public Effect(float duration, String sourceID, Rune[] runes, Essence[] essences) {
         this.duration = duration;
         this.runes = runes;
         this.essences = essences;
+        this.sourceID = sourceID;
     }
 
     public void reduceDuration(float value) {

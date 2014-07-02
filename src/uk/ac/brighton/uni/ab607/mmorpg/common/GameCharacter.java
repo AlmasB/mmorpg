@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -9,12 +10,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 
@@ -128,7 +131,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.name = name;
         this.description = description;
         this.charClass = charClass;
-        this.skills = charClass.skills;
+        this.skills = new Skill[charClass.skillIDs.length];
+        
+        for (int i = 0; i < skills.length; i++)
+            skills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
         
         Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
@@ -287,15 +293,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      *          false otherwise
      */
     public boolean hasStatusEffect(Status status) {
-        synchronized (statuses) {
-            for (StatusEffect e : statuses) {
-                if (e.getStatus() == status) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return statuses.contains(status);
     }
 
     /**
@@ -323,18 +321,22 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public abstract Element getArmorElement();
 
     public void addEffect(Effect e) {
-        // we should do synchronized
-        synchronized (effects) {
-            e.onBegin(this);
-            effects.add(e);
-            calculateStats();
+        for (Iterator<Effect> it = effects.iterator(); it.hasNext(); ) {
+            Effect eff = it.next();
+            if (eff.sourceID.equals(e.sourceID)) {
+                eff.onEnd(this);
+                it.remove();
+                break;
+            }
         }
+            
+        e.onBegin(this);
+        effects.add(e);
+        calculateStats();
     }
 
     public void addStatusEffect(StatusEffect e) {
-        synchronized (statuses) {
-            statuses.add(e);
-        }
+        statuses.add(e);
     }
 
     protected void updateEffects() {
@@ -361,6 +363,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     protected float regenTick = 0.0f;
 
+    /**
+     * With current server settings this update
+     * is called every 0.02 seconds
+     */
     public void update() {
         // HP/SP regen
         regenTick += 0.02f;
@@ -413,7 +419,16 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
      */
     public void changeClass(GameCharacterClass cl) {
         this.charClass = cl;
-        this.skills = cl.skills;
+        Skill[] tmpSkills = new Skill[skills.length + charClass.skillIDs.length];
+        
+        int j = 0;
+        for (j = 0; j < skills.length; j++)
+            tmpSkills[j] = skills[j];
+        
+        for (int i = 0; i < charClass.skillIDs.length; i++)
+            tmpSkills[j++] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
+        
+        this.skills = tmpSkills;
         calculateStats();
     }
 
@@ -650,8 +665,16 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         g.setColor(AnimationUtils.DEFAULT_COLOR);
         
         FontMetrics fm = g.getFontMetrics(g.getFont());
-        int width = fm.stringWidth(name);
+        int width = fm.stringWidth(name + " Lv " + baseLevel);
         
-        g.drawString(name, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
+        g.drawString(name + " Lv " + baseLevel, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
+        
+        // draw hp empty bar
+        g.setColor(Color.BLACK);
+        g.drawRect(tmpX, tmpY + 50, 40, 5);
+        
+        // draw hp
+        g.setColor(Color.RED);
+        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
     }
 }

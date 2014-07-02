@@ -10,6 +10,8 @@ public class GameCharacterClassChanger {
     static {
         reqList.put(GameCharacterClass.NOVICE, new Ascension(2, 2, GameCharacterClass.WARRIOR,
                 GameCharacterClass.SCOUT, GameCharacterClass.MAGE));
+        reqList.put(GameCharacterClass.WARRIOR, new Ascension(3, 3, GameCharacterClass.CRUSADER, 
+                GameCharacterClass.GLADIATOR));
     }
     
     /**

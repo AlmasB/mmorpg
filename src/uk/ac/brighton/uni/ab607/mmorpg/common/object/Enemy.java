@@ -42,6 +42,9 @@ public class Enemy extends GameCharacter {
         attributes[WIL] = attrs.wil;
         attributes[PER] = attrs.per;
         attributes[LUC] = attrs.luc;
+        calculateStats();
+        setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
+        setSP((int)getTotalStat(MAX_SP));
     }
 
     /*package-private*/ Enemy(Enemy copy) {

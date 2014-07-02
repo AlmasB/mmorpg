@@ -25,27 +25,34 @@ public class Desc {
 
     public class Skill {
         /*
-        public static final String HEAL = "Restores HP to target";
-        public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
+        
         public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
         public static final String PIERCING_TOUCH = "Deals physical damage based on target's armor. "
                 + "The more armor target has the greater the damage";
-        public static final String BULLSEYE = "Deals armor ignoring damage to target."
-                + "Target's defense is not ignored. "
-                + "Damage is based on caster's DEX";
-        public static final String CLAUDIUS = "Increases VIT, WIS, LUC. Decreases INT";
-        public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";*/
+        
+        */
 
         public class Warrior {
-            public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
             public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";
-            public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
             public static final String ROAR = "Increases STR and VIT for the duration";
-            public static final String SHATTER_ARMOR = "Decreases target's armor for the duration";
-            public static final String LAST_STAND = "Deals double base damage for the duration";
             public static final String WARRIOR_HEART = "Passively increases max HP";
             public static final String ARMOR_MASTERY = "Increases armor rating";
+        }
+        
+        public class Crusader {
+            public static final String HOLY_LIGHT = "Heals and increases VIT for the duration";
+            public static final String FAITH = "Further increases bonus given by Heart of a Warrior skill";
+            public static final String DIVINE_ARMOR = "Further increases bonus give by Armor Mastery skill";
+            public static final String PRECISION_STRIKE = "Deals armor ignoring damage based on STR";
+            public static final String LAST_STAND = "Deals double base damage for the duration";
+        }
+        
+        public class Gladiator {
             public static final String BLOODLUST = "Increases ATK based on the missing % HP";
+            public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
+            public static final String SHATTER_ARMOR = "Decreases target's armor for the duration";
+            public static final String DOUBLE_EDGE = "Sacrifice % of HP to deal double that damage to target. Damage is pure";
+            public static final String ENDURANCE = "Takes less damage and regenerates HP faster for the duration";
         }
 
         public class Mage {
@@ -53,23 +60,47 @@ public class Desc {
             public static final String ICE_SHARD = "Deals magic damage with water element";
             public static final String AIR_SPEAR = "Deals magic damage with air element";
             public static final String EARTH_BOULDER = "Deals magic damage with earth element";
-            public static final String MENTAL_STRIKE = "Deals pure damage based on MATK";
-            public static final String AMPLIFY_MAGIC = "Increases MATK for the duration";
-            public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
-            public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
-            public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
         }
 
+        public class Wizard {
+            public static final String MENTAL_STRIKE = "Deals pure damage based on MATK";
+            public static final String AMPLIFY_MAGIC = "Increases MATK for the duration";
+            public static final String MAGIC_MASTERY = "Passively increases INT and WIL";
+            public static final String THUNDERBOLT_FIRESTORM = "Deals magic damage with air and fire element";
+            public static final String ICICLE_AVALANCHE = "Deals magic damage with water and earth element";
+        }
+        
+        public class Enchanter {
+            public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
+            public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
+            public static final String MIND_BLAST = "Drains % of target's SP. Increases mana cost of all target's skills";
+            public static final String CURSE_OF_WITCHCRAFT = "Target cannot use skills for the duration";
+            public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
+        }
+        
         public class Scout {
-            public static final String PINPOINT_WEAKNESS = "Decreases target's armor rating for the duration";
-            public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
-            public static final String TRIPLE_STRIKE = "Quickly performs three attacks. Deals more damage if target is stunned";
-            public static final String THROW_DAGGER = "Throws a dagger dealing physical damage with a chance to poison the target";
-            public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
             public static final String POISON_ATTACK = "Attacks the target with high chance to poison him";
-            public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
+            public static final String TRICK_ATTACK = "Deals physical damage and steals gold equal to damage dealt";
             public static final String WEAPON_MASTERY = "Passively increases ATK";
             public static final String EXPERIENCED_FIGHTER = "Passively increases AGI and DEX";
+        }
+        
+        public class Rogue {
+            public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
+            public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
+            public static final String TRIPLE_STRIKE = "Quickly performs three attacks. Deals more damage if target is stunned";
+            public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
+            public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
+        }
+        
+        public class Ranger {
+            public static final String FAST_REFLEXES = "Increases ASPD for the duration";
+            public static final String ENCHANTED_ARROW = "Stuns target. Stun lasts longer for target's with high armor rating";
+            public static final String EAGLE_EYE = "Passively increases ATK based on DEX";
+            public static final String PINPOINT_WEAKNESS = "Decreases target's defense for the duration";
+            public static final String BULLSEYE = "Deals armor ignoring damage to target."
+                    + "Target's defense is not ignored. "
+                    + "Damage is based on caster's DEX";
         }
     }
 
