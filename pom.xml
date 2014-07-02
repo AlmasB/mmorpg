@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Orion</groupId>
   <artifactId>Orion</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
   <name>Orion</name>
   <description>Fantasy MMORPG</description>
   <build>
