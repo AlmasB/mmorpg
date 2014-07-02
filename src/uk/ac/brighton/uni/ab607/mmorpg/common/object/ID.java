@@ -99,7 +99,7 @@ public class ID {
             public static final String PINPOINT_WEAKNESS = "7230";
             public static final String BULLSEYE = "7231";
             public static final String FAST_REFLEXES = "7232";
-            public static final String ENCHANTED_ARROWS = "7233";
+            public static final String ENCHANTED_ARROW = "7233";
             public static final String EAGLE_EYE = "7234";
         }
     }

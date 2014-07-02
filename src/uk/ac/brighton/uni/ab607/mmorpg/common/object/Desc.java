@@ -95,8 +95,8 @@ public class Desc {
         
         public class Ranger {
             public static final String FAST_REFLEXES = "Increases ASPD for the duration";
-            public static final String ENCHANTED_ARROWS = "Increases ATK when BOW type weapon is equipped";
-            public static final String EAGLE = "Passively increases ATK based on DEX";
+            public static final String ENCHANTED_ARROW = "Stuns target. Stun lasts longer for target's with high armor rating";
+            public static final String EAGLE_EYE = "Passively increases ATK based on DEX";
             public static final String PINPOINT_WEAKNESS = "Decreases target's defense for the duration";
             public static final String BULLSEYE = "Deals armor ignoring damage to target."
                     + "Target's defense is not ignored. "

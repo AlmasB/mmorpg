@@ -22,7 +22,7 @@ public enum GameCharacterClass {
     SCOUT    (30, 35, ID.Skill.Scout.EXPERIENCED_FIGHTER, ID.Skill.Scout.POISON_ATTACK, ID.Skill.Scout.TRICK_ATTACK, ID.Skill.Scout.WEAPON_MASTERY),
     ROGUE    (50, 40, ID.Skill.Rogue.CRITICAL_STRIKE, ID.Skill.Rogue.DOUBLE_STRIKE, ID.Skill.Rogue.TRIPLE_STRIKE, ID.Skill.Rogue.FIVE_FINGER_DEATH_PUNCH, ID.Skill.Rogue.SHAMELESS),
     ASSASSIN (75, 45),
-    RANGER   (40, 40, ID.Skill.Ranger.BULLSEYE, ID.Skill.Ranger.EAGLE_EYE, ID.Skill.Ranger.ENCHANTED_ARROWS, ID.Skill.Ranger.FAST_REFLEXES, ID.Skill.Ranger.PINPOINT_WEAKNESS),
+    RANGER   (40, 40, ID.Skill.Ranger.BULLSEYE, ID.Skill.Ranger.EAGLE_EYE, ID.Skill.Ranger.ENCHANTED_ARROW, ID.Skill.Ranger.FAST_REFLEXES, ID.Skill.Ranger.PINPOINT_WEAKNESS),
     HUNTER   (50, 55),
     
     MAGE     (25, 45, ID.Skill.Mage.AIR_SPEAR, ID.Skill.Mage.EARTH_BOULDER, ID.Skill.Mage.FIREBALL, ID.Skill.Mage.ICE_SHARD),
