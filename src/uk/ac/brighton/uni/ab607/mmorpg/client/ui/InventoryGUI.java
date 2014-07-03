@@ -70,6 +70,9 @@ public class InventoryGUI extends GUI {
                 || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
             player = p;
             repaint();
+            // if item was changed while cursor was on it
+            // this will force it to update label
+            mouse.update();
         }
     }
 
@@ -181,6 +184,8 @@ public class InventoryGUI extends GUI {
     }
 
     private class Mouse implements MouseListener, MouseMotionListener {
+        private MouseEvent event;
+        
         @Override
         public void mouseClicked(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -200,10 +205,7 @@ public class InventoryGUI extends GUI {
             item.ifPresent(it -> {
                 // if weapon or armor
                 if (it instanceof Weapon || it instanceof Armor) {
-                    if (e.getButton() == 3)
-                        addActionRequest(new ActionRequest(Action.REFINE, player.name, itemIndex));
-                    else
-                        addActionRequest(new ActionRequest(Action.EQUIP, player.name, itemIndex));
+                    addActionRequest(new ActionRequest(e.getButton() == 3 ? Action.REFINE : Action.EQUIP, player.name, itemIndex));
                 }
                 else if (it instanceof UsableItem) {
                     addActionRequest(new ActionRequest(Action.USE_ITEM, player.name, itemIndex));
@@ -213,6 +215,7 @@ public class InventoryGUI extends GUI {
         
         @Override
         public void mouseMoved(MouseEvent e) {
+            event = e;
             int x = e.getX(), y = e.getY();
 
             int bodyPart = getEquipPlace(x, y);
@@ -240,6 +243,10 @@ public class InventoryGUI extends GUI {
                     updateItemInfoLabel();
                 }
             });
+        }
+        
+        public void update() {
+            mouseMoved(event);
         }
 
         @Override
