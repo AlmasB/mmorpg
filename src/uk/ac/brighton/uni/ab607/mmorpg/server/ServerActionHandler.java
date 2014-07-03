@@ -110,7 +110,7 @@ public class ServerActionHandler {
         if (tmpChar instanceof Enemy) { // if tmpChar == null, it isn't instance of Enemy
             Enemy target = (Enemy) tmpChar;
             if (target != null && target.isAlive()
-                    && server.distanceBetween(player, (GameCharacter)target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
+                    && server.distanceBetween(player, target) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
 
                 if (player.canAttack()) {
                     int dmg = player.attack(target);
@@ -144,7 +144,8 @@ public class ServerActionHandler {
     
     public void serverActionSkillUse(Player player, ActionRequest req) {
         Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2, req.data);
-        if (skTarget != null) {
+        if (skTarget != null
+                && server.distanceBetween(player, skTarget) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
             SkillUseResult result = player.useSkill(req.value1, skTarget);
             if (!result.success)
                 return;
