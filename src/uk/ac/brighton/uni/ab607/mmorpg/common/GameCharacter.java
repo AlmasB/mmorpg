@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;

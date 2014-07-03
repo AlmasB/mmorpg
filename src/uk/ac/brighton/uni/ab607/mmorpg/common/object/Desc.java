@@ -24,13 +24,6 @@ public class Desc {
     }
 
     public class Skill {
-        /*
-        
-        public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
-        public static final String PIERCING_TOUCH = "Deals physical damage based on target's armor. "
-                + "The more armor target has the greater the damage";
-        
-        */
 
         public class Warrior {
             public static final String MIGHTY_SWING = "Physical attack. Damage is greater if you have more STR than your target";

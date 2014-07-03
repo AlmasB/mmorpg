@@ -90,3 +90,16 @@ Out.println(Arrays.toString(Data.class.getDeclaredClasses()[0].getDeclaredClasse
                 }
             }
         }
+        
+                /*
+        
+        public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
+        public static final String PIERCING_TOUCH = "Deals physical damage based on target's armor. "
+                + "The more armor target has the greater the damage";
+        
+        */
+        
+                /* UNSORTED
+        public static final String FINAL_STRIKE = "7002";
+        public static final String PIERCING_TOUCH = "7003";
+        ;*/

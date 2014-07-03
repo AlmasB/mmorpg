@@ -99,4 +99,8 @@ public abstract class Skill implements java.io.Serializable {
     public SkillUseResult getUseResult() {
         return useResult;
     }
+    
+    // add some methods for overriding
+    // isPassive()
+    // isSelfTarget()
 }
