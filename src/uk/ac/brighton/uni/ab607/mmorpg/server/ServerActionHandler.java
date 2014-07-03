@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.Optional;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
@@ -73,20 +74,16 @@ public class ServerActionHandler {
         p.increaseSkillLevel(req.value1);
     }
     
-    public void serverActionEquip(Player player, ActionRequest req) throws BadActionRequestException {
-        GameItem item = player.getInventory().getItem(req.value1);
-        if (item != null) {
-            if (item instanceof Weapon) {
-                player.equipWeapon((Weapon) item);
+    public void serverActionEquip(Player player, ActionRequest req) {
+        Optional<GameItem> item = player.getInventory().getItem(req.value1);
+        item.ifPresent(it -> {
+            if (it instanceof Weapon) {
+                player.equipWeapon((Weapon) it);
             }
-            else if (item instanceof Armor) {
-                player.equipArmor((Armor) item);
+            else if (it instanceof Armor) {
+                player.equipArmor((Armor) it);
             }
-            else
-                throw new BadActionRequestException("Item not equippable: " + req.value1);
-        }
-        else
-            throw new BadActionRequestException("Item not found: " + req.value1);
+        });
     }
     
     public void serverActionUnequip(Player player, ActionRequest req) {
@@ -94,21 +91,13 @@ public class ServerActionHandler {
     }
     
     public void serverActionRefine(Player player, ActionRequest req) throws BadActionRequestException {
-        GameItem itemToRefine = player.getInventory().getItem(req.value1);
-
-        if (itemToRefine != null) {
-            if (itemToRefine instanceof EquippableItem) {
-                ((EquippableItem) itemToRefine).refine();
-            }
-            else
-                throw new BadActionRequestException("Item cannot be refined: " + req.value1);
-        }
-        else
-            throw new BadActionRequestException("Item not found: " + req.value1);
+        Optional<GameItem> itemToRefine = player.getInventory().getItem(req.value1);
+        itemToRefine.filter(item -> item instanceof EquippableItem).ifPresent(item -> ((EquippableItem) item).refine());
     }
     
     public void serverActionUseItem(Player player, ActionRequest req) {
-        ((UsableItem) player.getInventory().getItem(req.value1)).onUse(player);
+        Optional<GameItem> itemToUse = player.getInventory().getItem(req.value1);
+        itemToUse.filter(item -> item instanceof UsableItem).ifPresent(item -> ((UsableItem) item).onUse(player));
     }
     
     public void serverActionAttack(Player player, ActionRequest req) throws BadActionRequestException {

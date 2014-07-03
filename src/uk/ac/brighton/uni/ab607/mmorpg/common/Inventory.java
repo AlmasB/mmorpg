@@ -1,6 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -49,11 +50,11 @@ public class Inventory implements java.io.Serializable {
      *
      * @param index
      * @return
-     *          item if index less than inventory size
-     *          otherwise null
+     *          Optional item if index less than inventory size
+     *          otherwise empty Optional
      */
-    public GameItem getItem(int index) {
-        return index < items.size() ? items.get(index) : null;
+    public Optional<GameItem> getItem(int index) {
+        return index < items.size() ? Optional.of(items.get(index)) : Optional.empty();
     }
 
     /**
@@ -103,10 +104,5 @@ public class Inventory implements java.io.Serializable {
     @Override
     public String toString() {
         return items.toString();
-        /*String res = "[";
-        for (GameItem item : items)
-            res += item.name + ",";
-        res += "]";
-        return res;*/
     }
 }
