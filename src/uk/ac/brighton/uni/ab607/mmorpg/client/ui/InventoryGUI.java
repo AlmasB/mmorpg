@@ -215,6 +215,8 @@ public class InventoryGUI extends GUI {
         
         @Override
         public void mouseMoved(MouseEvent e) {
+            if (e == null) return;
+            
             event = e;
             int x = e.getX(), y = e.getY();
 

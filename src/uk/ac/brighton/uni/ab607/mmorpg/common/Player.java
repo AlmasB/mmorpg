@@ -154,7 +154,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         if (attributes[attr] < MAX_ATTRIBUTE) {
             attributes[attr]++;
             attributePoints--;
-            calculateStats();
         }
     }
 
@@ -208,7 +207,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         }
 
         w.onEquip(this);            // put it on
-        calculateStats();
     }
 
     public void equipArmor(Armor a) {
@@ -216,7 +214,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         unEquipItem(a.type.ordinal());  // just because place number made to match ArmorType enum
         equip[a.type.ordinal()] = a;
         a.onEquip(this);
-        calculateStats();
     }
 
     public void unEquipItem(int itemPlace) {
@@ -236,7 +233,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
         equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
-        calculateStats();
     }
 
     public boolean isFree(int itemPlace) {
