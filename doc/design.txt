@@ -68,3 +68,25 @@ can be done thru status effects and then check when attacking on server side
 
         
 */
+
+
+// Data/reflection
+
+Out.println(Arrays.toString(Data.class.getDeclaredClasses()[0].getDeclaredClasses()));
+        
+        for (Class c : Data.class.getDeclaredClasses()[0].getDeclaredClasses()) {
+            Out.println(c.getSimpleName());
+            Field[] fields = c.getDeclaredFields();
+            for (Field f : fields) {
+                try {
+                    Out.println("Members: " + f.getName() + " value: " + f.get(null).getClass().getSimpleName());
+                    
+                    
+                    
+                }
+                catch (IllegalArgumentException | IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
