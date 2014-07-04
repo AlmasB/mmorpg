@@ -25,10 +25,6 @@ public class ID {
     }
 
     public class Skill {
-        /* UNSORTED
-        public static final String FINAL_STRIKE = "7002";
-        public static final String PIERCING_TOUCH = "7003";
-        ;*/
 
         public class Novice {
 

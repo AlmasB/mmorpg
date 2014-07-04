@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -34,7 +35,7 @@ public class InventoryGUI extends GUI {
     private JLabel itemInfoLabel = new JLabel();
     private JButton infoButton = new JButton(INFO_OFF);
 
-    private GameItem selectedItem;
+    private Optional<GameItem> selectedItem;
 
     private Mouse mouse = new Mouse();
 
@@ -54,12 +55,8 @@ public class InventoryGUI extends GUI {
 
         infoButton.setBounds(346, 235, 80, 30);
         infoButton.addActionListener(event -> {
-            runOnUIThread(() -> {
-                infoButton.setText(event.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON);
-                if (selectedItem != null)
-                    itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                            : selectedItem.toPseudoHTMLShort());
-            });
+            SwingUtilities.invokeLater(() -> infoButton.setText(event.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON));
+            updateItemInfoLabel();
         });
         
         this.add(infoButton);
@@ -73,6 +70,9 @@ public class InventoryGUI extends GUI {
                 || !isSameEquip(p) || player.getMoney() != p.getMoney()) {
             player = p;
             repaint();
+            // if item was changed while cursor was on it
+            // this will force it to update label
+            mouse.update();
         }
     }
 
@@ -183,11 +183,9 @@ public class InventoryGUI extends GUI {
         return -1;
     }
 
-    private void runOnUIThread(Runnable r) {
-        SwingUtilities.invokeLater(r);
-    }
-
     private class Mouse implements MouseListener, MouseMotionListener {
+        private MouseEvent event;
+        
         @Override
         public void mouseClicked(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -203,36 +201,30 @@ public class InventoryGUI extends GUI {
             x /= 40; y /= 40;
 
             int itemIndex = x + 5*y;  // convert to 1d array, 5 columns
-            if (itemIndex < player.getInventory().getSize()) {
-                GameItem item = player.getInventory().getItem(itemIndex);
-                if (item != null) {
-                    // if weapon or armor
-                    if (item instanceof Weapon || item instanceof Armor) {
-                        if (e.getButton() == 3)
-                            addActionRequest(new ActionRequest(Action.REFINE, player.name, itemIndex));
-                        else
-                            addActionRequest(new ActionRequest(Action.EQUIP, player.name, itemIndex));
-                    }
-                    else if (item instanceof UsableItem) {
-                        addActionRequest(new ActionRequest(Action.USE_ITEM, player.name, itemIndex));
-                    }
+            Optional<GameItem> item = player.getInventory().getItem(itemIndex);
+            item.ifPresent(it -> {
+                // if weapon or armor
+                if (it instanceof Weapon || it instanceof Armor) {
+                    addActionRequest(new ActionRequest(e.getButton() == 3 ? Action.REFINE : Action.EQUIP, player.name, itemIndex));
                 }
-            }
+                else if (it instanceof UsableItem) {
+                    addActionRequest(new ActionRequest(Action.USE_ITEM, player.name, itemIndex));
+                }
+            });
         }
         
         @Override
         public void mouseMoved(MouseEvent e) {
+            if (e == null) return;
+            
+            event = e;
             int x = e.getX(), y = e.getY();
 
             int bodyPart = getEquipPlace(x, y);
             if (bodyPart != -1) {
                 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                selectedItem = player.getEquip(bodyPart);
-                runOnUIThread(() -> {
-                    if (selectedItem != null)
-                        itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                                : selectedItem.toPseudoHTMLShort());
-                });
+                selectedItem = Optional.of(player.getEquip(bodyPart));
+                updateItemInfoLabel();
                 return;
             }
 
@@ -246,17 +238,17 @@ public class InventoryGUI extends GUI {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             int itemIndex = x + 5*y;  // convert to 1d array, 5 columns
-            if (itemIndex < player.getInventory().getSize()) {
-                GameItem item = player.getInventory().getItem(itemIndex);
-                if (item != null && item != selectedItem) {
+            Optional<GameItem> item = player.getInventory().getItem(itemIndex);
+            item.ifPresent(it -> {
+                if (!item.equals(selectedItem)) {
                     selectedItem = item;
-                    runOnUIThread(() -> {
-                        if (selectedItem != null)
-                            itemInfoLabel.setText(infoButton.getText().equals(INFO_ON) ? selectedItem.toPseudoHTML()
-                                    : selectedItem.toPseudoHTMLShort());
-                    });
+                    updateItemInfoLabel();
                 }
-            }
+            });
+        }
+        
+        public void update() {
+            mouseMoved(event);
         }
 
         @Override
@@ -269,5 +261,12 @@ public class InventoryGUI extends GUI {
         public void mouseExited(MouseEvent e) {}
         @Override
         public void mouseDragged(MouseEvent e) {}
+    }
+    
+    private void updateItemInfoLabel() {
+        SwingUtilities.invokeLater(() -> {
+            selectedItem.ifPresent(item -> itemInfoLabel.setText(infoButton.getText().equals(INFO_ON)
+                    ? item.toPseudoHTML() : item.toPseudoHTMLShort()));
+        });
     }
 }

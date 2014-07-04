@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
@@ -332,7 +331,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             
         e.onBegin(this);
         effects.add(e);
-        calculateStats();
     }
 
     public void addStatusEffect(StatusEffect e) {
@@ -346,7 +344,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             if (e.getDuration() <= 0) {
                 e.onEnd(this);
                 it.remove();
-                calculateStats();
             }
         }
     }
@@ -429,7 +426,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             tmpSkills[j++] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
         
         this.skills = tmpSkills;
-        calculateStats();
     }
 
     /**

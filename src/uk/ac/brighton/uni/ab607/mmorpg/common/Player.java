@@ -154,7 +154,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         if (attributes[attr] < MAX_ATTRIBUTE) {
             attributes[attr]++;
             attributePoints--;
-            calculateStats();
         }
     }
 
@@ -184,38 +183,37 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public void equipWeapon(Weapon w) {
+        inventory.removeItem(w);    // remove item from inventory to clear space
+        
         if (w.type.ordinal() >= WeaponType.TWO_H_SWORD.ordinal()) {
+            if (Inventory.MAX_SIZE - inventory.getSize() == 1 && !isFree(RIGHT_HAND) && !isFree(LEFT_HAND)) {
+                // ex case, when inventory is full and player tries to equip 2H weapon
+                // but holds two 1H weapons
+                inventory.addItem(w);
+                return;
+            }
             unEquipItem(RIGHT_HAND);
             unEquipItem(LEFT_HAND);
             equip[RIGHT_HAND] = w;
             equip[LEFT_HAND] = w;
         }
-        else if (w.type == WeaponType.SHIELD) {
+        else if (w.type == WeaponType.SHIELD || !isFree(RIGHT_HAND)) {
             unEquipItem(LEFT_HAND);
             equip[LEFT_HAND] = w;
         }
         else {  // normal 1H weapon
-            if (isFree(RIGHT_HAND)) {
-                unEquipItem(RIGHT_HAND);
-                equip[RIGHT_HAND] = w;
-            }
-            else {
-                unEquipItem(LEFT_HAND);
-                equip[LEFT_HAND] = w;
-            }
+            unEquipItem(RIGHT_HAND);
+            equip[RIGHT_HAND] = w;
         }
 
-        inventory.removeItem(w);    // remove item from inventory
         w.onEquip(this);            // put it on
-        calculateStats();
     }
 
     public void equipArmor(Armor a) {
+        inventory.removeItem(a);    // remove it first, so we can unequip our armor
         unEquipItem(a.type.ordinal());  // just because place number made to match ArmorType enum
         equip[a.type.ordinal()] = a;
-        inventory.removeItem(a);
         a.onEquip(this);
-        calculateStats();
     }
 
     public void unEquipItem(int itemPlace) {
@@ -235,7 +233,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         equip[itemPlace].onUnEquip(this);   // take item off
         inventory.addItem(equip[itemPlace]);    // put it in inventory
         equip[itemPlace] = itemPlace >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + itemPlace);    // replace with default
-        calculateStats();
     }
 
     public boolean isFree(int itemPlace) {

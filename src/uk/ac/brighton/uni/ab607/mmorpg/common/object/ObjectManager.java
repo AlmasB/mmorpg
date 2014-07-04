@@ -269,7 +269,7 @@ public class ObjectManager {
                 float factor = 2.0f;
                 for (Skill skill : caster.getSkills()) {
                     if (skill.id.equals(ID.Skill.Crusader.DIVINE_ARMOR)) {
-                        factor += 0.1f * skill.getLevel();
+                        factor += 0.15f * skill.getLevel();
                         break;
                     }
                 }
