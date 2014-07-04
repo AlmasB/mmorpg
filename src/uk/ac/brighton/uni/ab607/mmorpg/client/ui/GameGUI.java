@@ -77,7 +77,7 @@ public class GameGUI extends GUI {
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
         this.setLocation(0, 0);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 
         name = playerName;        
         
@@ -96,6 +96,21 @@ public class GameGUI extends GUI {
             }
             @Override
             public void componentHidden(ComponentEvent e) {}
+        });
+        
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                inv.setVisible(false);
+                st.setVisible(false);
+                
+                try {
+                    client.send(new DataPacket(new QueryRequest(Query.LOGOFF, name)));
+                }
+                catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         });
 
         this.addKeyListener(new Keyboard());

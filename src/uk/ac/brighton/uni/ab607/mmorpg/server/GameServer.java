@@ -141,8 +141,7 @@ public class GameServer {
         }
         
         private void actionLogoff(DataPacket packet, QueryRequest req) {
-            // not implemented
-            //closePlayerConnection(req.value1);
+            closePlayerConnection(req.value1);
         }
         
         private void actionNone(DataPacket packet, QueryRequest req) {
@@ -171,14 +170,19 @@ public class GameServer {
          * @param playerName
          *                  name of the player to disconnect
          */
-        //private void closePlayerConnection(String playerName) {
-            /*for (Iterator<Player> iter = players.iterator(); iter.hasNext(); ) {
-                if (iter.next().name.equals(playerName)) {
-                    iter.remove();
+        private void closePlayerConnection(String playerName) {
+            Player p = null;
+            for (GameMap m : maps) {
+                p = m.getPlayerByName(playerName);
+                if (p != null) {
+                    m.removePlayer(p);
+                    GameAccount.setPlayer(p, p.name);
+                    GameAccount.setMapName(m.name, p.name);
+                    DBAccess.saveDB();
                     break;
                 }
-            }*/
-        //}
+            }
+        }
     }
     
     class ServerLoop implements Runnable {
