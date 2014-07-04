@@ -124,11 +124,11 @@ public class GameServer {
                 // purely for local debugging when db/accounts.db has been deleted
                 Out.debug("Account not found, using new");
                 
-                GameAccount.addAccount("Almas", "pass", "test@mail.com");
-                Player p = GameAccount.getPlayer("Almas");
+                GameAccount.addAccount("Debug", "pass", "test@mail.com");
+                Player p = GameAccount.getPlayer("Debug");
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
-                String mapName = GameAccount.getMapName("Almas");
+                String mapName = GameAccount.getMapName("Debug");
                 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
