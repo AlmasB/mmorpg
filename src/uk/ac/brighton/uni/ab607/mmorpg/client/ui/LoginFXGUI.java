@@ -53,10 +53,9 @@ public class LoginFXGUI extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setBuilderFactory(new JavaFXBuilderFactory());
 
-        // uncomment for running within jar and comment the other
-
-        //loader.setLocation(getClass().getResource("/res/UI/Login.fxml")); //jar
-        loader.setLocation(ResourceManager.getLocalURL("UI/Login.fxml"));   // not jar
+        loader.setLocation(ResourceManager.isRunningFromJar()
+                ? getClass().getResource("/res/UI/Login.fxml")
+                : ResourceManager.getLocalURL("UI/Login.fxml"));
 
         AnchorPane page;
         try {
