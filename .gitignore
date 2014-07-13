@@ -17,3 +17,6 @@ hs_err_pid*
 .settings/
 /bin
 /target
+
+# Game Account DB #
+/res/db/accounts.db

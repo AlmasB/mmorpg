@@ -34,7 +34,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 /**
  * Main game window
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
@@ -63,24 +63,24 @@ public class GameGUI extends GUI {
 
     private int selX = 0, selY = 0; // selected point
     private int renderX = 0, renderY = 0;   // render offset
-    
+
     private GraphicsContext gContext = null;
     private GameMap map;
 
     private List<Drawable[]> gameObjects = Collections.synchronizedList(new ArrayList<Drawable[]>(5));
-    
+
     private static final int INDEX_ANIMATIONS = 0,
             INDEX_CHESTS = 1,
             INDEX_ENEMIES = 2,
             INDEX_PLAYERS = 3;
-    
+
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 
-        name = playerName;        
-        
+        name = playerName;
+
         this.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {}
@@ -97,19 +97,21 @@ public class GameGUI extends GUI {
             @Override
             public void componentHidden(ComponentEvent e) {}
         });
-        
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 inv.setVisible(false);
                 st.setVisible(false);
-                
-                try {
+
+                // development version
+                System.exit(0);
+                /*try {
                     client.send(new DataPacket(new QueryRequest(Query.LOGOFF, name)));
                 }
                 catch (IOException ex) {
                     ex.printStackTrace();
-                }
+                }*/
             }
         });
 
@@ -141,10 +143,10 @@ public class GameGUI extends GUI {
 
         walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
         setCursor(walkCursor);
-        
+
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
-        
+
         // placeholders
         gameObjects.add(new Drawable[]{ });
         gameObjects.add(new Drawable[]{ });
@@ -165,24 +167,24 @@ public class GameGUI extends GUI {
         public void parseServerPacket(DataPacket packet) {
             if (packet.objectData instanceof ServerResponse) {
                 ServerResponse res = (ServerResponse) packet.objectData;
-                
+
                 map = ObjectManager.getMapByName(res.data);
-                
+
                 selX = res.value1;
                 selY = res.value2;
             }
-            
+
             if (packet.objectData instanceof Player) {
                 player = (Player) packet.objectData;
                 // login complete, all set, we can now show GUI
                 // and start drawing
                 inv = new InventoryGUI(player);
                 st = new StatsGUI(player);
-                
+
                 setVisible(true);
                 requestFocusInWindow();
             }
-            
+
             if (packet.multipleObjectData instanceof Player[]) {
                 update((Player[]) packet.multipleObjectData);
             }
@@ -213,7 +215,7 @@ public class GameGUI extends GUI {
                     break;
                 }
             }
-            
+
             gameObjects.set(INDEX_PLAYERS, sPlayers);
 
             // update main window
@@ -245,7 +247,7 @@ public class GameGUI extends GUI {
             for (Enemy e : sEnemies) {
                 enemies.add(e);
             }
-            
+
             gameObjects.set(INDEX_ENEMIES, sEnemies);
 
             tmpEnemies = new ArrayList<Enemy>(enemies);
@@ -259,10 +261,10 @@ public class GameGUI extends GUI {
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
-        
+
         if (gContext != null)
             gContext.setRenderOffset(renderX, renderY);
-        
+
         int moveToX = (selX/40)*40;
         int moveToY = (selY/40)*40;
 
@@ -292,7 +294,7 @@ public class GameGUI extends GUI {
     protected void createPicture(Graphics2D g) {
         if (gContext == null)
             gContext = new GraphicsContext(g);
-        
+
         // draw background / clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, 1280, 690);
@@ -306,7 +308,7 @@ public class GameGUI extends GUI {
         g.drawImage(Resources.getImage(map.spriteName),
                 dx, dy, dx1, dy1,
                 sx, sy, sx1, sy1, this);
-        
+
         synchronized(gameObjects) {
             Rectangle playerVision = new Rectangle(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
@@ -429,7 +431,7 @@ public class GameGUI extends GUI {
                         return;
                     }
                 }
-                
+
                 // if no enemy in that selection
                 // drop target, then move player to that cell
                 targetRuntimeID = 0;
@@ -478,13 +480,13 @@ public class GameGUI extends GUI {
     /**
      * This check is needed to see if target runtimeID
      * still exists in the world
-     * 
+     *
      * @return
      *          target's runtimeID or 0 if invalid
      */
     private int checkRuntimeID() {
         if (targetRuntimeID == 0) return 0;
-        
+
         for (Enemy e : tmpEnemies) {
             if (e.getRuntimeID() == targetRuntimeID)
                 return targetRuntimeID;
