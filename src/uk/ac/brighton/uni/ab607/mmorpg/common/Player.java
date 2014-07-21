@@ -1,11 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-
+import uk.ac.brighton.uni.ab607.libs.graphics.Color;
+import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
 import uk.ac.brighton.uni.ab607.libs.main.Out;
 import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
@@ -17,7 +16,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
 /**
  * Actual user, 1 per client
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
@@ -58,17 +57,17 @@ public class Player extends GameCharacter implements PseudoHTML {
         EXP_NEEDED_JOB[0]  = EXP_NEEDED_FOR_LEVEL2;
         for (int i = 1; i < EXP_NEEDED_BASE.length; i++) {
             EXP_NEEDED_BASE[i] = (int) (EXP_NEEDED_BASE[i-1] * EXP_NEEDED_INC_BASE) + 2 * i;
-            
+
             if (i < EXP_NEEDED_STAT.length)
                 EXP_NEEDED_STAT[i] = (int) (EXP_NEEDED_STAT[i-1] * EXP_NEEDED_INC_STAT) + i;
-            
+
             if (i < EXP_NEEDED_JOB.length)
                 EXP_NEEDED_JOB[i]  = (int) (EXP_NEEDED_JOB[i-1] * EXP_NEEDED_INC_JOB) + 3 * i;
         }
     }
 
     private int statLevel = 1, jobLevel = 1;
-   
+
     private int attributePoints = 0,
             skillPoints = 0;
 
@@ -82,8 +81,8 @@ public class Player extends GameCharacter implements PseudoHTML {
             LEFT_HAND = 4;
 
     private EquippableItem[] equip = new EquippableItem[5];
-    
-    public String ip; 
+
+    public String ip;
     public int port;
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
@@ -92,15 +91,16 @@ public class Player extends GameCharacter implements PseudoHTML {
         this.y = y;
         this.ip = ip;
         this.port = port;
-        this.spriteName = "player1.png";
+        //this.spriteName = "player1.png";
+        this.spriteID = R.IMAGE.PLAYER_1;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
     }
-    
+
     /**
      * Increases player's experience
-     * 
+     *
      * @param gainedXP
      * @return
      *          true if player gained new base level
@@ -164,12 +164,12 @@ public class Player extends GameCharacter implements PseudoHTML {
         if (skills[skillCode].levelUp())
             skillPoints--;
     }
-    
+
     @Override
     public boolean canAttack() {
         Weapon w1 = (Weapon) this.getEquip(RIGHT_HAND);
         Weapon w2 = (Weapon) this.getEquip(LEFT_HAND);
-        
+
         return atkTick >= 50 / (1 + getTotalStat(GameCharacter.ASPD)
                 *w1.type.aspdFactor*w2.type.aspdFactor/100.0f);
     }
@@ -184,7 +184,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public void equipWeapon(Weapon w) {
         inventory.removeItem(w);    // remove item from inventory to clear space
-        
+
         if (w.type.ordinal() >= WeaponType.TWO_H_SWORD.ordinal()) {
             if (Inventory.MAX_SIZE - inventory.getSize() == 1 && !isFree(RIGHT_HAND) && !isFree(LEFT_HAND)) {
                 // ex case, when inventory is full and player tries to equip 2H weapon
@@ -262,7 +262,7 @@ public class Player extends GameCharacter implements PseudoHTML {
         hp = (int)(0.25f*getTotalStat(MAX_HP));
         sp = (int)(0.25f*getTotalStat(MAX_SP));
     }
-    
+
     public int getJobLevel() {
         return jobLevel;
     }
@@ -274,7 +274,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public String statsToPseudoHTML() {
         int aspd = (int)(getTotalStat(ASPD) * ((Weapon)getEquip(RIGHT_HAND)).type.aspdFactor * ((Weapon)getEquip(LEFT_HAND)).type.aspdFactor);
-        
+
         return HTML_START
                 + B + this.name + B_END + BR
                 + "Class: " + BLUE + charClass.toString() + FBR
@@ -286,25 +286,25 @@ public class Player extends GameCharacter implements PseudoHTML {
                 + "ASPD: " + BLUE + aspd + "%" + FONT_END + " MSPD: " + BLUE + (int)getTotalStat(MSPD) + "%" + FBR
                 + "CRIT: " + BLUE + (int)getTotalStat(CRIT_CHANCE) + "%" + FONT_END + " MCRIT: " + BLUE + (int)getTotalStat(MCRIT_CHANCE) + "%" + FONT_END;
     }
-    
+
     @Override
-    public void draw(GraphicsContext gContext) {
-        super.draw(gContext);
-        Graphics2D g = gContext.getGraphics();
-        int tmpX = x - gContext.getRenderX();
-        int tmpY = y - gContext.getRenderY();
-        
+    public void draw(GraphicsContext g) {
+        super.draw(g);
+
+        int tmpX = x - g.getRenderX();
+        int tmpY = y - g.getRenderY();
+
         // draw sp/xp empty bars
         g.setColor(Color.BLACK);
         g.drawRect(tmpX, tmpY + 55, 40, 5);
         g.drawRect(tmpX, tmpY + 60, 40, 5);
-        
+
         // draw sp
         g.setColor(Color.BLUE);
         g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
-        
+
         // draw xp
-        g.setColor(AnimationUtils.COLOR_GOLD);
+        g.setColor(Color.GOLD);
         g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
 }

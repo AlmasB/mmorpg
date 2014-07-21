@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Orion</groupId>
   <artifactId>Orion</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.3-SNAPSHOT</version>
   <name>Orion</name>
   <description>Fantasy MMORPG</description>
   <build>
@@ -97,13 +97,6 @@
 		<version>1.8</version>
 		<scope>system</scope>
 		<systemPath>${basedir}/lib/jfxrt.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>com.almasb.libs</groupId>
-		<artifactId>almas_libs</artifactId>
-		<version>1.0</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/almas_libs.jar</systemPath>
 	</dependency>
   </dependencies>
 </project>

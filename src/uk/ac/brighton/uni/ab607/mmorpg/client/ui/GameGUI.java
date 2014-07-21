@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,10 +17,14 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
+import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
+import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
 import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
 import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
 import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
+import uk.ac.brighton.uni.ab607.libs.ui.AWTGraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.GameResources;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -63,6 +68,9 @@ public class GameGUI extends GUI {
 
     private int selX = 0, selY = 0; // selected point
     private int renderX = 0, renderY = 0;   // render offset
+
+
+    private GameResources resources = new GameResources();
 
     private GraphicsContext gContext = null;
     private GameMap map;
@@ -263,7 +271,7 @@ public class GameGUI extends GUI {
         renderY = player.getY() - 360;  // half of height
 
         if (gContext != null)
-            gContext.setRenderOffset(renderX, renderY);
+            gContext.setRenderXY(renderX, renderY);
 
         int moveToX = (selX/40)*40;
         int moveToY = (selY/40)*40;
@@ -293,7 +301,7 @@ public class GameGUI extends GUI {
     @Override
     protected void createPicture(Graphics2D g) {
         if (gContext == null)
-            gContext = new GraphicsContext(g);
+            gContext = new AWTGraphicsContext(g, resources, 1280, 720);
 
         // draw background / clear screen
         g.setColor(Color.GRAY);

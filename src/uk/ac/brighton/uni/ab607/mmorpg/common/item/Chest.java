@@ -1,11 +1,11 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
+import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 
 public class Chest implements java.io.Serializable, Drawable {
@@ -56,11 +56,10 @@ public class Chest implements java.io.Serializable, Drawable {
     public int getY() {
         return y;
     }
-    
+
     @Override
-    public void draw(GraphicsContext gContext) {
-        Graphics2D g = gContext.getGraphics();
-        g.drawImage(Resources.getImage(Resource.Image.CHEST), x - gContext.getRenderX(),
-                10 + y - gContext.getRenderY(), null);  // + 10, so that image looks nicer on grid
+    public void draw(GraphicsContext g) {
+        // + 10, so that image looks nicer on grid
+        g.drawImage(R.IMAGE.CHEST, x - g.getRenderX(), y - g.getRenderY() + 10);
     }
 }

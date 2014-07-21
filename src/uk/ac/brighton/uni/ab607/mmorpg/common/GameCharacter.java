@@ -2,16 +2,14 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
 
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import uk.ac.brighton.uni.ab607.libs.graphics.Color;
+import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
+import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.Drawable;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
@@ -23,20 +21,20 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 /**
  * Essentially alive game object
  * Enemies/NPCs/players
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
 public abstract class GameCharacter implements java.io.Serializable, Drawable {
     private static final long serialVersionUID = -4840633591092062960L;
-    
+
     public static class Experience implements java.io.Serializable {
         private static final long serialVersionUID = 2762180993708324531L;
         public int base, stat, job;
         public Experience(int base, int stat, int job) {
             this.base = base;
             this.stat = stat;
-            this.job = job;    
+            this.job = job;
         }
         public void add(Experience xp) {
             this.base += xp.base;
@@ -122,7 +120,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     protected boolean alive = true;
 
     protected GameCharacterClass charClass;
-    
+
     protected Experience xp = new Experience(0, 0, 0);
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
@@ -131,10 +129,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.description = description;
         this.charClass = charClass;
         this.skills = new Skill[charClass.skillIDs.length];
-        
+
         for (int i = 0; i < skills.length; i++)
             skills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
-        
+
         Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
 
         calculateStats();
@@ -328,7 +326,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
                 break;
             }
         }
-            
+
         e.onBegin(this);
         effects.add(e);
     }
@@ -369,13 +367,13 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         regenTick += 0.02f;
 
         if (regenTick >= 2.0f) {    // 2 secs
-            if (!hasStatusEffect(Status.POISONED)) {   
+            if (!hasStatusEffect(Status.POISONED)) {
                 hp = Math.min((int)getTotalStat(MAX_HP), (int)(hp + getTotalStat(HP_REGEN)));
                 sp = Math.min((int)getTotalStat(MAX_SP), (int)(sp + getTotalStat(SP_REGEN)));
             }
             regenTick = 0.0f;
         }
-        
+
         if (!canAttack()) atkTick++;
 
         // skill cooldowns
@@ -398,7 +396,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
         calculateStats();
     }
-    
+
     /**
      * @return
      *          if character is ready to perform basic attack
@@ -417,14 +415,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public void changeClass(GameCharacterClass cl) {
         this.charClass = cl;
         Skill[] tmpSkills = new Skill[skills.length + charClass.skillIDs.length];
-        
+
         int j = 0;
         for (j = 0; j < skills.length; j++)
             tmpSkills[j] = skills[j];
-        
+
         for (int i = 0; i < charClass.skillIDs.length; i++)
             tmpSkills[j++] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
-        
+
         this.skills = tmpSkills;
     }
 
@@ -585,12 +583,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public int place = 0;
     public int sprite = 0;
     private int factor = 3;
-    
-    protected String spriteName;
-    
+
+    /*protected String spriteName;
+
     public String getSpriteName() {
         return spriteName;
-    }
+    }*/
+
+    protected int spriteID;
 
     public enum Dir {
         UP, DOWN, LEFT, RIGHT
@@ -645,30 +645,29 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public int getRow() {
         return direction.ordinal();
     }
-    
+
     @Override
-    public void draw(GraphicsContext gContext) {
-        Graphics2D g = gContext.getGraphics();
-        
-        int tmpX = x - gContext.getRenderX();
-        int tmpY = y - gContext.getRenderY();
-        
-        g.drawImage(Resources.getImage(spriteName),
+    public void draw(GraphicsContext g) {
+
+        int tmpX = x - g.getRenderX();
+        int tmpY = y - g.getRenderY();
+
+        g.drawImage(spriteID,
                 tmpX, tmpY, tmpX + 40, tmpY + 40,
-                place*40, getRow()*40, place*40+40, getRow()*40+40, null);
-        
-        g.setFont(AnimationUtils.DEFAULT_FONT);
-        g.setColor(AnimationUtils.DEFAULT_COLOR);
-        
-        FontMetrics fm = g.getFontMetrics(g.getFont());
-        int width = fm.stringWidth(name + " Lv " + baseLevel);
-        
+                place*40, getRow()*40, place*40+40, getRow()*40+40);
+
+        //g.setFont(AnimationUtils.DEFAULT_FONT);
+        //g.setColor(AnimationUtils.DEFAULT_COLOR);
+        g.setColor(Color.YELLOW);
+
+        int width = g.getStringWidth(name + " Lv " + baseLevel);
+
         g.drawString(name + " Lv " + baseLevel, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
-        
+
         // draw hp empty bar
         g.setColor(Color.BLACK);
         g.drawRect(tmpX, tmpY + 50, 40, 5);
-        
+
         // draw hp
         g.setColor(Color.RED);
         g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);

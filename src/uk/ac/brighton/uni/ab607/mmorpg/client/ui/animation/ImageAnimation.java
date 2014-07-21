@@ -1,16 +1,15 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import java.awt.Graphics2D;
-
+import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
 import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 
 public class ImageAnimation extends Animation {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1496702577417839916L;
-    
+
     private String imageFileName;
     private int spriteX = 0, spriteY = 0;
     private int endX = 0, endY = 0;
@@ -23,7 +22,7 @@ public class ImageAnimation extends Animation {
         endY = y;*/
         this(x, y, x, y, maxDuration, imageFileName);
     }
-    
+
     public ImageAnimation(int x, int y, int endX, int endY, float maxDuration, String imageFileName) {
         super(x, y, maxDuration);
         this.imageFileName = imageFileName;
@@ -37,18 +36,17 @@ public class ImageAnimation extends Animation {
         int which = (int)(completed * 63);
         spriteX = which % 8;
         spriteY = which / 8;    // number of columns
-        
+
         dx = (int)(completed * (endX - x));
         dy = (int)(completed * (endY - y));
     }
 
     @Override
-    public void draw(GraphicsContext gContext) {
-        Graphics2D g = gContext.getGraphics();
-        int tmpX = x - gContext.getRenderX() + dx;
-        int tmpY = y - gContext.getRenderY() + dy;
-        g.drawImage(Resources.getImage(imageFileName), tmpX, tmpY, tmpX+40, tmpY+40,
-                spriteX*128, spriteY*128, spriteX*128+128, spriteY*128+128, null);  // make general
-        
+    public void draw(GraphicsContext g) {
+        int tmpX = x - g.getRenderX() + dx;
+        int tmpY = y - g.getRenderY() + dy;
+        g.drawImage(R.IMAGE.LEVEL_UP, tmpX, tmpY, tmpX+40, tmpY+40,
+                spriteX*128, spriteY*128, spriteX*128+128, spriteY*128+128);  // make general
+
     }
 }
