@@ -1,16 +1,18 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
-import uk.ac.brighton.uni.ab607.libs.encryption.Account;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.libs.encryption.*;
+import com.almasb.common.encryption.Account;
+import com.almasb.common.encryption.Encryptor;
+import com.almasb.common.encryption.PasswordManager;
+import com.almasb.java.main.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 
 /**
  * One client's account
- * 
+ *
  * Username is also the player's name in game
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
@@ -19,7 +21,7 @@ public class GameAccount extends Account {
      *
      */
     private static final long serialVersionUID = 826478717098386944L;
-    
+
     /**
      * name of the map where current account's player is last seen
      * and coordinates
@@ -29,7 +31,7 @@ public class GameAccount extends Account {
 
     /**
      * Hidden ctor
-     * 
+     *
      * @param username
      * @param password
      * @param key
@@ -60,7 +62,7 @@ public class GameAccount extends Account {
         DBAccess.getAccounts().put(username, new GameAccount(username, encryptedPass, passkey));
         return true;
     }
-    
+
     /**
      * @param username
      * @return
@@ -81,19 +83,19 @@ public class GameAccount extends Account {
             return false;
         return PasswordManager.isValid(acc, pass);
     }
-    
+
     public static String getMapName(String username) {
         return getAccountByUserName(username).mapName;
     }
-    
+
     public static Player getPlayer(String username) {
         return getAccountByUserName(username).player;
     }
-    
+
     public static void setPlayer(Player p, String username) {
         getAccountByUserName(username).player = p;
     }
-    
+
     public static void setMapName(String map, String username) {
         getAccountByUserName(username).mapName = map;
     }

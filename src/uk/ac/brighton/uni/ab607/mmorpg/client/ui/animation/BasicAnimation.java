@@ -1,7 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Color;
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.GraphicsContext;
 
 /**
  * This mainly uses java.awt to create basic shape based

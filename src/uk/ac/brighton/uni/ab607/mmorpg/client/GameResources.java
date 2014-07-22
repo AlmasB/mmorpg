@@ -2,8 +2,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 
 import java.awt.image.BufferedImage;
 
-import uk.ac.brighton.uni.ab607.libs.io.AppResources;
-import uk.ac.brighton.uni.ab607.libs.io.ResourceManager;
+import com.almasb.java.io.AppResources;
+import com.almasb.java.io.ResourceManager;
 
 public class GameResources extends AppResources {
 

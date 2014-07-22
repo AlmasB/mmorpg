@@ -9,7 +9,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,13 +16,14 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
-import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
-import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
-import uk.ac.brighton.uni.ab607.libs.ui.AWTGraphicsContext;
+import com.almasb.common.graphics.Drawable;
+import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.ServerPacketParser;
+import com.almasb.common.net.UDPClient;
+import com.almasb.java.io.Resources;
+import com.almasb.java.ui.AWTGraphicsContext;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.GameResources;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;

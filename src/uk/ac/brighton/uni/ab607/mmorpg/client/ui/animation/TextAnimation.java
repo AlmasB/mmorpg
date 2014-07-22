@@ -6,7 +6,8 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
+import com.almasb.common.graphics.GraphicsContext;
+
 
 public class TextAnimation extends Animation {
     /**

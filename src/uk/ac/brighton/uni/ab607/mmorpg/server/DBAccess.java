@@ -3,8 +3,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import uk.ac.brighton.uni.ab607.libs.io.ResourceManager;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
+import com.almasb.java.io.ResourceManager;
+import com.almasb.java.main.Out;
 
 /**
  * Handles all DB operations
@@ -17,9 +17,9 @@ public class DBAccess {
 
     private static final String DB_FOLDER = "db/";
     private static final String DB_FILE = DB_FOLDER + "accounts.db";
-    
+
     private static TreeMap<String, GameAccount> accounts;
-    
+
     static {
         accounts = loadDB();
     }
@@ -52,7 +52,7 @@ public class DBAccess {
 
         return map;
     }
-    
+
     public static TreeMap<String, GameAccount> getAccounts() {
         return accounts;
     }

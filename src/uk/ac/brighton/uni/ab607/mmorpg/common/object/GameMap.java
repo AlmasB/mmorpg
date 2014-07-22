@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
-import uk.ac.brighton.uni.ab607.libs.net.UDPServer;
-import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.UDPServer;
+import com.almasb.common.search.AStarNode;
+import com.almasb.java.io.Resources;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
@@ -24,29 +25,29 @@ public class GameMap {
     public final int width, height;
     public final List<String> data;
     private AStarNode[][] map;
-    
+
     private ArrayList< ArrayList<Enemy> > enemies = new ArrayList< ArrayList<Enemy> >();
     private SpawnInfo[] spawnInfo;
     private int enemyRuntimeID = 1; // it will keep going up
-    
+
     private int enemyNumbers = 0;
-    
+
     private ArrayList<Player> players = new ArrayList<Player>();
     public ArrayList<Chest> chests = new ArrayList<Chest>();
-    
+
     public ArrayList<Animation> animations = new ArrayList<Animation>();
-    
+
     /*package-private*/ GameMap(String name, String spriteName, SpawnInfo... info) {
         this.name = name;
         this.spriteName = spriteName;
-        
+
         data = Resources.getText(name);
 
         height = data.size();
         width = data.get(0).length();
-        
+
         map = new AStarNode[width][height];
-        
+
         for (int i = 0; i < data.size(); i++) {
             String line = data.get(i);
             for (int j = 0; j < line.length(); j++) {
@@ -55,7 +56,7 @@ public class GameMap {
         }
 
         spawnInfo = info;
-        
+
         for (SpawnInfo sp : spawnInfo) {
             ArrayList<Enemy> list = new ArrayList<Enemy>();
             for (int i = 0; i < sp.number; i++) {
@@ -70,14 +71,14 @@ public class GameMap {
             enemies.add(list);
         }
     }
-    
+
     /*package-private*/ GameMap(GameMap copy) {
         this(copy.name, copy.spriteName, copy.spawnInfo);
     }
-    
+
     public void update(UDPServer server) {
         List<Player> tmpPlayers = new ArrayList<Player>(players);
-        
+
         // process animations
         for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
             Animation a = it.next();
@@ -89,7 +90,7 @@ public class GameMap {
         // process enemies
         for (int i = 0; i < enemies.size(); i++) {
             ArrayList<Enemy> enemyList = enemies.get(i);
-            
+
             for (Iterator<Enemy> it = enemyList.iterator(); it.hasNext(); ) {
                 Enemy e = it.next();
                 if (e.isAlive()) {
@@ -100,7 +101,7 @@ public class GameMap {
                 }
             }
         }
-        
+
         // respawn monsters if needed
         for (int j = 0; j < spawnInfo.length; j++) {
             ArrayList<Enemy> list = enemies.get(j);
@@ -113,7 +114,7 @@ public class GameMap {
                 list.add(e);
             }
         }
-        
+
 
         // process players
         for (Player p : tmpPlayers) {
@@ -138,7 +139,7 @@ public class GameMap {
                 }
             }
         }
-        
+
         // all objects to send
         Player[] toSend = new Player[tmpPlayers.size()];
         for (int i = 0; i < tmpPlayers.size(); i++)
@@ -147,7 +148,7 @@ public class GameMap {
         Chest[] chestsToSend = new Chest[chests.size()];
         for (int i = 0; i < chests.size(); i++)
             chestsToSend[i] = chests.get(i);
-        
+
         Animation[] animsToSend = new Animation[animations.size()];
         for (int i = 0; i < animations.size(); i++)
             animsToSend[i] = animations.get(i);
@@ -159,10 +160,10 @@ public class GameMap {
                 enemyToSend[j++] = list.get(i);
             }
         }
-        
+
         for (Player p : tmpPlayers) {
             try {
-                
+
                 server.send(new DataPacket(chestsToSend), p.ip, p.port);
                 server.send(new DataPacket(enemyToSend), p.ip, p.port);
                 server.send(new DataPacket(animsToSend), p.ip, p.port);
@@ -172,25 +173,25 @@ public class GameMap {
                 e.printStackTrace();
             }
         }
-        
+
     }
-    
+
     public Enemy getEnemyByRuntimeID(int id) {
         for (ArrayList<Enemy> list : enemies) {
             for (Enemy e : list)
                 if (e.getRuntimeID() == id)
                     return e;
         }
-        
+
         return null;
     }
-    
+
     public ArrayList<Player> getPlayers() {
         return players;
     }
-    
+
     /**
-     * 
+     *
      * @return
      *          x, y coords of random unoccupied cell
      */
@@ -201,22 +202,22 @@ public class GameMap {
             y = GameMath.random(height) - 1;
         }
         while(data.get(y).charAt(x) == '1');
-        
+
         return new Point(x*40, y*40);
     }
-    
+
     public AStarNode[][] getGrid() {
         return map;
     }
-    
+
     public void addPlayer(Player p) {
         players.add(p);
     }
-    
+
     public void removePlayer(Player p) {
         players.remove(p);
     }
-    
+
     public Player getPlayerByName(String name) {
         for (Player p : players)
             if (p.name.equals(name))
@@ -224,24 +225,24 @@ public class GameMap {
 
         return null;
     }
-    
-    /**
-    *
-    * @param ch1
-    *              character 1
-    * @param ch2
-    *              character 2
-    * @return
-    *          distance between 2 characters in number of cells
-    */
-   /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
-       return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
-   }
 
-   /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-       return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
-   }
-    
+    /**
+     *
+     * @param ch1
+     *              character 1
+     * @param ch2
+     *              character 2
+     * @return
+     *          distance between 2 characters in number of cells
+     */
+    /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
+        return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
+    }
+
+    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
+        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
+    }
+
     static class SpawnInfo {
         public String enemyID;
         public int number;

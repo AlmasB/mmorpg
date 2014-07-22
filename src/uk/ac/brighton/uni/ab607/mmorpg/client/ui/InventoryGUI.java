@@ -17,7 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import com.almasb.java.io.Resources;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
@@ -45,7 +46,7 @@ public class InventoryGUI extends GUI {
         this.setAlwaysOnTop(true);
         this.setFocusableWindowState(false);
         this.setLocation(640, 44);
-        
+
         player = p;
 
         itemInfoLabel.setBounds(200, 0, 225, 304);
@@ -58,7 +59,7 @@ public class InventoryGUI extends GUI {
             SwingUtilities.invokeLater(() -> infoButton.setText(event.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON));
             updateItemInfoLabel();
         });
-        
+
         this.add(infoButton);
 
         this.addMouseListener(mouse);
@@ -185,7 +186,7 @@ public class InventoryGUI extends GUI {
 
     private class Mouse implements MouseListener, MouseMotionListener {
         private MouseEvent event;
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -212,11 +213,11 @@ public class InventoryGUI extends GUI {
                 }
             });
         }
-        
+
         @Override
         public void mouseMoved(MouseEvent e) {
             if (e == null) return;
-            
+
             event = e;
             int x = e.getX(), y = e.getY();
 
@@ -246,7 +247,7 @@ public class InventoryGUI extends GUI {
                 }
             });
         }
-        
+
         public void update() {
             mouseMoved(event);
         }
@@ -262,7 +263,7 @@ public class InventoryGUI extends GUI {
         @Override
         public void mouseDragged(MouseEvent e) {}
     }
-    
+
     private void updateItemInfoLabel() {
         SwingUtilities.invokeLater(() -> {
             selectedItem.ifPresent(item -> itemInfoLabel.setText(infoButton.getText().equals(INFO_ON)

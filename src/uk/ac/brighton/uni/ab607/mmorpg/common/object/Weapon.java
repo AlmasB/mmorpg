@@ -2,7 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import java.util.Arrays;
 
-import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
+import com.almasb.common.parsing.PseudoHTML;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;

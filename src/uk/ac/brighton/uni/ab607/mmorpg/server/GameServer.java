@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.libs.net.*;
-import uk.ac.brighton.uni.ab607.libs.search.AStarLogic;
-import uk.ac.brighton.uni.ab607.libs.search.AStarNode;
+import com.almasb.common.net.ClientPacketParser;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.UDPServer;
+import com.almasb.common.search.AStarLogic;
+import com.almasb.common.search.AStarNode;
+import com.almasb.java.main.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
@@ -31,14 +34,14 @@ public class GameServer {
     private int playerRuntimeID = 1000;
 
     //private ArrayList<Player> players = new ArrayList<Player>();
-    
+
     private ServerActionHandler actionHandler;
-    
+
     private ArrayList<GameMap> maps = new ArrayList<GameMap>();
 
     public GameServer() throws SocketException {
         actionHandler = new ServerActionHandler(this);
-        
+
         // init world
         initGameMaps();
 
@@ -47,29 +50,29 @@ public class GameServer {
 
         // start main server loop
         new Thread(new ServerLoop()).start();
-        
+
         // test
-        spawnChest(new Chest(1000, 680, 1000, 
+        spawnChest(new Chest(1000, 680, 1000,
                 ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
                 ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
-        
+
         // call save state to db every 5 mins
         new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
     }
-    
+
     interface QueryAction {
         public void execute(DataPacket packet, QueryRequest req) throws IOException;
     }
 
     class ClientQueryParser extends ClientPacketParser {
         private HashMap<Query, QueryAction> actions = new HashMap<Query, QueryAction>();
-        
+
         public ClientQueryParser() {
             actions.put(Query.CHECK,  this::actionCheck);
             actions.put(Query.LOGIN,  this::actionLogin);
             actions.put(Query.LOGOFF, this::actionLogoff);
         }
-        
+
         @Override
         public void parseClientPacket(DataPacket packet) {
             if (packet.objectData instanceof QueryRequest) {
@@ -87,7 +90,7 @@ public class GameServer {
                 actionHandler.process((ActionRequest[]) packet.multipleObjectData);
             }
         }
-        
+
         private void actionCheck(DataPacket packet, QueryRequest req) throws IOException {
             String user = req.value1;
             String pass = req.value2;
@@ -96,54 +99,54 @@ public class GameServer {
                 GameAccount.addAccount(user, pass, "test@mail.com");    // created new account
                 server.send(new DataPacket(new ServerResponse(Query.CHECK, false, "New Account Created", "")),
                         packet.getIP(), packet.getPort());
-                
+
                 return;
             }
-            
+
             boolean ok = !playerNameExists(user) && GameAccount.validateLogin(user, pass);
             server.send(new DataPacket(new ServerResponse(Query.CHECK, ok,
                     ok ? "Login Accepted" : "Login Rejected", "")), packet.getIP(), packet.getPort());
         }
-        
+
         private void actionLogin(DataPacket packet, QueryRequest req) throws IOException {
             String name = req.value1;
             // get data from game account
-            if (GameAccount.exists(name)) {                
+            if (GameAccount.exists(name)) {
                 Player p = GameAccount.getPlayer(name);
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
                 String mapName = GameAccount.getMapName(name);
-                
+
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
-                server.send(new DataPacket(p)); // send player so client can init 
-                
+                server.send(new DataPacket(p)); // send player so client can init
+
                 loginPlayer(mapName, p);
             }
             else {
                 // purely for local debugging when db/accounts.db has been deleted
                 Out.debug("Account not found, using new");
-                
+
                 GameAccount.addAccount("Debug", "pass", "test@mail.com");
                 Player p = GameAccount.getPlayer("Debug");
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
                 String mapName = GameAccount.getMapName("Debug");
-                
+
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
                 server.send(new DataPacket(p)); // send player for init
-                
+
                 loginPlayer(mapName, p);
-                
+
                 saveState();
             }
         }
-        
+
         private void actionLogoff(DataPacket packet, QueryRequest req) {
             closePlayerConnection(req.value1);
         }
-        
+
         private void actionNone(DataPacket packet, QueryRequest req) {
             Out.err("Invalid QueryRequest: " + req.query);
         }
@@ -184,18 +187,18 @@ public class GameServer {
             }
         }
     }
-    
+
     class ServerLoop implements Runnable {
         @Override
         public void run() {
             long start;
-            
+
             while (true) {
                 start = System.currentTimeMillis();
 
                 for (GameMap map : maps)
                     map.update(server);
-   
+
                 long delay = System.currentTimeMillis() - start;
                 try {
                     if (delay < 20) {
@@ -223,7 +226,7 @@ public class GameServer {
             if (p != null)
                 return p;
         }
-        
+
         return null;
     }
 
@@ -238,23 +241,23 @@ public class GameServer {
     /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id, String mapName) {
         return getMapByName(mapName).getEnemyByRuntimeID(id);
     }
-    
+
     /*package-private*/ GameMap getMapByName(String name) {
         for (GameMap m : maps)
             if (m.name.equals(name))
                 return m;
-        
+
         return null;
     }
 
     /*package-private*/ void moveObject(GameCharacter ch, String mapName, int x, int y) {
         x /= 40; y /= 40;
-        
+
         GameMap m = getMapByName(mapName);
-        
+
         if (x < 0 || x >= m.width || y < 0 || y >= m.height)
             return;
-        
+
         AStarNode[][] grid = m.getGrid();
 
         AStarNode targetNode = grid[x][y];
@@ -268,7 +271,7 @@ public class GameServer {
         ArrayList<AStarNode> busyNodes = new ArrayList<AStarNode>();
         // find "busy" nodes
         //for (Enemy e : enemies) {
-            //busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
+        //busyNodes.add(new AStarNode(e.getX()/40, e.getY()/40, 0, 1));
         //}
 
         AStarNode[] busy = new AStarNode[busyNodes.size()];
@@ -295,7 +298,7 @@ public class GameServer {
             ch.ySpeed = 0;
         }
     }
-    
+
     private void loginPlayer(String mapName, Player p) {
         p.setRuntimeID(playerRuntimeID++);
         GameMap m = getMapByName(mapName);
@@ -310,7 +313,7 @@ public class GameServer {
         getMapByName(mapName).chests.add(chest);
         return chest;
     }
-    
+
     /*package-private*/ void addAnimation(Animation a, String mapName) {
         getMapByName(mapName).animations.add(a);
     }
@@ -318,7 +321,7 @@ public class GameServer {
     private void initGameMaps() {
         maps.add(ObjectManager.getMapByName("map1.txt"));
     }
-    
+
     public void saveState() {
         for (GameMap m : maps) {
             for (Player p : m.getPlayers()) {
@@ -326,7 +329,7 @@ public class GameServer {
                 GameAccount.setMapName(m.name, p.name);
             }
         }
-        
+
         DBAccess.saveDB();
     }
 

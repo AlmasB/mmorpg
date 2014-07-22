@@ -1,15 +1,15 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
-import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
+import static com.almasb.common.parsing.PseudoHTML.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Color;
-import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.Drawable;
+import com.almasb.common.graphics.GraphicsContext;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;

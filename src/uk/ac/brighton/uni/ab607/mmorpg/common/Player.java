@@ -1,9 +1,11 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Color;
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML;
+
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.parsing.PseudoHTML;
+import com.almasb.java.main.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;

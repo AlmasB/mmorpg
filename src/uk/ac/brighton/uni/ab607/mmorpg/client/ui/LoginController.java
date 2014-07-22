@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import uk.ac.brighton.uni.ab607.libs.main.Out;
-import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
-import uk.ac.brighton.uni.ab607.libs.net.DataPacketParser;
-import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.DataPacketParser;
+import com.almasb.common.net.UDPClient;
+import com.almasb.java.main.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;

@@ -1,6 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
+import com.almasb.common.graphics.Drawable;
+
 
 /**
  * Any visible image/text/object that may or may not

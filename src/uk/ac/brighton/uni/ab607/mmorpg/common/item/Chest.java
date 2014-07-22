@@ -2,9 +2,9 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 
 import java.util.ArrayList;
 
-import uk.ac.brighton.uni.ab607.libs.graphics.Drawable;
-import uk.ac.brighton.uni.ab607.libs.graphics.GraphicsContext;
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import com.almasb.common.graphics.Drawable;
+import com.almasb.common.graphics.GraphicsContext;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Resource;
 

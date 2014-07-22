@@ -2,7 +2,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
 import java.io.InputStream;
 
-import uk.ac.brighton.uni.ab607.libs.io.ResourceManager;
+import com.almasb.java.io.ResourceManager;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -55,7 +56,7 @@ public class LoginFXGUI extends Application {
 
         loader.setLocation(ResourceManager.isRunningFromJar()
                 ? getClass().getResource("/res/UI/Login.fxml")
-                : ResourceManager.getLocalURL("UI/Login.fxml"));
+                        : ResourceManager.getLocalURL("UI/Login.fxml"));
 
         AnchorPane page;
         try {
