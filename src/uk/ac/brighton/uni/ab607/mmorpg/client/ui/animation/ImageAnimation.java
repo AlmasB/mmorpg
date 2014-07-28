@@ -45,7 +45,7 @@ public class ImageAnimation extends Animation {
     public void draw(GraphicsContext g) {
         int tmpX = x - g.getRenderX() + dx;
         int tmpY = y - g.getRenderY() + dy;
-        g.drawImage(R.IMAGE.LEVEL_UP, tmpX, tmpY, tmpX+40, tmpY+40,
+        g.drawImage(R.drawable.level_up, tmpX, tmpY, tmpX+40, tmpY+40,
                 spriteX*128, spriteY*128, spriteX*128+128, spriteY*128+128);  // make general
 
     }

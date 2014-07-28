@@ -94,7 +94,7 @@ public class Player extends GameCharacter implements PseudoHTML {
         this.ip = ip;
         this.port = port;
         //this.spriteName = "player1.png";
-        this.spriteID = R.IMAGE.PLAYER_1;
+        this.spriteID = R.drawable.player1;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
@@ -298,15 +298,15 @@ public class Player extends GameCharacter implements PseudoHTML {
 
         // draw sp/xp empty bars
         g.setColor(Color.BLACK);
-        g.drawRect(tmpX, tmpY + 55, 40, 5);
         g.drawRect(tmpX, tmpY + 60, 40, 5);
+        g.drawRect(tmpX, tmpY + 65, 40, 5);
 
         // draw sp
         g.setColor(Color.BLUE);
-        g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (sp*1.0f/(int)(getTotalStat(MAX_SP)))) - 1, 3);
 
         // draw xp
         g.setColor(Color.GOLD);
-        g.fillRect(tmpX + 1, tmpY + 61, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 66, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
 }

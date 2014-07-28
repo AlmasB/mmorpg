@@ -2,22 +2,22 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 
 public final class R {
 
-    public static class IMAGE {
-        public static final int MAP = 0;
-        public static final int INVENTORY_LEFT = 1;
-        public static final int INVENTORY_RIGHT = 2;
-        public static final int SPRITESHEET = 3;
-        public static final int CHEST = 4;
-        public static final int ICON_SKILL = 5;
-        public static final int LEVEL_UP = 6;
-        public static final int CURSOR_WALK = 7;
-        public static final int ENEMY_1 = 8;
-        public static final int ENEMY_2 = 9;
-        public static final int ENEMY_3 = 10;
-        public static final int PLAYER_1 = 11;
+    public static final class drawable {
+        public static final int map1 = 0;
+        public static final int inventory_left = 1;
+        public static final int inventory_right = 2;
+        public static final int spritesheet = 3;
+        public static final int chest = 4;
+        public static final int ic_skill_dummy = 5;
+        public static final int level_up = 6;
+        public static final int cursor_walk = 7;
+        public static final int enemy1 = 8;
+        public static final int enemy2 = 9;
+        public static final int enemy3 = 10;
+        public static final int player1 = 11;
     }
 
-    public static class AUDIO {
+    public static final class raw {
 
     }
 }

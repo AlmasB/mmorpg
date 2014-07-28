@@ -46,6 +46,9 @@ public class ClientMain {
                 return;
         }
 
+        // load game resources
+        Resources.init(R.drawable.class, R.raw.class);
+
         // load game data
         ObjectManager.load();
 

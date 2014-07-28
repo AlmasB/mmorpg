@@ -13,6 +13,7 @@ import javax.swing.ToolTipManager;
 
 import com.almasb.java.io.Resources;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClassChanger;
@@ -75,7 +76,7 @@ public class StatsGUI extends GUI {
             skillButtons[i] = new JButton("");
             skillButtons[i].setLocation(180 + 50 * (i % 3), 25 + 50 * (i / 3));
             skillButtons[i].setSize(40, 40);
-            skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
+            skillButtons[i].setIcon(new ImageIcon(Resources.getImage(R.drawable.ic_skill_dummy)));
             skillButtons[i].setEnabled(false);
             skillButtons[i].addActionListener(e
                     -> addActionRequest(new ActionRequest(Action.SKILL_UP, player.name, skillValue)));

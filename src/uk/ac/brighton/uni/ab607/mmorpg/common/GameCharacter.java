@@ -662,14 +662,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
         int width = g.getStringWidth(name + " Lv " + baseLevel);
 
-        g.drawString(name + " Lv " + baseLevel, tmpX + 20 - (width/2), tmpY + 40 + 5);   // +5 to push name down a lil bit
+        g.drawString(name + " Lv " + baseLevel, tmpX + 20 - (width/2), tmpY + 40);   // +5 to push name down a lil bit
 
         // draw hp empty bar
         g.setColor(Color.BLACK);
-        g.drawRect(tmpX, tmpY + 50, 40, 5);
+        g.drawRect(tmpX, tmpY + 55, 40, 5);
 
         // draw hp
         g.setColor(Color.RED);
-        g.fillRect(tmpX + 1, tmpY + 51, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
+        g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
     }
 }

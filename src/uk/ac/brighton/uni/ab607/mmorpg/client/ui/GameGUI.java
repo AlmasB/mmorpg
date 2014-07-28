@@ -24,7 +24,7 @@ import com.almasb.common.net.UDPClient;
 import com.almasb.java.io.Resources;
 import com.almasb.java.ui.AWTGraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.GameResources;
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -68,9 +68,6 @@ public class GameGUI extends GUI {
 
     private int selX = 0, selY = 0; // selected point
     private int renderX = 0, renderY = 0;   // render offset
-
-
-    private GameResources resources = new GameResources();
 
     private GraphicsContext gContext = null;
     private GameMap map;
@@ -149,7 +146,7 @@ public class GameGUI extends GUI {
         });
         this.add(chat);
 
-        walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
+        walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage(R.drawable.cursor_walk), new Point(16, 16), "WALK");
         setCursor(walkCursor);
 
         client = new UDPClient(ip, 55555, new ServerResponseParser());
@@ -301,7 +298,7 @@ public class GameGUI extends GUI {
     @Override
     protected void createPicture(Graphics2D g) {
         if (gContext == null)
-            gContext = new AWTGraphicsContext(g, resources, 1280, 720);
+            gContext = new AWTGraphicsContext(g, 1280, 720);
 
         // draw background / clear screen
         g.setColor(Color.GRAY);
@@ -313,14 +310,14 @@ public class GameGUI extends GUI {
 
         int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
         int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-        g.drawImage(Resources.getImage(map.spriteName),
+        g.drawImage(Resources.getImage(map.spriteID),
                 dx, dy, dx1, dy1,
                 sx, sy, sx1, sy1, this);
 
         synchronized(gameObjects) {
             Rectangle playerVision = new Rectangle(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
-                for (Drawable obj : objects) {
+                for (Drawable obj : objects) {  // TODO: remove getX getY
                     if (playerVision.contains(new Point(obj.getX(), obj.getY())))
                         obj.draw(gContext);
                 }

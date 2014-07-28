@@ -60,6 +60,6 @@ public class Chest implements java.io.Serializable, Drawable {
     @Override
     public void draw(GraphicsContext g) {
         // + 10, so that image looks nicer on grid
-        g.drawImage(R.IMAGE.CHEST, x - g.getRenderX(), y - g.getRenderY() + 10);
+        g.drawImage(R.drawable.chest, x - g.getRenderX(), y - g.getRenderY() + 10);
     }
 }

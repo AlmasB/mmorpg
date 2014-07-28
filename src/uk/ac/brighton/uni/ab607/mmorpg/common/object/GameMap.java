@@ -21,7 +21,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 public class GameMap {
 
-    public final String name, spriteName;
+    public final String name;
+    public final int spriteID;
     public final int width, height;
     public final List<String> data;
     private AStarNode[][] map;
@@ -37,9 +38,9 @@ public class GameMap {
 
     public ArrayList<Animation> animations = new ArrayList<Animation>();
 
-    /*package-private*/ GameMap(String name, String spriteName, SpawnInfo... info) {
+    /*package-private*/ GameMap(String name, int spriteID, SpawnInfo... info) {
         this.name = name;
-        this.spriteName = spriteName;
+        this.spriteID = spriteID;
 
         data = Resources.getText(name);
 
@@ -73,7 +74,7 @@ public class GameMap {
     }
 
     /*package-private*/ GameMap(GameMap copy) {
-        this(copy.name, copy.spriteName, copy.spawnInfo);
+        this(copy.name, copy.spriteID, copy.spawnInfo);
     }
 
     public void update(UDPServer server) {
