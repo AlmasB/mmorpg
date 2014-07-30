@@ -10,7 +10,6 @@ import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.AnimationUtils;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;

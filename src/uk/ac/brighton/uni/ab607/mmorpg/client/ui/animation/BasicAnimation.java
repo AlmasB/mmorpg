@@ -31,7 +31,6 @@ public class BasicAnimation extends Animation {
     public void draw(GraphicsContext g) {
         // atm only circle for skill target, more later
         g.setColor(Color.GOLD);
-        //g.drawOval((int)(x - g.getRenderX() - radius*8), (int)(y - g.getRenderY() - radius*8),
-        //      40 + (int)(16*radius), 40 + (int)(16*radius));
+        g.drawCircle((int)(x - g.getRenderX() - radius*8), (int)(y - g.getRenderY() - radius*8), 20 + (int)(8*radius));
     }
 }

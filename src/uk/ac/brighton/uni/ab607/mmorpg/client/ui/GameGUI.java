@@ -1,6 +1,5 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,8 +15,11 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
+import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.graphics.Point2D;
+import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
@@ -301,8 +303,8 @@ public class GameGUI extends GUI {
             gContext = new AWTGraphicsContext(g, 1280, 720);
 
         // draw background / clear screen
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, 1280, 690);
+        gContext.setColor(Color.GRAY);
+        gContext.fillRect(0, 0, 1280, 690);
 
         // draw map
         int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, map.width*40);
@@ -310,15 +312,14 @@ public class GameGUI extends GUI {
 
         int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
         int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-        g.drawImage(Resources.getImage(map.spriteID),
-                dx, dy, dx1, dy1,
-                sx, sy, sx1, sy1, this);
+
+        gContext.drawImage(map.spriteID, dx, dy, dx1, dy1, sx, sy, sx1, sy1);
 
         synchronized(gameObjects) {
-            Rectangle playerVision = new Rectangle(player.getX() - 640, player.getY() - 360, 1280, 720);
+            Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
-                for (Drawable obj : objects) {  // TODO: remove getX getY
-                    if (playerVision.contains(new Point(obj.getX(), obj.getY())))
+                for (Drawable obj : objects) {
+                    if (playerVision.contains(new Point2D(obj.getX(), obj.getY())))
                         obj.draw(gContext);
                 }
             }
@@ -327,8 +328,8 @@ public class GameGUI extends GUI {
         // debug full grid drawing
         /*for (int i = 0; i < map.height; i++) {
             for (int j = 0; j < map.width; j++) {
-                g.setColor(Color.YELLOW);
-                g.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
+                gContext.setColor(Color.YELLOW);
+                gContext.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
             }
         }*/
     }

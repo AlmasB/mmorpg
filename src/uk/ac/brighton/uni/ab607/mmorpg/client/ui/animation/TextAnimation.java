@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 
 import com.almasb.common.graphics.GraphicsContext;
 
-
 public class TextAnimation extends Animation {
     /**
      *
