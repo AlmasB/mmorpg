@@ -1,10 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.almasb.common.graphics.Point2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
@@ -62,9 +62,9 @@ public class GameMap {
             ArrayList<Enemy> list = new ArrayList<Enemy>();
             for (int i = 0; i < sp.number; i++) {
                 Enemy e = ObjectManager.getEnemyByID(sp.enemyID);
-                Point p = getRandomFreePos();
-                e.setX(p.x);
-                e.setY(p.y);
+                Point2D p = getRandomFreePos();
+                e.setX((int) p.getX());
+                e.setY((int) p.getY());
                 e.setRuntimeID(enemyRuntimeID++);
                 list.add(e);
                 enemyNumbers++;
@@ -108,9 +108,9 @@ public class GameMap {
             ArrayList<Enemy> list = enemies.get(j);
             for (int i = 0; i < spawnInfo[j].number - list.size(); i++) {
                 Enemy e = ObjectManager.getEnemyByID(spawnInfo[j].enemyID);
-                Point p = getRandomFreePos();
-                e.setX(p.x);
-                e.setY(p.y);
+                Point2D p = getRandomFreePos();
+                e.setX((int) p.getX());
+                e.setY((int) p.getY());
                 e.setRuntimeID(enemyRuntimeID++);
                 list.add(e);
             }
@@ -196,7 +196,7 @@ public class GameMap {
      * @return
      *          x, y coords of random unoccupied cell
      */
-    public Point getRandomFreePos() {
+    public Point2D getRandomFreePos() {
         int x, y;
         do {
             x = GameMath.random(width) - 1;
@@ -204,7 +204,7 @@ public class GameMap {
         }
         while(data.get(y).charAt(x) == '1');
 
-        return new Point(x*40, y*40);
+        return new Point2D(x*40, y*40);
     }
 
     public AStarNode[][] getGrid() {

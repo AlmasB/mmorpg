@@ -1,10 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.Optional;
 
-import com.almasb.java.main.Out;
+import com.almasb.common.graphics.Point2D;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
@@ -62,7 +62,7 @@ public class ServerActionHandler {
                 actions.getOrDefault(req.action, this::serverActionNone).execute(p, req);
             }
             catch (BadActionRequestException e) {
-                Out.err(e);
+                Out.e("process(ActionRequest[])", "Couldn't fulfill ActionRequest", this, e);
             }
         }
     }
@@ -134,9 +134,9 @@ public class ServerActionHandler {
                     server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
                     if (player.getHP() <= 0) {
                         player.onDeath();
-                        Point p = server.getMapByName(req.data).getRandomFreePos();
-                        player.setX(p.x);
-                        player.setY(p.y);
+                        Point2D p = server.getMapByName(req.data).getRandomFreePos();
+                        player.setX((int) p.getX());
+                        player.setY((int) p.getY());
                     }
                 }
             }
@@ -195,6 +195,6 @@ public class ServerActionHandler {
     }
 
     public void serverActionNone(Player p, ActionRequest req) {
-        Out.debug("GameServer::serverActionNone called");
+        Out.d("serverActionNone", "ActionRequest wasn't found");
     }
 }
