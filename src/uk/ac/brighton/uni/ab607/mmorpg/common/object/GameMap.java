@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
@@ -12,7 +13,6 @@ import com.almasb.java.io.Resources;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -134,7 +134,7 @@ public class GameMap {
                             c.open();
                             c.getItems().forEach(p.getInventory()::addItem);
                             p.incMoney(c.money);
-                            animations.add(new TextAnimation(c.getX(), c.getY(), c.money + " G", TextAnimationType.FADE));
+                            animations.add(new TextAnimation(c.getX(), c.getY(), c.money + " G", Color.GOLD, 1.0f));
                         }
                     }
                 }

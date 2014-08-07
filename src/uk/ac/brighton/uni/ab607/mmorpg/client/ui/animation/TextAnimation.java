@@ -1,11 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.Graphics2D;
-
+import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
 
 public class TextAnimation extends Animation {
@@ -14,7 +9,7 @@ public class TextAnimation extends Animation {
      */
     private static final long serialVersionUID = 6951995575141406171L;
 
-    public enum TextAnimationType {
+    /*public enum TextAnimationType {
         DAMAGE_PLAYER(new Font("Lucida Grande", Font.PLAIN, 15), new Color(0x73, 0x6A, 0xFF), 0.5f),
         DAMAGE_ENEMY(AnimationUtils.DEFAULT_FONT, Color.WHITE, 0.5f),
         SKILL(AnimationUtils.DEFAULT_FONT, Color.BLUE, 1.0f),
@@ -34,52 +29,25 @@ public class TextAnimation extends Animation {
             this.color = color;
             this.duration = duration;
         }
-    }
+    }*/
 
     private String text;
-    private TextAnimationType type;
-    private float alpha = 1.0f; // fully visible
+    private Color color;
 
-    // experimental
-    private Font font;
-
-    public TextAnimation(int x, int y, String text, TextAnimationType type) {
-        super(x, y, type.duration);
+    public TextAnimation(int x, int y, String text, Color color, float duration) {
+        super(x, y, duration);
         this.text = text;
-        this.type = type;
-        //
-        this.font = type.font;
+        this.color = color;
     }
-
-    //public TextAnimation(int x, int y, )
 
     @Override
     protected void updateImpl(float completed) {
-        switch (type) {
-            case CHAT:
-                break;
-            case FADE:
-                alpha = 1.0f - completed; // FALLTHRU
-            case DAMAGE_PLAYER: // FALLTHRU
-            case DAMAGE_ENEMY:
-                y -= 1;
-                break;
-            case NONE:
-                break;
-            case SKILL:
-                font = new Font("Lucida Grande", Font.PLAIN, 13 + (int)(completed * 5));
-                break;
-            case NFADE:
-            case SFADE:
-                alpha = 1.0f - completed;
-                break;
-            default:
-                break;
-        }
+        y -= 1;
     }
 
     @Override
     public void draw(GraphicsContext g) {
+        g.setColor(color);
         g.drawString(text, x - g.getRenderX(), y - g.getRenderY());
 
         /*Composite tmp = g.getComposite();

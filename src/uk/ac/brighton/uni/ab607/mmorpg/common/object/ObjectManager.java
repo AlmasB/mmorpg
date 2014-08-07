@@ -4,10 +4,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import com.almasb.common.graphics.Color;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
@@ -329,7 +330,7 @@ public class ObjectManager {
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
                 useResult = new SkillUseResult(Target.ENEMY, d,
                         new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
-                        new TextAnimation(target.getX(), target.getY(), d + "", TextAnimationType.SKILL));
+                        new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
             }
         });
 
@@ -558,10 +559,10 @@ public class ObjectManager {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
                     stun = true;
                 }
-                useResult = new SkillUseResult(Target.ENEMY, 0,
+                /*useResult = new SkillUseResult(Target.ENEMY, 0,
                         new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE));
+                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE));*/
             }
         });
 
@@ -696,11 +697,11 @@ public class ObjectManager {
                 int dmg2 = caster.dealPhysicalDamage(target, dmg);
                 int dmg3 = caster.dealPhysicalDamage(target, dmg);
 
-                useResult = new SkillUseResult(Target.ENEMY, 0,
+                /*useResult = new SkillUseResult(Target.ENEMY, 0,
                         new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 40, target.getY()+40, dmg3 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));
+                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));*/
             }
         });
 

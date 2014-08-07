@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.almasb.common.graphics.Color;
 import com.almasb.common.net.ClientPacketParser;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
@@ -17,7 +18,6 @@ import com.almasb.java.main.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
@@ -305,8 +305,8 @@ public class GameServer {
         m.addPlayer(p);
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
-        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", TextAnimationType.NFADE), m.name);
-        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", TextAnimationType.SFADE), m.name);
+        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);
+        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
     }
 
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {

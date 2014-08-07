@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.util.HashMap;
 import java.util.Optional;
 
+import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.util.Out;
 
@@ -10,7 +11,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -115,11 +115,11 @@ public class ServerActionHandler {
 
                 if (player.canAttack()) {
                     int dmg = player.attack(target);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", TextAnimationType.DAMAGE_PLAYER), req.data);
+                    server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", Color.BLUE, 2.0f), req.data);
 
                     if (target.getHP() <= 0) {
                         server.addAnimation(new TextAnimation(target.getX(), target.getY(),
-                                target.getXP().base + " XP", TextAnimationType.FADE), req.data);
+                                target.getXP().base + " XP", Color.YELLOW, 2.0f), req.data);
 
                         if (player.gainXP(target.getXP())) {
                             server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
@@ -131,7 +131,7 @@ public class ServerActionHandler {
 
                 if (target.canAttack() && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", TextAnimationType.DAMAGE_ENEMY), req.data);
+                    server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", Color.WHITE, 2.0f), req.data);
                     if (player.getHP() <= 0) {
                         player.onDeath();
                         Point2D p = server.getMapByName(req.data).getRandomFreePos();
@@ -157,7 +157,7 @@ public class ServerActionHandler {
             }
             else if (result.target == Target.ENEMY) {
                 server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
-                server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
+                //server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
             }
             else if (result.target == Target.SELF) {
                 server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
@@ -165,7 +165,7 @@ public class ServerActionHandler {
 
             if (skTarget.getHP() <= 0) {
                 server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(),
-                        skTarget.getXP().base + " XP", TextAnimationType.FADE), req.data);
+                        skTarget.getXP().base + " XP", Color.BLUE, 2.0f), req.data);
 
                 if (player.gainXP(skTarget.getXP())) {
                     server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
@@ -177,7 +177,7 @@ public class ServerActionHandler {
     }
 
     public void serverActionChat(Player player, ActionRequest req) {
-        server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data.split(",")[1], TextAnimationType.CHAT), req.data.split(",")[0]);
+        server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data.split(",")[1], Color.WHITE, 3.0f), req.data.split(",")[0]);
     }
 
     public void serverActionMove(Player p, ActionRequest req) {
