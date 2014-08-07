@@ -1,22 +1,21 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
-import java.awt.Graphics2D;
-
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GraphicsContext;
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.GraphicsContext;
 
 /**
  * This mainly uses java.awt to create basic shape based
  * animations
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
 public class BasicAnimation extends Animation {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7369869688084003215L;
-    
+
     private float radius = 1.0f;
 
     public BasicAnimation(int x, int y, float maxDuration) {
@@ -29,11 +28,9 @@ public class BasicAnimation extends Animation {
     }
 
     @Override
-    public void draw(GraphicsContext gContext) {
-        Graphics2D g = gContext.getGraphics();
+    public void draw(GraphicsContext g) {
         // atm only circle for skill target, more later
-        g.setColor(AnimationUtils.COLOR_GOLD);
-        g.drawOval((int)(x - gContext.getRenderX() - radius*8), (int)(y - gContext.getRenderY() - radius*8),
-                40 + (int)(16*radius), 40 + (int)(16*radius));
+        g.setColor(Color.GOLD);
+        g.drawCircle((int)(x - g.getRenderX() - radius*8), (int)(y - g.getRenderY() - radius*8), 20 + (int)(8*radius));
     }
 }

@@ -11,7 +11,9 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import com.almasb.java.io.Resources;
+
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClassChanger;
@@ -22,24 +24,24 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 public class StatsGUI extends GUI {
     private static final long serialVersionUID = -5781436876701869521L;
-    
+
     private JLabel attributes = new JLabel();
     private JLabel stats = new JLabel();
 
     private JButton[] buttons = new JButton[9];
     private JButton[] skillButtons = new JButton[9];
-    
+
     private JButton classChangeButton = new JButton("Change Class");
-    
+
     private Player player;
-    
+
     public StatsGUI(Player p) {
         super(640, 304, "Char Stats/Skills Window");
         this.setUndecorated(true);
         this.setAlwaysOnTop(true);
         this.setFocusableWindowState(false);
         this.setLocation(0, 44);
-        
+
         player = p;
 
         attributes.setBounds(0, 0, 320, 304);
@@ -62,7 +64,7 @@ public class StatsGUI extends GUI {
             buttons[i] = new JButton("+");
             buttons[i].setBounds(125, 3 + 30 * i, 45, 28);
             buttons[i].setFont(new Font("Courier", Font.PLAIN, 18));
-            buttons[i].addActionListener(e 
+            buttons[i].addActionListener(e
                     -> addActionRequest(new ActionRequest(Action.ATTR_UP, player.name, attr)));
             add(buttons[i]);
         }
@@ -74,7 +76,7 @@ public class StatsGUI extends GUI {
             skillButtons[i] = new JButton("");
             skillButtons[i].setLocation(180 + 50 * (i % 3), 25 + 50 * (i / 3));
             skillButtons[i].setSize(40, 40);
-            skillButtons[i].setIcon(new ImageIcon(Resources.getImage("enemy.png")));
+            skillButtons[i].setIcon(new ImageIcon(Resources.getImage(R.drawable.ic_skill_dummy)));
             skillButtons[i].setEnabled(false);
             skillButtons[i].addActionListener(e
                     -> addActionRequest(new ActionRequest(Action.SKILL_UP, player.name, skillValue)));
@@ -91,25 +93,25 @@ public class StatsGUI extends GUI {
         classChangeButton.setVisible(false);
         this.add(classChangeButton);
     }
-    
+
     private boolean equal(Player p) {
         return attributes.getText().equals(p.attributesToPseudoHTML()) && stats.getText().equals(p.statsToPseudoHTML());
     }
 
     public void update(final Player p) {
         player = p;
-        
+
         Skill[] skills = p.getSkills();
         for (int i = 0; i < skills.length; i++) {
             skillButtons[i].setToolTipText("<html><b>" + skills[i].name + "</b><br>"
                     + "Level: <font color=green><b>" + skills[i].getLevel() + "</b></font><br>"
                     + skills[i].description + "</html>");
-            
+
             if (skills[i].getLevel() < Skill.MAX_LEVEL) {
                 skillButtons[i].setEnabled(p.hasSkillPoints());
             }
         }
-        
+
         classChangeButton.setVisible(GameCharacterClassChanger.canChangeClass(p));
 
         if (equal(p))
@@ -136,13 +138,13 @@ public class StatsGUI extends GUI {
         attributes.repaint();
         stats.repaint();
     }
-    
+
     /**
      * Creates and shows <b>input</b> dialog with given message and title and
      * provides with given options.
-     * 
+     *
      * If no options are provided any user input will be valid
-     * 
+     *
      * @param message
      *            the dialog message
      * @param title

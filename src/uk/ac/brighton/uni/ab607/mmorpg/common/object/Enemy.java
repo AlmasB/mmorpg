@@ -24,14 +24,15 @@ public class Enemy extends GameCharacter {
 
     private DroppableItem[] drops;
 
-    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, AttributeInfo attrs, Experience xp, String spriteName, DroppableItem... drops) {
+    /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, AttributeInfo attrs, Experience xp, int spriteID, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
         this.id = id;
         this.type = type;
         this.element = element;
         this.baseLevel = level;
         this.xp = xp;
-        this.spriteName = spriteName;
+        this.spriteID = spriteID;
+        //this.spriteName = spriteName;
         this.drops = drops;
         attributes[STR] = attrs.str;
         attributes[VIT] = attrs.vit;
@@ -50,14 +51,14 @@ public class Enemy extends GameCharacter {
     /*package-private*/ Enemy(Enemy copy) {
         this(copy.id, copy.name, copy.description, copy.type, copy.element, copy.baseLevel,
                 new AttributeInfo().str(copy.getBaseAttribute(STR))
-                    .vit(copy.getBaseAttribute(VIT))
-                    .dex(copy.getBaseAttribute(DEX))
-                    .agi(copy.getBaseAttribute(AGI))
-                    .int_(copy.getBaseAttribute(INT))
-                    .wis(copy.getBaseAttribute(WIS))
-                    .wil(copy.getBaseAttribute(WIL))
-                    .per(copy.getBaseAttribute(PER))
-                    .luc(copy.getBaseAttribute(LUC)), copy.xp, copy.spriteName, copy.drops);
+                .vit(copy.getBaseAttribute(VIT))
+                .dex(copy.getBaseAttribute(DEX))
+                .agi(copy.getBaseAttribute(AGI))
+                .int_(copy.getBaseAttribute(INT))
+                .wis(copy.getBaseAttribute(WIS))
+                .wil(copy.getBaseAttribute(WIL))
+                .per(copy.getBaseAttribute(PER))
+                .luc(copy.getBaseAttribute(LUC)), copy.xp, copy.spriteID, copy.drops);
     }
 
     public Chest onDeath() {
@@ -72,7 +73,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * 
+     *
      * @return
      *          Experience object containing base/stat/job xp
      *          for this enemy

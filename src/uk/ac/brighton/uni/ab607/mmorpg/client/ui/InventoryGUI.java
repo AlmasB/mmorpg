@@ -17,7 +17,9 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
+import com.almasb.java.io.Resources;
+
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
@@ -45,7 +47,7 @@ public class InventoryGUI extends GUI {
         this.setAlwaysOnTop(true);
         this.setFocusableWindowState(false);
         this.setLocation(640, 44);
-        
+
         player = p;
 
         itemInfoLabel.setBounds(200, 0, 225, 304);
@@ -58,7 +60,7 @@ public class InventoryGUI extends GUI {
             SwingUtilities.invokeLater(() -> infoButton.setText(event.getActionCommand().equals(INFO_ON) ? INFO_OFF : INFO_ON));
             updateItemInfoLabel();
         });
-        
+
         this.add(infoButton);
 
         this.addMouseListener(mouse);
@@ -97,7 +99,7 @@ public class InventoryGUI extends GUI {
         drawItem(player.getEquip(Player.HELM),       g, 90, 85);
         drawItem(player.getEquip(Player.SHOES),      g, 90, 180);
 
-        g.drawImage(Resources.getImage("inv.png"), 2, 27, this);
+        g.drawImage(Resources.getImage(R.drawable.inventory_left), 2, 27, this);
     }
 
     private void createPicture2(Graphics2D g) {
@@ -111,7 +113,7 @@ public class InventoryGUI extends GUI {
             drawItem(items.get(i), g, 2 + (i%5)*40, 29 + (i/5)*40);
         }
 
-        g.drawImage(Resources.getImage("inventory2.png"), 0, 27, this);
+        g.drawImage(Resources.getImage(R.drawable.inventory_right), 0, 27, this);
 
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Courier", Font.PLAIN, 20));
@@ -148,7 +150,7 @@ public class InventoryGUI extends GUI {
     }
 
     private void drawItem(GameItem item, Graphics2D g, int x, int y) {
-        g.drawImage(Resources.getImage("ss.png"), x, y, x + 34, y + 34,
+        g.drawImage(Resources.getImage(R.drawable.spritesheet), x, y, x + 34, y + 34,
                 item.ssX*34, item.ssY*34, item.ssX*34 + 34, item.ssY*34 + 34, this);
     }
 
@@ -185,7 +187,7 @@ public class InventoryGUI extends GUI {
 
     private class Mouse implements MouseListener, MouseMotionListener {
         private MouseEvent event;
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
             int x = e.getX(), y = e.getY();
@@ -212,11 +214,11 @@ public class InventoryGUI extends GUI {
                 }
             });
         }
-        
+
         @Override
         public void mouseMoved(MouseEvent e) {
             if (e == null) return;
-            
+
             event = e;
             int x = e.getX(), y = e.getY();
 
@@ -246,7 +248,7 @@ public class InventoryGUI extends GUI {
                 }
             });
         }
-        
+
         public void update() {
             mouseMoved(event);
         }
@@ -262,7 +264,7 @@ public class InventoryGUI extends GUI {
         @Override
         public void mouseDragged(MouseEvent e) {}
     }
-    
+
     private void updateItemInfoLabel() {
         SwingUtilities.invokeLater(() -> {
             selectedItem.ifPresent(item -> itemInfoLabel.setText(infoButton.getText().equals(INFO_ON)

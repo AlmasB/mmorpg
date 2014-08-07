@@ -4,9 +4,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import com.almasb.common.graphics.Color;
+
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation.TextAnimationType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
@@ -273,7 +275,7 @@ public class ObjectManager {
                         break;
                     }
                 }
-                        
+
                 value = (int)(factor * level);
                 caster.addBonusStat(Stat.ARM, value);
             }
@@ -302,8 +304,8 @@ public class ObjectManager {
                         break;
                     }
                 }
-                
-                
+
+
                 value = Math.round(factor * level * caster.getBaseStat(Stat.MAX_HP));
                 caster.addBonusStat(Stat.MAX_HP, value);
             }
@@ -328,7 +330,7 @@ public class ObjectManager {
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
                 useResult = new SkillUseResult(Target.ENEMY, d,
                         new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
-                        new TextAnimation(target.getX(), target.getY(), d + "", TextAnimationType.SKILL));
+                        new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
             }
         });
 
@@ -557,10 +559,10 @@ public class ObjectManager {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
                     stun = true;
                 }
-                useResult = new SkillUseResult(Target.ENEMY, 0, 
+                /*useResult = new SkillUseResult(Target.ENEMY, 0,
                         new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE)); 
+                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE));*/
             }
         });
 
@@ -694,20 +696,20 @@ public class ObjectManager {
                 int dmg1 = caster.dealPhysicalDamage(target, dmg);
                 int dmg2 = caster.dealPhysicalDamage(target, dmg);
                 int dmg3 = caster.dealPhysicalDamage(target, dmg);
-                
-                useResult = new SkillUseResult(Target.ENEMY, 0, 
+
+                /*useResult = new SkillUseResult(Target.ENEMY, 0,
                         new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
                         new TextAnimation(target.getX() + 40, target.getY()+40, dmg3 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));
+                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));*/
             }
         });
-        
+
         // NEWLY ADDED SKILLS
-        
+
         addSkill(new Skill(ID.Skill.Crusader.HOLY_LIGHT, "Holy Light", Desc.Skill.Crusader.HOLY_LIGHT, true, 20.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 5685022402103377679L;
 
@@ -721,14 +723,14 @@ public class ObjectManager {
                 target.setHP(Math.min(target.getHP() + 30 + level*10, (int)target.getTotalStat(Stat.MAX_HP)));
                 target.addEffect(new Effect(20.0f, ID.Skill.Crusader.HOLY_LIGHT, new Rune[] {
                         new Rune(Attribute.VITALITY, level*2)
-                        }, 
-                        new Essence[] {}));
+                },
+                new Essence[] {}));
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Crusader.PRECISION_STRIKE, "Precision Strike", Desc.Skill.Crusader.PRECISION_STRIKE, true, 20.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 2024648263069876L;
 
@@ -743,10 +745,10 @@ public class ObjectManager {
                 caster.dealPureDamage(target, dmg);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Crusader.DIVINE_ARMOR, "Divine Armor", Desc.Skill.Crusader.DIVINE_ARMOR, false, 0.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = -7936080589333242098L;
 
@@ -760,10 +762,10 @@ public class ObjectManager {
                 // impl is in ARMOR_MASTERY
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Crusader.FAITH, "Faith", Desc.Skill.Crusader.FAITH, false, 0.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 4325213967370795918L;
 
@@ -777,10 +779,10 @@ public class ObjectManager {
                 // impl is in WARRIOR_HEART
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Gladiator.ENDURANCE, "Endurance", Desc.Skill.Gladiator.ENDURANCE, true, 40.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = -7936080589333242098L;
 
@@ -798,10 +800,10 @@ public class ObjectManager {
                 }));
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Wizard.THUNDERBOLT_FIRESTORM, "Thunderbolt Firestorm", Desc.Skill.Wizard.THUNDERBOLT_FIRESTORM, true, 40.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 4325213967370795918L;
 
@@ -817,10 +819,10 @@ public class ObjectManager {
                 caster.dealMagicalDamage(target, dmg, Element.AIR);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Wizard.ICICLE_AVALANCHE, "Icicle Avalanche", Desc.Skill.Wizard.ICICLE_AVALANCHE, true, 40.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 6791451275759000638L;
 
@@ -836,10 +838,10 @@ public class ObjectManager {
                 caster.dealMagicalDamage(target, dmg, Element.EARTH);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Enchanter.MANA_BURN, "Mana Burn", Desc.Skill.Enchanter.MANA_BURN, true, 20.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 1031700846462374399L;
 
@@ -855,10 +857,10 @@ public class ObjectManager {
                 caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Enchanter.CURSE_OF_WITCHCRAFT, "Curse of Witchcraft", Desc.Skill.Enchanter.CURSE_OF_WITCHCRAFT, true, 20.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 8295208480454374043L;
 
@@ -872,10 +874,10 @@ public class ObjectManager {
                 target.addStatusEffect(new StatusEffect(Status.SILENCED, level*3));
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Enchanter.MIND_BLAST, "Mind Blast", Desc.Skill.Enchanter.MIND_BLAST, true, 20.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = -3587620067204007562L;
 
@@ -889,10 +891,10 @@ public class ObjectManager {
                 // TODO: impl
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Rogue.FIVE_FINGER_DEATH_PUNCH, "Five Finger Death Punch", Desc.Skill.Rogue.FIVE_FINGER_DEATH_PUNCH, true, 35.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 9128637084476710269L;
 
@@ -907,10 +909,10 @@ public class ObjectManager {
                 caster.dealPhysicalDamage(target, dmg);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Ranger.BULLSEYE, "Bullseye", Desc.Skill.Ranger.BULLSEYE, true, 60.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 3498114139079315L;
 
@@ -925,13 +927,13 @@ public class ObjectManager {
                 caster.dealPureDamage(target, dmg);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Ranger.EAGLE_EYE, "Eagle Eye", Desc.Skill.Ranger.EAGLE_EYE, false, 0.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 7005439875094828368L;
-            
+
             private int value = 0;
 
             @Override
@@ -946,10 +948,10 @@ public class ObjectManager {
                 caster.addBonusStat(Stat.ATK, value);
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Ranger.ENCHANTED_ARROW, "Enchanted Arrows", Desc.Skill.Ranger.ENCHANTED_ARROW, true, 35.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 5416340917264724397L;
 
@@ -964,10 +966,10 @@ public class ObjectManager {
                 target.addStatusEffect(new StatusEffect(Status.STUNNED, duration));
             }
         });
-        
+
         addSkill(new Skill(ID.Skill.Ranger.FAST_REFLEXES, "Fast Reflexes", Desc.Skill.Ranger.FAST_REFLEXES, true, 35.0f) {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 5766544471206156505L;
 
@@ -990,24 +992,24 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), Resource.Image.ENEMY1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), R.drawable.enemy1, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), Resource.Image.ENEMY2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                new Experience(100, 100, 100), R.drawable.enemy2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), Resource.Image.ENEMY3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), R.drawable.enemy3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
 
         addEssence(new Essence("Minor Fire Spirit Essence", Stat.ATK, 5));
-        
+
         // MAPS
-        
-        addMap(new GameMap("map1.txt", "map1.png", 
+
+        addMap(new GameMap("map1.txt", R.drawable.map1,
                 new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
                 new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
                 new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));
@@ -1032,7 +1034,7 @@ public class ObjectManager {
     private static void addEssence(Essence e) {
         defaultEssences.put(e.id, e);
     }
-    
+
     private static void addMap(GameMap m) {
         defaultMaps.put(m.name, m);
     }
@@ -1079,9 +1081,9 @@ public class ObjectManager {
     public static Essence getEssenceByID(String id) {
         return defaultEssences.containsKey(id) ? new Essence(defaultEssences.get(id)) : null;
     }
-    
+
     /**
-     * 
+     *
      * @param name
      * @return
      *          COPY of a map

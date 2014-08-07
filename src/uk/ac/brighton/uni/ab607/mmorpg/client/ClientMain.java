@@ -1,7 +1,8 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.main.Out;
+import com.almasb.java.io.Resources;
+import com.almasb.java.main.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
@@ -19,15 +20,15 @@ public class ClientMain {
         Out.println("-client\t\t starts the client");
         Out.println("-version\t prints game version");
     }
-    
+
     public static void main(String[] args) {
         if (args.length != 1) {
             usage();
             return;
         }
-        
+
         boolean local = false, server = false;
-        
+
         switch (args[0]) {
             case "-version":
                 Out.println("Version: " + Resources.getText("system/version.txt").get(0));
@@ -38,12 +39,15 @@ public class ClientMain {
                 server = true;
             case "-client":
                 break;
-                
+
             case "-?": case "-help": case "-usage": // fallthru
             default:
                 usage();
                 return;
         }
+
+        // load game resources
+        Resources.init(R.drawable.class, R.raw.class);
 
         // load game data
         ObjectManager.load();
@@ -51,7 +55,7 @@ public class ClientMain {
         try {
             if (server || local)
                 new GameServer();
-            
+
             if (local) {
                 new GameGUI("127.0.0.1", "Debug");
             }

@@ -7,7 +7,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
-import static uk.ac.brighton.uni.ab607.libs.parsing.PseudoHTML.*;
+
+import static com.almasb.common.parsing.PseudoHTML.*;
 
 public class Armor extends EquippableItem {
 

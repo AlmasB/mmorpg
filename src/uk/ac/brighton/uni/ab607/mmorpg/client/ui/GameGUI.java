@@ -1,6 +1,5 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,10 +15,18 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import uk.ac.brighton.uni.ab607.libs.io.Resources;
-import uk.ac.brighton.uni.ab607.libs.net.DataPacket;
-import uk.ac.brighton.uni.ab607.libs.net.ServerPacketParser;
-import uk.ac.brighton.uni.ab607.libs.net.UDPClient;
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.Drawable;
+import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.graphics.Point2D;
+import com.almasb.common.graphics.Rect2D;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.ServerPacketParser;
+import com.almasb.common.net.UDPClient;
+import com.almasb.java.io.Resources;
+import com.almasb.java.ui.AWTGraphicsContext;
+
+import uk.ac.brighton.uni.ab607.mmorpg.client.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -34,7 +41,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 
 /**
  * Main game window
- * 
+ *
  * @author Almas Baimagambetov
  *
  */
@@ -63,24 +70,24 @@ public class GameGUI extends GUI {
 
     private int selX = 0, selY = 0; // selected point
     private int renderX = 0, renderY = 0;   // render offset
-    
+
     private GraphicsContext gContext = null;
     private GameMap map;
 
     private List<Drawable[]> gameObjects = Collections.synchronizedList(new ArrayList<Drawable[]>(5));
-    
+
     private static final int INDEX_ANIMATIONS = 0,
             INDEX_CHESTS = 1,
             INDEX_ENEMIES = 2,
             INDEX_PLAYERS = 3;
-    
+
     public GameGUI(String ip, String playerName) throws IOException {
         super(1280, 720, "Main Window");
         this.setLocation(0, 0);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 
-        name = playerName;        
-        
+        name = playerName;
+
         this.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {}
@@ -96,6 +103,23 @@ public class GameGUI extends GUI {
             }
             @Override
             public void componentHidden(ComponentEvent e) {}
+        });
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                inv.setVisible(false);
+                st.setVisible(false);
+
+                // development version
+                System.exit(0);
+                /*try {
+                    client.send(new DataPacket(new QueryRequest(Query.LOGOFF, name)));
+                }
+                catch (IOException ex) {
+                    ex.printStackTrace();
+                }*/
+            }
         });
 
         this.addKeyListener(new Keyboard());
@@ -124,12 +148,12 @@ public class GameGUI extends GUI {
         });
         this.add(chat);
 
-        walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage("cursor_walk.png"), new Point(16, 16), "WALK");
+        walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage(R.drawable.cursor_walk), new Point(16, 16), "WALK");
         setCursor(walkCursor);
-        
+
         client = new UDPClient(ip, 55555, new ServerResponseParser());
         client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
-        
+
         // placeholders
         gameObjects.add(new Drawable[]{ });
         gameObjects.add(new Drawable[]{ });
@@ -150,24 +174,24 @@ public class GameGUI extends GUI {
         public void parseServerPacket(DataPacket packet) {
             if (packet.objectData instanceof ServerResponse) {
                 ServerResponse res = (ServerResponse) packet.objectData;
-                
+
                 map = ObjectManager.getMapByName(res.data);
-                
+
                 selX = res.value1;
                 selY = res.value2;
             }
-            
+
             if (packet.objectData instanceof Player) {
                 player = (Player) packet.objectData;
                 // login complete, all set, we can now show GUI
                 // and start drawing
                 inv = new InventoryGUI(player);
                 st = new StatsGUI(player);
-                
+
                 setVisible(true);
                 requestFocusInWindow();
             }
-            
+
             if (packet.multipleObjectData instanceof Player[]) {
                 update((Player[]) packet.multipleObjectData);
             }
@@ -198,7 +222,7 @@ public class GameGUI extends GUI {
                     break;
                 }
             }
-            
+
             gameObjects.set(INDEX_PLAYERS, sPlayers);
 
             // update main window
@@ -230,7 +254,7 @@ public class GameGUI extends GUI {
             for (Enemy e : sEnemies) {
                 enemies.add(e);
             }
-            
+
             gameObjects.set(INDEX_ENEMIES, sEnemies);
 
             tmpEnemies = new ArrayList<Enemy>(enemies);
@@ -244,10 +268,10 @@ public class GameGUI extends GUI {
     public void updateGameClient() {
         renderX = player.getX() - 640;  // half of width
         renderY = player.getY() - 360;  // half of height
-        
+
         if (gContext != null)
-            gContext.setRenderOffset(renderX, renderY);
-        
+            gContext.setRenderXY(renderX, renderY);
+
         int moveToX = (selX/40)*40;
         int moveToY = (selY/40)*40;
 
@@ -276,11 +300,11 @@ public class GameGUI extends GUI {
     @Override
     protected void createPicture(Graphics2D g) {
         if (gContext == null)
-            gContext = new GraphicsContext(g);
-        
+            gContext = new AWTGraphicsContext(g, 1280, 720);
+
         // draw background / clear screen
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, 1280, 690);
+        gContext.setColor(Color.GRAY);
+        gContext.fillRect(0, 0, 1280, 690);
 
         // draw map
         int sx = Math.max(player.getX() - 640, 0), sx1 = Math.min(player.getX() + 640, map.width*40);
@@ -288,15 +312,14 @@ public class GameGUI extends GUI {
 
         int dx = 0 + Math.max(640 - player.getX(), 0), dx1 = dx + sx1-sx;
         int dy = 0 + Math.max(360 - player.getY(), 0), dy1 = dy + sy1-sy;
-        g.drawImage(Resources.getImage(map.spriteName),
-                dx, dy, dx1, dy1,
-                sx, sy, sx1, sy1, this);
-        
+
+        gContext.drawImage(map.spriteID, dx, dy, dx1, dy1, sx, sy, sx1, sy1);
+
         synchronized(gameObjects) {
-            Rectangle playerVision = new Rectangle(player.getX() - 640, player.getY() - 360, 1280, 720);
+            Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
                 for (Drawable obj : objects) {
-                    if (playerVision.contains(new Point(obj.getX(), obj.getY())))
+                    if (playerVision.contains(new Point2D(obj.getX(), obj.getY())))
                         obj.draw(gContext);
                 }
             }
@@ -305,8 +328,8 @@ public class GameGUI extends GUI {
         // debug full grid drawing
         /*for (int i = 0; i < map.height; i++) {
             for (int j = 0; j < map.width; j++) {
-                g.setColor(Color.YELLOW);
-                g.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
+                gContext.setColor(Color.YELLOW);
+                gContext.drawRect(j*40 - renderX, i*40 - renderY, 40, 40);
             }
         }*/
     }
@@ -414,7 +437,7 @@ public class GameGUI extends GUI {
                         return;
                     }
                 }
-                
+
                 // if no enemy in that selection
                 // drop target, then move player to that cell
                 targetRuntimeID = 0;
@@ -463,13 +486,13 @@ public class GameGUI extends GUI {
     /**
      * This check is needed to see if target runtimeID
      * still exists in the world
-     * 
+     *
      * @return
      *          target's runtimeID or 0 if invalid
      */
     private int checkRuntimeID() {
         if (targetRuntimeID == 0) return 0;
-        
+
         for (Enemy e : tmpEnemies) {
             if (e.getRuntimeID() == targetRuntimeID)
                 return targetRuntimeID;
