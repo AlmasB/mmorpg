@@ -1,15 +1,24 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
+import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
+import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.SocketConnection;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
+import com.almasb.common.util.Out;
 import com.almasb.java.io.Resources;
+import com.almasb.java.ui.AWTGraphicsContext;
+import com.almasb.java.util.ImageProcessor;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
@@ -142,7 +151,7 @@ public class GameMap {
         }
 
         // all objects to send
-        Player[] toSend = new Player[tmpPlayers.size()];
+        /*Player[] toSend = new Player[tmpPlayers.size()];
         for (int i = 0; i < tmpPlayers.size(); i++)
             toSend[i] = tmpPlayers.get(i);
 
@@ -171,9 +180,67 @@ public class GameMap {
                 server.send(new DataPacket(toSend), p.ip, p.port);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Out.e("update", "Failed to send a packet", this, e);
             }
-        }
+        }*/
+
+        ArrayList<Enemy> tmpList = new ArrayList<Enemy>();
+        enemies.forEach(list -> list.forEach(enemy -> tmpList.add(enemy)));
+
+
+        Stream<Player> playerStream = tmpPlayers.stream();
+        Stream<Chest> chestStream = chests.stream();
+        Stream<Animation> animationStream = animations.stream();
+        Stream<Enemy> enemyStream = tmpList.stream();
+
+        tmpPlayers.forEach(player -> {
+            Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
+
+            Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
+            Chest[] chestsToSend = chestStream.filter(chest -> playerVision.contains(new Point2D(chest.getX(), chest.getY()))).toArray(Chest[]::new);
+            Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
+            Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
+
+            try {
+                if (playersToSend.length > 0)
+                    server.send(new DataPacket(playersToSend), player.ip, player.port);
+                if (chestsToSend.length > 0)
+                    server.send(new DataPacket(chestsToSend), player.ip, player.port);
+                if (enemiesToSend.length > 0)
+                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
+                if (animationsToSend.length > 0)
+                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
+            }
+            catch (Exception e) {
+                Out.e("update", "Failed to send a packet", this, e);
+            }
+
+            //Out.d("update", "packet size: " + SocketConnection.calculatePacketSize(new DataPacket(playersToSend)));
+            /*BufferedImage img = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g = (Graphics2D) img.getGraphics();
+            GraphicsContext ctx = new AWTGraphicsContext(g, 1280, 720);
+            for (Player p : playersToSend) {
+                p.draw(ctx);
+            }
+
+            for (Chest p : chestsToSend) {
+                p.draw(ctx);
+            }
+
+            for (Animation p : animationsToSend) {
+                p.draw(ctx);
+            }
+
+            for (Enemy p : enemiesToSend) {
+                p.draw(ctx);
+            }
+
+            g.dispose();
+            byte[] bytes = ImageProcessor.imageToByteArray(img);
+
+            Out.println(bytes.length + " size");*/
+        });
 
     }
 

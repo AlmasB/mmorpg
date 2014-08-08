@@ -9,7 +9,7 @@ public class ImageAnimation extends Animation {
     private static final long serialVersionUID = 1496702577417839916L;
 
     private int spriteX = 0, spriteY = 0;
-    private int endX = 0, endY = 0;
+    private transient int endX = 0, endY = 0;
     private int dx = 0, dy = 0;
 
     private int spriteID;

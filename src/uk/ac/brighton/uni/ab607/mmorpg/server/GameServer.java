@@ -5,6 +5,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +50,8 @@ public class GameServer {
         server = new UDPServer(55555, new ClientQueryParser());
 
         // start main server loop
-        new Thread(new ServerLoop()).start();
+        //new Thread(new ServerLoop()).start();
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::serverLoop, 0, 20, TimeUnit.MILLISECONDS);
 
         // test
         spawnChest(new Chest(1000, 680, 1000,
@@ -159,14 +161,10 @@ public class GameServer {
          * @param name
          *              player name
          * @return
-         *          true if player name exists on server, false otherwise
+         *          true if player name exists on server (is online), false otherwise
          */
-        private boolean playerNameExists(String name) { // is player online
-            /*for (Player p : players)
-                if (p.name.equals(name))
-                    return true;*/
-
-            return false;
+        private boolean playerNameExists(String name) {
+            return getPlayerByName(name) != null;
         }
 
         /**
@@ -193,7 +191,7 @@ public class GameServer {
         }
     }
 
-    private class ServerLoop implements Runnable {
+    /*private class ServerLoop implements Runnable {
         @Override
         public void run() {
             long start;
@@ -215,6 +213,11 @@ public class GameServer {
                 }
             }
         }
+    }*/
+
+    private void serverLoop() {
+        for (GameMap map : maps)
+            map.update(server);
     }
 
     /**
@@ -222,7 +225,7 @@ public class GameServer {
      * @param name
      *              player name
      * @return
-     *          player if name exists on the server, if not then null
+     *          player if name exists on the server (is online), if not then null
      */
     /*package-private*/ Player getPlayerByName(String name) {
         Player p = null;

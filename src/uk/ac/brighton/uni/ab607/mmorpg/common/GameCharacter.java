@@ -576,7 +576,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     // For Drawing/Moving screen stuff
     protected int x, y;
 
-    public int xSpeed, ySpeed;
+    public transient int xSpeed, ySpeed;
 
     public int frame = 0;
     public int place = 0;
