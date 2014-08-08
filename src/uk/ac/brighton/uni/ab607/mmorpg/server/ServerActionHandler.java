@@ -34,6 +34,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
  */
 public class ServerActionHandler {
 
+    private interface ServerAction {
+        public void execute(Player p, ActionRequest req) throws BadActionRequestException;
+    }
+
     private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
     private GameServer server;
 

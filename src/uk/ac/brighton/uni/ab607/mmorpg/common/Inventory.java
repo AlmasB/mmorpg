@@ -3,7 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import com.almasb.java.main.Out;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 
@@ -40,7 +40,7 @@ public class Inventory implements java.io.Serializable {
      */
     public boolean addItem(GameItem item) {
         if (isFull()) {
-            Out.err("Inventory is full");
+            Out.d("addItem", "Inventory is full");
             return false;
         }
         return items.add(item);
@@ -67,7 +67,7 @@ public class Inventory implements java.io.Serializable {
      */
     public boolean removeItem(GameItem item) {
         if (!items.remove(item)) {
-            Out.err("This item isn't in the inventory");
+            Out.d("removeItem", "This item isn't in the inventory");
             return false;
         }
         return true;
