@@ -4,16 +4,16 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JTextField;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JTextField;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
@@ -26,7 +26,7 @@ import com.almasb.common.net.UDPClient;
 import com.almasb.java.io.Resources;
 import com.almasb.java.ui.AWTGraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -431,8 +431,8 @@ public class GameGUI extends GUI {
             if (!choosingTarget) {  // if not choosing skill target
 
                 for (Enemy enemy : tmpEnemies) {
-                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
-                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                    Rect2D r = new Rect2D(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point2D(mouseX + renderX, mouseY + renderY))) {
                         targetRuntimeID = enemy.getRuntimeID();
                         return;
                     }
@@ -450,8 +450,8 @@ public class GameGUI extends GUI {
                 choosingTarget = false;
                 setCursor(walkCursor);
                 for (Enemy enemy : tmpEnemies) {
-                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
-                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                    Rect2D r = new Rect2D(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point2D(mouseX + renderX, mouseY + renderY))) {
                         addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
                                 map.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;

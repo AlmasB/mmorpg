@@ -64,6 +64,8 @@ public class GameServer {
         public void execute(DataPacket packet, QueryRequest req) throws IOException;
     }
 
+    private int n = 1;
+
     class ClientQueryParser extends ClientPacketParser {
         private HashMap<Query, QueryAction> actions = new HashMap<Query, QueryAction>();
 
@@ -124,14 +126,25 @@ public class GameServer {
                 loginPlayer(mapName, p);
             }
             else {
+
                 // purely for local debugging when db/accounts.db has been deleted
                 Out.debug("Account not found, using new");
 
-                GameAccount.addAccount("Debug", "pass", "test@mail.com");
-                Player p = GameAccount.getPlayer("Debug");
+                String nam;
+
+                if (n == 0) {
+                    nam = "Debug";
+                    n++;
+                }
+                else {
+                    nam = "Android";
+                }
+
+                GameAccount.addAccount(nam, "pass", "test@mail.com");
+                Player p = GameAccount.getPlayer(nam);
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
-                String mapName = GameAccount.getMapName("Debug");
+                String mapName = GameAccount.getMapName(nam);
 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());

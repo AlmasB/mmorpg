@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 
 public class Chest implements java.io.Serializable, Drawable {
     /**

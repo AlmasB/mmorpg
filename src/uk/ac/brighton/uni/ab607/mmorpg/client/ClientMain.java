@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 import com.almasb.java.io.Resources;
 import com.almasb.java.main.Out;
 
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;

@@ -2,7 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 
 public class ImageAnimation extends Animation {
     /**
