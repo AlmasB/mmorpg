@@ -91,7 +91,6 @@ public class Player extends GameCharacter implements PseudoHTML {
         this.y = y;
         this.ip = ip;
         this.port = port;
-        //this.spriteName = "player1.png";
         this.spriteID = R.drawable.player1;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);

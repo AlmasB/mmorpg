@@ -329,7 +329,7 @@ public class ObjectManager {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
                 useResult = new SkillUseResult(Target.ENEMY, d,
-                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
+                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, R.drawable.level_up),
                         new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
             }
         });

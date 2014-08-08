@@ -32,7 +32,6 @@ public class Enemy extends GameCharacter {
         this.baseLevel = level;
         this.xp = xp;
         this.spriteID = spriteID;
-        //this.spriteName = spriteName;
         this.drops = drops;
         attributes[STR] = attrs.str;
         attributes[VIT] = attrs.vit;
