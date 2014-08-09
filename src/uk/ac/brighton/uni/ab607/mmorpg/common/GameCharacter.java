@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static com.almasb.common.parsing.PseudoHTML.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -127,6 +128,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         this.name = name;
         this.description = description;
         this.charClass = charClass;
+        init();
+    }
+
+    public void init() {
         this.skills = new Skill[charClass.skillIDs.length];
 
         for (int i = 0; i < skills.length; i++)
@@ -573,6 +578,36 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         return id + "," + name;
     }
 
+    /*private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        for (int i = 0; i < attributes.length; i++) {
+            out.writeInt(attributes[i]);
+            out.writeInt(bAttributes[i]);
+        }
+
+        for (int i = 0; i < stats.length; i++) {
+            out.writeFloat(stats[i]);
+            out.writeFloat(bStats[i]);
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        attributes = new int[9];
+        bAttributes = new int[9];
+        for (int i = 0; i < attributes.length; i++) {
+            attributes[i] = in.readInt();
+            bAttributes[i] = in.readInt();
+        }
+
+        stats = new float[16];
+        bStats = new float[16];
+        for (int i = 0; i < stats.length; i++) {
+            stats[i] = in.readFloat();
+            bStats[i] = in.readFloat();
+        }
+    }*/
+
     // For Drawing/Moving screen stuff
     protected int x, y;
 
@@ -582,12 +617,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
     public int place = 0;
     public int sprite = 0;
     private int factor = 3;
-
-    /*protected String spriteName;
-
-    public String getSpriteName() {
-        return spriteName;
-    }*/
 
     protected int spriteID;
 
@@ -655,8 +684,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
                 tmpX, tmpY, tmpX + 40, tmpY + 40,
                 place*40, getRow()*40, place*40+40, getRow()*40+40);
 
-        //g.setFont(AnimationUtils.DEFAULT_FONT);
-        //g.setColor(AnimationUtils.DEFAULT_COLOR);
         g.setColor(Color.YELLOW);
 
         int width = g.getStringWidth(name + " Lv " + baseLevel);

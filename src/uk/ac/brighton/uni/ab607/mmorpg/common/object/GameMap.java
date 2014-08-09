@@ -1,13 +1,24 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
-import com.almasb.common.graphics.GraphicsContext;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.graphics.Rect2D;
@@ -17,16 +28,6 @@ import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
 import com.almasb.java.io.Resources;
-import com.almasb.java.ui.AWTGraphicsContext;
-import com.almasb.java.util.ImageProcessor;
-
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 public class GameMap {
 
@@ -215,31 +216,112 @@ public class GameMap {
                 Out.e("update", "Failed to send a packet", this, e);
             }
 
-            //Out.d("update", "packet size: " + SocketConnection.calculatePacketSize(new DataPacket(playersToSend)));
-            /*BufferedImage img = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_ARGB);
 
-            Graphics2D g = (Graphics2D) img.getGraphics();
-            GraphicsContext ctx = new AWTGraphicsContext(g, 1280, 720);
-            for (Player p : playersToSend) {
-                p.draw(ctx);
-            }
 
-            for (Chest p : chestsToSend) {
-                p.draw(ctx);
-            }
 
-            for (Animation p : animationsToSend) {
-                p.draw(ctx);
-            }
 
-            for (Enemy p : enemiesToSend) {
-                p.draw(ctx);
-            }
 
-            g.dispose();
-            byte[] bytes = ImageProcessor.imageToByteArray(img);
 
-            Out.println(bytes.length + " size");*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /*try {
+
+                byte[] data = SocketConnection.toByteArray(new DataPacket(player));
+
+                Out.println(data.length + " size");
+                //for (byte b : data)
+                //Out.print(b + ",");
+
+
+
+                Out.println("");
+                //Out.println(new String(data));
+
+                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+                DataPacket result = (DataPacket) ois.readObject();
+
+                Player p = (Player) result.objectData;
+
+                Out.println(p.getRuntimeID() + " id");
+                //Out.println((Integer)result.objectData + "");
+
+                ois.close();
+
+
+                Out.println(SocketConnection.calculatePacketSize(new DataPacket(data)) + "");
+
+
+
+
+                // Encode a String into bytes
+                //String inputString = "blahblahblah";
+                //byte[] input = inputString.getBytes("UTF-8");
+
+                // Compress the bytes
+                byte[] output = new byte[data.length];
+                Deflater compresser = new Deflater(9, true);
+                compresser.setInput(data);
+                compresser.finish();
+                int compressedDataLength = compresser.deflate(output);
+                compresser.end();
+
+                Out.println("input: " + data.length + " compressed: " + compressedDataLength);
+
+
+                // Decompress the bytes
+                Inflater decompresser = new Inflater(true);
+                decompresser.setInput(output, 0, compressedDataLength);
+                byte[] res = new byte[data.length];
+                int resultLength = decompresser.inflate(res);
+                decompresser.end();
+
+
+                boolean ok = true;
+                for (int i = 0; i < resultLength; i++) {
+                    if (data[i] != res[i]) {
+                        ok = false;
+                    }
+                }
+
+                Out.println("");
+
+                // Decode the bytes into a String
+                //String outputString = new String(res, 0, resultLength, "UTF-8");
+                Out.println(ok + " same");
+
+
+
+
+
+
+                byte[] newData = Arrays.copyOf(res, resultLength);
+
+
+
+                ois = new ObjectInputStream(new ByteArrayInputStream(newData));
+                DataPacket created = (DataPacket) ois.readObject();
+
+                Player p2 = (Player) created.objectData;
+
+                Out.println(p2.getRuntimeID() + " id");
+
+                //Out.println((Integer)created.objectData + "");
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }*/
         });
 
     }

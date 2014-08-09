@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.net.Compressable;
 import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
@@ -20,7 +21,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
  * @author Almas Baimagambetov
  *
  */
-public class Player extends GameCharacter implements PseudoHTML {
+public class Player extends GameCharacter implements PseudoHTML, Compressable {
     /**
      *
      */
@@ -305,5 +306,22 @@ public class Player extends GameCharacter implements PseudoHTML {
         // draw xp
         g.setColor(Color.GOLD);
         g.fillRect(tmpX + 1, tmpY + 66, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
+    }
+
+    @Override
+    public byte[] compress() {
+        String data = "";
+
+
+
+        return data.getBytes();
+    }
+
+    @Override
+    public void decompress(byte[] compressedData) {
+        String data = new String(compressedData);
+
+
+
     }
 }
