@@ -1,15 +1,9 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
@@ -23,7 +17,6 @@ import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
-import com.almasb.common.net.SocketConnection;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
@@ -152,39 +145,6 @@ public class GameMap {
         }
 
         // all objects to send
-        /*Player[] toSend = new Player[tmpPlayers.size()];
-        for (int i = 0; i < tmpPlayers.size(); i++)
-            toSend[i] = tmpPlayers.get(i);
-
-        Chest[] chestsToSend = new Chest[chests.size()];
-        for (int i = 0; i < chests.size(); i++)
-            chestsToSend[i] = chests.get(i);
-
-        Animation[] animsToSend = new Animation[animations.size()];
-        for (int i = 0; i < animations.size(); i++)
-            animsToSend[i] = animations.get(i);
-
-        Enemy[] enemyToSend = new Enemy[enemyNumbers];
-        int j = 0;
-        for (ArrayList<Enemy> list : enemies) {
-            for (int i = 0; i < list.size(); i++) {
-                enemyToSend[j++] = list.get(i);
-            }
-        }
-
-        for (Player p : tmpPlayers) {
-            try {
-
-                server.send(new DataPacket(chestsToSend), p.ip, p.port);
-                server.send(new DataPacket(enemyToSend), p.ip, p.port);
-                server.send(new DataPacket(animsToSend), p.ip, p.port);
-                server.send(new DataPacket(toSend), p.ip, p.port);
-            }
-            catch (Exception e) {
-                Out.e("update", "Failed to send a packet", this, e);
-            }
-        }*/
-
         ArrayList<Enemy> tmpList = new ArrayList<Enemy>();
         enemies.forEach(list -> list.forEach(enemy -> tmpList.add(enemy)));
 
@@ -215,115 +175,7 @@ public class GameMap {
             catch (Exception e) {
                 Out.e("update", "Failed to send a packet", this, e);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            /*try {
-
-                byte[] data = SocketConnection.toByteArray(new DataPacket(player));
-
-                Out.println(data.length + " size");
-                //for (byte b : data)
-                //Out.print(b + ",");
-
-
-
-                Out.println("");
-                //Out.println(new String(data));
-
-                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-                DataPacket result = (DataPacket) ois.readObject();
-
-                Player p = (Player) result.objectData;
-
-                Out.println(p.getRuntimeID() + " id");
-                //Out.println((Integer)result.objectData + "");
-
-                ois.close();
-
-
-                Out.println(SocketConnection.calculatePacketSize(new DataPacket(data)) + "");
-
-
-
-
-                // Encode a String into bytes
-                //String inputString = "blahblahblah";
-                //byte[] input = inputString.getBytes("UTF-8");
-
-                // Compress the bytes
-                byte[] output = new byte[data.length];
-                Deflater compresser = new Deflater(9, true);
-                compresser.setInput(data);
-                compresser.finish();
-                int compressedDataLength = compresser.deflate(output);
-                compresser.end();
-
-                Out.println("input: " + data.length + " compressed: " + compressedDataLength);
-
-
-                // Decompress the bytes
-                Inflater decompresser = new Inflater(true);
-                decompresser.setInput(output, 0, compressedDataLength);
-                byte[] res = new byte[data.length];
-                int resultLength = decompresser.inflate(res);
-                decompresser.end();
-
-
-                boolean ok = true;
-                for (int i = 0; i < resultLength; i++) {
-                    if (data[i] != res[i]) {
-                        ok = false;
-                    }
-                }
-
-                Out.println("");
-
-                // Decode the bytes into a String
-                //String outputString = new String(res, 0, resultLength, "UTF-8");
-                Out.println(ok + " same");
-
-
-
-
-
-
-                byte[] newData = Arrays.copyOf(res, resultLength);
-
-
-
-                ois = new ObjectInputStream(new ByteArrayInputStream(newData));
-                DataPacket created = (DataPacket) ois.readObject();
-
-                Player p2 = (Player) created.objectData;
-
-                Out.println(p2.getRuntimeID() + " id");
-
-                //Out.println((Integer)created.objectData + "");
-            } catch(Exception ex) {
-                ex.printStackTrace();
-            }*/
         });
-
     }
 
     public Enemy getEnemyByRuntimeID(int id) {
