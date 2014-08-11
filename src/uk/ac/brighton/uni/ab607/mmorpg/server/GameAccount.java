@@ -3,7 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import com.almasb.common.encryption.Account;
 import com.almasb.common.encryption.Encryptor;
 import com.almasb.common.encryption.PasswordManager;
-import com.almasb.java.main.Out;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -44,7 +44,7 @@ public class GameAccount extends Account {
 
     public static boolean addAccount(String username, String password, String email) {
         if (DBAccess.getAccounts().containsKey(username)) {
-            Out.err("Can't create account - username exists");
+            Out.e("GameAccount::addAccount", "Can't create account - username exists", null, null);
             return false;
         }
 
@@ -54,8 +54,8 @@ public class GameAccount extends Account {
             encryptedPass = Encryptor.encrypt(password, passkey);
         }
         catch (IllegalArgumentException e) {
-            Out.err("Can't create account");
-            Out.err(e);
+            Out.i("Can't create account");
+            Out.e(e);
             return false;
         }
 
