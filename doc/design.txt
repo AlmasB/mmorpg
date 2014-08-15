@@ -1,0 +1,105 @@
+MAX_LEVEL = 100, 100, 60
+
+lvl (base, stat, job)
+
+                    skill points start here
+       (10, 10, 10) |       (40, 45, 30)             (90, 90, 60)
+                    |
+Novice              -> Warrior        -> Crusader     -> Paladin
+                                      -> Gladiator    -> Knight
+                    -> Scout          -> Rogue        -> Assassin
+                                      -> Ranger       -> Hunter
+                    -> Mage           -> Wizard       -> Archmage
+                                      -> Enchanter    -> Sage
+                                      
+when class changes to tier 1
+players get reduced skill set ~4 skills of their class
+once they change to tier 2 jobs they get the rest ~5 skills
+tier 3 jobs don't offer new skills but better attributes/stats bonuses
+
+skills in total = 3*4 + 6*5 = 12 + 30 = 42
+
+things like life steal, extra passives (more dmg if target hp <)
+can be done thru status effects and then check when attacking on server side
+
+         * Soul Slash - 7 consecutive attacks.
+         * Performs 6 fast attacks of type NORMAL, each attack deals 10% more than previous.
+         * Deals 850% of your base ATK.
+         * Final hit is of type GHOST.
+         * Deals 200% of your total ATK
+         
+                /*
+
+
+        addSkill(new Skill(ID.Skill.FINAL_STRIKE, "Final Strike", Desc.Skill.FINAL_STRIKE, true, 10.0f) {
+            private static final long serialVersionUID = 2091028246707933529L;
+
+            @Override
+            public int getManaCost() {
+                return 100 + level * 100;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float phys = (caster.getHP() - 1) * 0.003f + 250*level;
+                float mag  = caster.getSP() * 0.003f + 250*level;
+                caster.setHP(1);
+                caster.setSP(0);
+                caster.dealMagicalDamage(target, mag, Element.NEUTRAL);
+                caster.dealPhysicalDamage(target, phys, Element.NEUTRAL);
+            }
+        });
+
+        // PIERCING TOUCH
+        addSkill(new Skill(ID.Skill.PIERCING_TOUCH, "Piercing Touch", Desc.Skill.PIERCING_TOUCH, true, 9.0f) {
+            private static final long serialVersionUID = 1513947512801417510L;
+
+            @Override
+            public int getManaCost() {
+                return 25 + level * 30;
+            }
+
+            @Override
+            public void useImpl(GameCharacter caster, GameCharacter target) {
+                float dmg = level * 5 * (15 + target.getTotalStat(GameCharacter.ARM) / 100.0f);
+                caster.dealPhysicalDamage(target, dmg);
+            }
+        });
+
+        
+*/
+
+
+// Data/reflection
+
+Out.println(Arrays.toString(Data.class.getDeclaredClasses()[0].getDeclaredClasses()));
+        
+        for (Class c : Data.class.getDeclaredClasses()[0].getDeclaredClasses()) {
+            Out.println(c.getSimpleName());
+            Field[] fields = c.getDeclaredFields();
+            for (Field f : fields) {
+                try {
+                    Out.println("Members: " + f.getName() + " value: " + f.get(null).getClass().getSimpleName());
+                    
+                    
+                    
+                }
+                catch (IllegalArgumentException | IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+                /*
+        
+        public static final String FINAL_STRIKE = "Drains all HP/SP leaving 1 HP/0 SP. For each HP/SP drained the skill damage increases by 0.3%";
+        public static final String PIERCING_TOUCH = "Deals physical damage based on target's armor. "
+                + "The more armor target has the greater the damage";
+        
+        */
+        
+                /* UNSORTED
+        public static final String FINAL_STRIKE = "7002";
+        public static final String PIERCING_TOUCH = "7003";
+        ;*/
