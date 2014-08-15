@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 
 import com.almasb.java.io.Resources;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;

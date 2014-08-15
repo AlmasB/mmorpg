@@ -4,16 +4,18 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JTextField;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JTextField;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
@@ -23,10 +25,11 @@ import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
+import com.almasb.common.util.Out;
 import com.almasb.java.io.Resources;
 import com.almasb.java.ui.AWTGraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -159,6 +162,17 @@ public class GameGUI extends GUI {
         gameObjects.add(new Drawable[]{ });
         gameObjects.add(new Drawable[]{ });
         gameObjects.add(new Drawable[]{ });
+
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
+    }
+
+    private void showTraffic() {
+        // 10 seconds
+        float kbs = client.resetAC() / 10240.0f;
+        Out.d("showTraffic", kbs + " KB/s (IN). Required bandwidth: " + kbs * 10 + " kbit/s");
+
+        kbs = client.resetACSent() / 10240.0f;
+        Out.d("showTraffic", kbs + " KB/s (OUT). Required bandwidth: " + kbs * 10 + " kbit/s");
     }
 
     /**
@@ -224,6 +238,10 @@ public class GameGUI extends GUI {
             }
 
             gameObjects.set(INDEX_PLAYERS, sPlayers);
+            // clear others in case they don't get updated
+            gameObjects.set(INDEX_ANIMATIONS, new Drawable[]{ });
+            gameObjects.set(INDEX_CHESTS, new Drawable[]{ });
+            gameObjects.set(INDEX_ENEMIES, new Drawable[]{ });
 
             // update main window
             updateGameClient();
@@ -285,12 +303,19 @@ public class GameGUI extends GUI {
 
         if (!stop) {
             try {
-                client.send(new DataPacket(inv.clearPendingActionRequests()));
-                client.send(new DataPacket(st.clearPendingActionRequests()));
-                client.send(new DataPacket(this.clearPendingActionRequests()));  // main ui actions
+                ActionRequest[] invGUI = inv.clearPendingActionRequests();
+                ActionRequest[] stGUI = st.clearPendingActionRequests();
+                ActionRequest[] thisGUI = this.clearPendingActionRequests();
+
+                if (invGUI.length > 0)
+                    client.send(new DataPacket(invGUI));
+                if (stGUI.length > 0)
+                    client.send(new DataPacket(stGUI));
+                if (thisGUI.length > 0)
+                    client.send(new DataPacket(thisGUI));
             }
             catch (IOException e) {
-                e.printStackTrace();
+                Out.e("updateGameClient", "Failed to send a packet", this, e);
             }
         }
 
@@ -316,11 +341,11 @@ public class GameGUI extends GUI {
         gContext.drawImage(map.spriteID, dx, dy, dx1, dy1, sx, sy, sx1, sy1);
 
         synchronized(gameObjects) {
-            Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
+            //Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
             for (Drawable[] objects : gameObjects) {
                 for (Drawable obj : objects) {
-                    if (playerVision.contains(new Point2D(obj.getX(), obj.getY())))
-                        obj.draw(gContext);
+                    //if (playerVision.contains(new Point2D(obj.getX(), obj.getY())))
+                    obj.draw(gContext);
                 }
             }
         }
@@ -431,8 +456,8 @@ public class GameGUI extends GUI {
             if (!choosingTarget) {  // if not choosing skill target
 
                 for (Enemy enemy : tmpEnemies) {
-                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
-                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                    Rect2D r = new Rect2D(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point2D(mouseX + renderX, mouseY + renderY))) {
                         targetRuntimeID = enemy.getRuntimeID();
                         return;
                     }
@@ -450,8 +475,8 @@ public class GameGUI extends GUI {
                 choosingTarget = false;
                 setCursor(walkCursor);
                 for (Enemy enemy : tmpEnemies) {
-                    Rectangle r = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
-                    if (r.contains(new Point(mouseX + renderX, mouseY + renderY))) {
+                    Rect2D r = new Rect2D(enemy.getX(), enemy.getY(), 40, 40);
+                    if (r.contains(new Point2D(mouseX + renderX, mouseY + renderY))) {
                         addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
                                 map.name, Integer.parseInt(input+"")-1, enemy.getRuntimeID()));
                         return;

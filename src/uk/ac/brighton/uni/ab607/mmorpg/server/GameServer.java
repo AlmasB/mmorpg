@@ -5,6 +5,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +15,7 @@ import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarLogic;
 import com.almasb.common.search.AStarNode;
-import com.almasb.java.main.Out;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
@@ -49,7 +50,8 @@ public class GameServer {
         server = new UDPServer(55555, new ClientQueryParser());
 
         // start main server loop
-        new Thread(new ServerLoop()).start();
+        //new Thread(new ServerLoop()).start();
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::serverLoop, 0, 20, TimeUnit.MILLISECONDS);
 
         // test
         spawnChest(new Chest(1000, 680, 1000,
@@ -60,11 +62,11 @@ public class GameServer {
         new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
     }
 
-    interface QueryAction {
+    private interface QueryAction {
         public void execute(DataPacket packet, QueryRequest req) throws IOException;
     }
 
-    class ClientQueryParser extends ClientPacketParser {
+    private class ClientQueryParser extends ClientPacketParser {
         private HashMap<Query, QueryAction> actions = new HashMap<Query, QueryAction>();
 
         public ClientQueryParser() {
@@ -81,7 +83,7 @@ public class GameServer {
                             this::actionNone).execute(packet, (QueryRequest)packet.objectData);
                 }
                 catch (IOException e) {
-                    Out.err(e);
+                    Out.e("parseClientPacket", "Bad query request", this, e);
                 }
             }
 
@@ -124,14 +126,17 @@ public class GameServer {
                 loginPlayer(mapName, p);
             }
             else {
-                // purely for local debugging when db/accounts.db has been deleted
-                Out.debug("Account not found, using new");
 
-                GameAccount.addAccount("Debug", "pass", "test@mail.com");
-                Player p = GameAccount.getPlayer("Debug");
+                // purely for local debugging when db/accounts.db has been deleted
+                Out.d("actionLogin", "Account not found, using new");
+
+                String nam = "Debug";
+
+                GameAccount.addAccount(nam, "pass", "test@mail.com");
+                Player p = GameAccount.getPlayer(nam);
                 p.ip = packet.getIP();
                 p.port = packet.getPort();
-                String mapName = GameAccount.getMapName("Debug");
+                String mapName = GameAccount.getMapName(nam);
 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
@@ -148,7 +153,7 @@ public class GameServer {
         }
 
         private void actionNone(DataPacket packet, QueryRequest req) {
-            Out.err("Invalid QueryRequest: " + req.query);
+            Out.e("actionNone", "Invalid QueryRequest: " + req.query, this, null);
         }
 
         /**
@@ -156,19 +161,17 @@ public class GameServer {
          * @param name
          *              player name
          * @return
-         *          true if player name exists on server, false otherwise
+         *          true if player name exists on server (is online), false otherwise
          */
-        private boolean playerNameExists(String name) { // is player online
-            /*for (Player p : players)
-                if (p.name.equals(name))
-                    return true;*/
-
-            return false;
+        private boolean playerNameExists(String name) {
+            return getPlayerByName(name) != null;
         }
 
         /**
-         * No longer tracks the player but client
-         * still receives updates at this point
+         * No longer tracks the player
+         *
+         * (The address however still remains
+         * in the address "book" of UDPServer)
          *
          * @param playerName
          *                  name of the player to disconnect
@@ -188,7 +191,7 @@ public class GameServer {
         }
     }
 
-    class ServerLoop implements Runnable {
+    /*private class ServerLoop implements Runnable {
         @Override
         public void run() {
             long start;
@@ -210,6 +213,11 @@ public class GameServer {
                 }
             }
         }
+    }*/
+
+    private void serverLoop() {
+        for (GameMap map : maps)
+            map.update(server);
     }
 
     /**
@@ -217,7 +225,7 @@ public class GameServer {
      * @param name
      *              player name
      * @return
-     *          player if name exists on the server, if not then null
+     *          player if name exists on the server (is online), if not then null
      */
     /*package-private*/ Player getPlayerByName(String name) {
         Player p = null;

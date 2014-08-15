@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import com.almasb.common.graphics.Color;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
@@ -329,7 +329,7 @@ public class ObjectManager {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
                 useResult = new SkillUseResult(Target.ENEMY, d,
-                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, "levelUP.png"),
+                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, R.drawable.level_up),
                         new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
             }
         });

@@ -7,6 +7,7 @@ import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.util.Out;
 
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
@@ -33,6 +34,10 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
  *
  */
 public class ServerActionHandler {
+
+    private interface ServerAction {
+        public void execute(Player p, ActionRequest req) throws BadActionRequestException;
+    }
 
     private HashMap<Action, ServerAction> actions = new HashMap<Action, ServerAction>();
     private GameServer server;
@@ -122,7 +127,7 @@ public class ServerActionHandler {
                                 target.getXP().base + " XP", Color.YELLOW, 2.0f), req.data);
 
                         if (player.gainXP(target.getXP())) {
-                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
+                            server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, R.drawable.level_up), req.data);
                         }
 
                         server.spawnChest(target.onDeath(), req.data);
@@ -168,7 +173,7 @@ public class ServerActionHandler {
                         skTarget.getXP().base + " XP", Color.BLUE, 2.0f), req.data);
 
                 if (player.gainXP(skTarget.getXP())) {
-                    server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, "levelUP.png"), req.data);
+                    server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, R.drawable.level_up), req.data);
                 }
 
                 server.spawnChest(skTarget.onDeath(), req.data);

@@ -2,7 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.item;
 
 import java.util.ArrayList;
 
-import com.almasb.java.main.Out;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
@@ -63,7 +63,7 @@ public abstract class EquippableItem extends GameItem {
         if (runes.size() < runesMax) {
             return runes.add(rune);
         }
-        Out.err("Can't add any more runes to this item");
+        Out.d("addRune", "Can't add any more runes to this item");
         return false;
     }
 
@@ -72,7 +72,7 @@ public abstract class EquippableItem extends GameItem {
             this.essence = e;
             return true;
         }
-        Out.err("Can't add any more essences to this item");
+        Out.d("addEssence", "Can't add any more essences to this item");
         return false;
     }
 
@@ -96,7 +96,7 @@ public abstract class EquippableItem extends GameItem {
 
     public void refine() {
         if (refineLevel >= MAX_REFINE_LEVEL) {
-            Out.err("Can't refine this item any more");
+            Out.d("refine", "Can't refine this item any more");
             return;
         }
 

@@ -1,0 +1,11 @@
+uk.ac.brighton.uni.ab607.mmorpg
+uk.ac.brighton.uni.ab607.mmorpg.client
+uk.ac.brighton.uni.ab607.mmorpg.client.ui
+uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation
+uk.ac.brighton.uni.ab607.mmorpg.common
+uk.ac.brighton.uni.ab607.mmorpg.common.combat
+uk.ac.brighton.uni.ab607.mmorpg.common.item
+uk.ac.brighton.uni.ab607.mmorpg.common.math
+uk.ac.brighton.uni.ab607.mmorpg.common.object
+uk.ac.brighton.uni.ab607.mmorpg.common.request
+uk.ac.brighton.uni.ab607.mmorpg.server

@@ -3,8 +3,8 @@ package uk.ac.brighton.uni.ab607.mmorpg.server;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import com.almasb.common.util.Out;
 import com.almasb.java.io.ResourceManager;
-import com.almasb.java.main.Out;
 
 /**
  * Handles all DB operations
@@ -29,8 +29,8 @@ public class DBAccess {
             ResourceManager.writeJavaObject(DB_FILE, accounts);
         }
         catch (IOException e) {
-            Out.err("Failed to save DB");
-            Out.err(e);
+            Out.i("Failed to save DB");
+            Out.e(e);
         }
     }
 
@@ -42,12 +42,12 @@ public class DBAccess {
             map = (TreeMap<String, GameAccount>) ResourceManager.loadJavaObject(DB_FILE);
         }
         catch (IOException | ClassNotFoundException e) {
-            Out.err(e);
+            Out.e(e);
         }
 
         if (map == null) {
             map = new TreeMap<String, GameAccount>();
-            Out.println("Using new DB");
+            Out.i("Using new DB");
         }
 
         return map;

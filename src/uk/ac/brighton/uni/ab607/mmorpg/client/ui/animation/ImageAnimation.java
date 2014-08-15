@@ -2,32 +2,27 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation;
 
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
-
 public class ImageAnimation extends Animation {
     /**
      *
      */
     private static final long serialVersionUID = 1496702577417839916L;
 
-    private String imageFileName;
     private int spriteX = 0, spriteY = 0;
-    private int endX = 0, endY = 0;
+    private transient int endX = 0, endY = 0;
     private int dx = 0, dy = 0;
 
-    public ImageAnimation(int x, int y, float maxDuration, String imageFileName) {
-        /*super(x, y, maxDuration);
-        this.imageFileName = imageFileName;
-        endX = x;
-        endY = y;*/
-        this(x, y, x, y, maxDuration, imageFileName);
+    private int spriteID;
+
+    public ImageAnimation(int x, int y, float maxDuration, int spriteID) {
+        this(x, y, x, y, maxDuration, spriteID);
     }
 
-    public ImageAnimation(int x, int y, int endX, int endY, float maxDuration, String imageFileName) {
+    public ImageAnimation(int x, int y, int endX, int endY, float maxDuration, int spriteID) {
         super(x, y, maxDuration);
-        this.imageFileName = imageFileName;
         this.endX = endX;
         this.endY = endY;
+        this.spriteID = spriteID;
     }
 
     @Override
@@ -45,7 +40,7 @@ public class ImageAnimation extends Animation {
     public void draw(GraphicsContext g) {
         int tmpX = x - g.getRenderX() + dx;
         int tmpY = y - g.getRenderY() + dy;
-        g.drawImage(R.drawable.level_up, tmpX, tmpY, tmpX+40, tmpY+40,
+        g.drawImage(spriteID, tmpX, tmpY, tmpX+40, tmpY+40,
                 spriteX*128, spriteY*128, spriteX*128+128, spriteY*128+128);  // make general
 
     }

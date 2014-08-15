@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.R;
+import uk.ac.brighton.uni.ab607.mmorpg.R;
 
 public class Chest implements java.io.Serializable, Drawable {
     /**
@@ -13,13 +13,13 @@ public class Chest implements java.io.Serializable, Drawable {
      */
     private static final long serialVersionUID = -2554224770526414165L;
 
-    private ArrayList<GameItem> items = new ArrayList<GameItem>();
+    private transient ArrayList<GameItem> items = new ArrayList<GameItem>();
 
     public final int x, y;
 
-    public final int money;
+    public transient final int money;
 
-    private boolean opened = false;
+    private transient boolean opened = false;
 
     public Chest(int x, int y, int money, GameItem... itemset) {
         this.x = x;

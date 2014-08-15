@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.DataPacketParser;
 import com.almasb.common.net.UDPClient;
-import com.almasb.java.main.Out;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
@@ -152,7 +152,7 @@ public class LoginController extends AnchorPane implements Initializable {
                 client.send(new DataPacket(new QueryRequest(Query.CHECK, user, pass)));
             }
             catch (IOException e) {
-                Out.err(e);
+                Out.e(e);
             }
 
             long startTime = System.currentTimeMillis();

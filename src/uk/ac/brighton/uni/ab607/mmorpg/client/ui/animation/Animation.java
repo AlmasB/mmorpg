@@ -26,7 +26,7 @@ public abstract class Animation implements java.io.Serializable, Drawable {
      *
      * Max duration - at which animation ends
      */
-    protected float currentDuration = 0.0f, maxDuration;
+    protected transient float currentDuration = 0.0f, maxDuration;
 
     public Animation(int x, int y, float maxDuration) {
         this.x = x;

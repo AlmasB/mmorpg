@@ -18,11 +18,11 @@ public class Enemy extends GameCharacter {
         NORMAL, MINIBOSS, BOSS
     }
 
-    public final EnemyType type;
+    public transient final EnemyType type;
 
-    private Element element;
+    private transient Element element;
 
-    private DroppableItem[] drops;
+    private transient DroppableItem[] drops;
 
     /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, AttributeInfo attrs, Experience xp, int spriteID, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
@@ -32,7 +32,6 @@ public class Enemy extends GameCharacter {
         this.baseLevel = level;
         this.xp = xp;
         this.spriteID = spriteID;
-        //this.spriteName = spriteName;
         this.drops = drops;
         attributes[STR] = attrs.str;
         attributes[VIT] = attrs.vit;

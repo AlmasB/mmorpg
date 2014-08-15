@@ -3,13 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import com.almasb.common.graphics.Color;
-import com.almasb.common.graphics.Point2D;
-import com.almasb.common.net.DataPacket;
-import com.almasb.common.net.UDPServer;
-import com.almasb.common.search.AStarNode;
-import com.almasb.java.io.Resources;
+import java.util.stream.Stream;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
@@ -18,6 +12,15 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+
+import com.almasb.common.graphics.Color;
+import com.almasb.common.graphics.Point2D;
+import com.almasb.common.graphics.Rect2D;
+import com.almasb.common.net.DataPacket;
+import com.almasb.common.net.UDPServer;
+import com.almasb.common.search.AStarNode;
+import com.almasb.common.util.Out;
+import com.almasb.java.io.Resources;
 
 public class GameMap {
 
@@ -142,39 +145,37 @@ public class GameMap {
         }
 
         // all objects to send
-        Player[] toSend = new Player[tmpPlayers.size()];
-        for (int i = 0; i < tmpPlayers.size(); i++)
-            toSend[i] = tmpPlayers.get(i);
+        ArrayList<Enemy> tmpList = new ArrayList<Enemy>();
+        enemies.forEach(list -> list.forEach(enemy -> tmpList.add(enemy)));
 
-        Chest[] chestsToSend = new Chest[chests.size()];
-        for (int i = 0; i < chests.size(); i++)
-            chestsToSend[i] = chests.get(i);
 
-        Animation[] animsToSend = new Animation[animations.size()];
-        for (int i = 0; i < animations.size(); i++)
-            animsToSend[i] = animations.get(i);
+        Stream<Player> playerStream = tmpPlayers.stream();
+        Stream<Chest> chestStream = chests.stream();
+        Stream<Animation> animationStream = animations.stream();
+        Stream<Enemy> enemyStream = tmpList.stream();
 
-        Enemy[] enemyToSend = new Enemy[enemyNumbers];
-        int j = 0;
-        for (ArrayList<Enemy> list : enemies) {
-            for (int i = 0; i < list.size(); i++) {
-                enemyToSend[j++] = list.get(i);
-            }
-        }
+        tmpPlayers.forEach(player -> {
+            Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
-        for (Player p : tmpPlayers) {
+            Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
+            Chest[] chestsToSend = chestStream.filter(chest -> playerVision.contains(new Point2D(chest.getX(), chest.getY()))).toArray(Chest[]::new);
+            Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
+            Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
+
             try {
-
-                server.send(new DataPacket(chestsToSend), p.ip, p.port);
-                server.send(new DataPacket(enemyToSend), p.ip, p.port);
-                server.send(new DataPacket(animsToSend), p.ip, p.port);
-                server.send(new DataPacket(toSend), p.ip, p.port);
+                if (playersToSend.length > 0)
+                    server.send(new DataPacket(playersToSend), player.ip, player.port);
+                if (chestsToSend.length > 0)
+                    server.send(new DataPacket(chestsToSend), player.ip, player.port);
+                if (enemiesToSend.length > 0)
+                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
+                if (animationsToSend.length > 0)
+                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Out.e("update", "Failed to send a packet", this, e);
             }
-        }
-
+        });
     }
 
     public Enemy getEnemyByRuntimeID(int id) {
