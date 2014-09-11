@@ -2,7 +2,6 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static com.almasb.common.parsing.PseudoHTML.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;

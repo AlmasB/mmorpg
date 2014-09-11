@@ -50,7 +50,7 @@ public class LoginFXGUI extends Application {
         primaryStage.setResizable(false);
         primaryStage.setTitle("Login GUI");
 
-        InputStream in = ResourceManager.loadResourceAsStream("UI/Login.fxml");
+        InputStream in = ResourceManager.loadResourceAsStream("UI/Login.fxml").get();
         FXMLLoader loader = new FXMLLoader();
         loader.setBuilderFactory(new JavaFXBuilderFactory());
 

@@ -34,8 +34,6 @@ public class GameMap {
     private SpawnInfo[] spawnInfo;
     private int enemyRuntimeID = 1; // it will keep going up
 
-    private int enemyNumbers = 0;
-
     private ArrayList<Player> players = new ArrayList<Player>();
     public ArrayList<Chest> chests = new ArrayList<Chest>();
 
@@ -70,7 +68,6 @@ public class GameMap {
                 e.setY((int) p.getY());
                 e.setRuntimeID(enemyRuntimeID++);
                 list.add(e);
-                enemyNumbers++;
             }
             enemies.add(list);
         }
