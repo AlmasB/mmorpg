@@ -15,6 +15,7 @@ import com.almasb.java.io.ResourceManager;
  */
 public class DBAccess {
 
+    private static final String RES_FOLDER = "res/";
     private static final String DB_FOLDER = "db/";
     private static final String DB_FILE = DB_FOLDER + "accounts.db";
 
@@ -26,7 +27,7 @@ public class DBAccess {
 
     public static void saveDB() {
         try {
-            ResourceManager.writeJavaObject(DB_FILE, accounts);
+            ResourceManager.writeJavaObject(RES_FOLDER + DB_FILE, accounts);
         }
         catch (IOException e) {
             Out.i("Failed to save DB");
@@ -39,7 +40,7 @@ public class DBAccess {
         TreeMap<String, GameAccount> map = null;
 
         try {
-            map = (TreeMap<String, GameAccount>) ResourceManager.loadJavaObject(DB_FILE);
+            map = (TreeMap<String, GameAccount>) ResourceManager.loadJavaObject(RES_FOLDER + DB_FILE);
         }
         catch (IOException | ClassNotFoundException e) {
             Out.e(e);
