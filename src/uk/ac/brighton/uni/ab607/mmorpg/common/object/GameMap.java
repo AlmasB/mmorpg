@@ -152,12 +152,19 @@ public class GameMap {
         Stream<Enemy> enemyStream = tmpList.stream();
 
         tmpPlayers.forEach(player -> {
+
+
+
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
             Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
             Chest[] chestsToSend = chestStream.filter(chest -> playerVision.contains(new Point2D(chest.getX(), chest.getY()))).toArray(Chest[]::new);
             Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
             Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
+
+
+            //Out.d("map update", playersToSend.length + "");
+
 
             try {
                 if (playersToSend.length > 0)

@@ -90,13 +90,4 @@
   <scm>
   	<url>https://github.com/AlmasB/mmorpg</url>
   </scm>
-  <dependencies>
-  	<dependency>
-		<groupId>com.java</groupId>
-		<artifactId>jfxrt</artifactId>
-		<version>1.8</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/jfxrt.jar</systemPath>
-	</dependency>
-  </dependencies>
 </project>
