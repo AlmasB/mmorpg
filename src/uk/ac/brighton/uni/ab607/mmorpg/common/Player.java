@@ -1,5 +1,9 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.parsing.PseudoHTML;
@@ -68,7 +72,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     private int statLevel = 1, jobLevel = 1;
 
-    private int attributePoints = 0,
+    private byte attributePoints = 0,
             skillPoints = 0;
 
     private int money = 0;
@@ -85,8 +89,25 @@ public class Player extends GameCharacter implements PseudoHTML {
     public String ip;
     public int port;
 
+    public transient SimpleIntegerProperty[] attributeProperties = new SimpleIntegerProperty[9];
+    public transient SimpleIntegerProperty[] bonusAttributeProperties = new SimpleIntegerProperty[9];
+    public transient SimpleDoubleProperty[] statProperties = new SimpleDoubleProperty[16];
+    public transient SimpleDoubleProperty[] bonusStatProperties = new SimpleDoubleProperty[16];
+
+    public transient SimpleIntegerProperty hpProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty spProperty = new SimpleIntegerProperty();
+
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
+        for (int i = STR; i <= LUC; i++) {
+            attributeProperties[i] = new SimpleIntegerProperty(1);
+            bonusAttributeProperties[i] = new SimpleIntegerProperty();
+        }
+        for (int i = MAX_HP; i <= SP_REGEN; i++) {
+            statProperties[i] = new SimpleDoubleProperty();
+            bonusStatProperties[i] = new SimpleDoubleProperty();
+        }
+
         this.x = x;
         this.y = y;
         this.ip = ip;
@@ -95,6 +116,22 @@ public class Player extends GameCharacter implements PseudoHTML {
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
+    }
+
+    public void update(Player player) {
+        Platform.runLater(() -> {
+            for (int i = STR; i <= LUC; i++) {
+                attributeProperties[i].set(player.getBaseAttribute(i));
+                bonusAttributeProperties[i].set(player.getBonusAttribute(i));
+            }
+            for (int i = MAX_HP; i <= SP_REGEN; i++) {
+                statProperties[i].set(player.getBaseStat(Stat.values()[i]));
+                bonusStatProperties[i].set(player.getBonusStat(Stat.values()[i]));
+            }
+
+            hpProperty.set(player.getHP());
+            spProperty.set(player.getSP());
+        });
     }
 
     /**
@@ -306,4 +343,22 @@ public class Player extends GameCharacter implements PseudoHTML {
         g.setColor(Color.GOLD);
         g.fillRect(tmpX + 1, tmpY + 66, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
+
+    // BYTE STREAM IMPL
+
+    //    @Override
+    //    public void loadFromByteArray(byte[] data) {
+    //
+    //    }
+    //
+    //    @Override
+    //    public byte[] toByteArray() {
+    //        byte[] data = new byte[100];
+    //
+    //        data[0] = "P".getBytes()[0];
+    //
+    //
+    //
+    //        return data;
+    //    }
 }

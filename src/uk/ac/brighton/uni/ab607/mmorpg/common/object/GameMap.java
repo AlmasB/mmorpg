@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +39,8 @@ public class GameMap {
     public ArrayList<Chest> chests = new ArrayList<Chest>();
 
     public ArrayList<Animation> animations = new ArrayList<Animation>();
+
+    private int tick = 0;
 
     /*package-private*/ GameMap(String name, int spriteID, SpawnInfo... info) {
         this.name = name;
@@ -167,14 +170,32 @@ public class GameMap {
 
 
             try {
-                if (playersToSend.length > 0)
-                    server.send(new DataPacket(playersToSend), player.ip, player.port);
+                if (tick == 0)
+                    server.send(new DataPacket(player), player.ip, player.port);
+
+                if (playersToSend.length > 0) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    for (int i = 0; i < playersToSend.length; i++) {
+                        baos.write(playersToSend[i].toByteArray());
+                        //baos.write(-128);
+                    }
+
+                    server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
+                }
+                //server.send(new DataPacket(playersToSend), player.ip, player.port);
+
+
                 if (chestsToSend.length > 0)
                     server.send(new DataPacket(chestsToSend), player.ip, player.port);
                 if (enemiesToSend.length > 0)
                     server.send(new DataPacket(enemiesToSend), player.ip, player.port);
                 if (animationsToSend.length > 0)
                     server.send(new DataPacket(animationsToSend), player.ip, player.port);
+
+                tick++;
+
+                if (tick == 50)
+                    tick = 0;
             }
             catch (Exception e) {
                 Out.e("update", "Failed to send a packet", this, e);

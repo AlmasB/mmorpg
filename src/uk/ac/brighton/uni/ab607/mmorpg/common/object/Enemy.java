@@ -33,15 +33,15 @@ public class Enemy extends GameCharacter {
         this.xp = xp;
         this.spriteID = spriteID;
         this.drops = drops;
-        attributes[STR] = attrs.str;
-        attributes[VIT] = attrs.vit;
-        attributes[DEX] = attrs.dex;
-        attributes[AGI] = attrs.agi;
-        attributes[INT] = attrs.int_;
-        attributes[WIS] = attrs.wis;
-        attributes[WIL] = attrs.wil;
-        attributes[PER] = attrs.per;
-        attributes[LUC] = attrs.luc;
+        attributes[STR] = (byte) attrs.str;
+        attributes[VIT] = (byte) attrs.vit;
+        attributes[DEX] = (byte) attrs.dex;
+        attributes[AGI] = (byte) attrs.agi;
+        attributes[INT] = (byte) attrs.int_;
+        attributes[WIS] = (byte) attrs.wis;
+        attributes[WIL] = (byte) attrs.wil;
+        attributes[PER] = (byte) attrs.per;
+        attributes[LUC] = (byte) attrs.luc;
         calculateStats();
         setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
         setSP((int)getTotalStat(MAX_SP));

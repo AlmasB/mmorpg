@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,9 +10,20 @@ import java.util.ArrayList;
 
 
 
+
+
+
+
+
+
+
+
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
@@ -24,6 +36,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
@@ -35,6 +48,7 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -46,10 +60,14 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import com.almasb.common.compression.LZMACompressor;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
+import com.almasb.common.net.SocketConnection;
 import com.almasb.common.net.UDPClient;
+import com.almasb.common.net.UDPConnection;
 import com.almasb.common.util.Out;
+import com.almasb.common.util.ZIPCompressor;
 import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
 
@@ -66,7 +84,11 @@ public class GameWindow extends FXWindow {
 
     private Pane uiRoot;
 
-    private Stage menu;
+    private Stage menu, stats;
+
+    private Font font;
+
+    private Player player = new Player("Debug", GameCharacterClass.KNIGHT, 0, 0, "", 0);
 
     public GameWindow(String ip, String playerName) {
         name = playerName;
@@ -79,6 +101,22 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }*/
 
+
+        /*       int size = SocketConnection.calculatePacketSize(new DataPacket(player));
+
+        int size2 = UDPConnection.toByteArray(player).length;
+
+        Out.d("datapacket", size + "");
+        Out.d("rawish", size2 + "");
+
+        byte[] data = UDPConnection.toByteArray(new DataPacket(player));
+        byte[] data2 = UDPConnection.toByteArray(player);
+
+        Out.d("zip", new ZIPCompressor().compress(data).length + "");
+        Out.d("zip2", new ZIPCompressor().compress(data2).length + "");
+
+        Out.d("lzma", LZMACompressor.compress(data).length + "");
+        Out.d("lzma2", LZMACompressor.compress(data2).length + "");*/
     }
 
     @Override
@@ -98,8 +136,6 @@ public class GameWindow extends FXWindow {
         uiScene = new SubScene(uiRoot, 1280, 720);
         uiScene.translateXProperty().bind(camera.translateXProperty());
 
-
-        Font font = null;
         try {
             font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
         }
@@ -130,7 +166,78 @@ public class GameWindow extends FXWindow {
         Scene menuScene = new Scene(new Menu(), 450, 375, Color.TRANSPARENT);
 
         menu.setScene(menuScene);
-        menu.show();
+        //menu.show();
+
+        // STATS
+
+        stats = new Stage(StageStyle.TRANSPARENT);
+        //stats.setX(0);
+        //stats.setY(0);
+        stats.setAlwaysOnTop(true);
+
+
+        Scene attrScene = new Scene(new StatsWindow(), 770, 620, Color.TRANSPARENT);
+
+        stats.setScene(attrScene);
+        stats.show();
+    }
+
+    private class StatsWindow extends Parent {
+
+        public StatsWindow() {
+
+            StackPane stack = new StackPane();
+            stack.setAlignment(Pos.TOP_LEFT);
+
+            try {
+                ImageView img = new ImageView(ResourceManager.loadFXImage("ui_stats_bg.png"));
+                stack.getChildren().add(img);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            HBox hbox = new HBox(50);
+
+            VBox attrBox = new VBox(10);
+            attrBox.setRotate(2);
+            attrBox.setPadding(new Insets(20, 0, 0, 120));
+
+            for (int i = GameCharacter.STR; i <= GameCharacter.LUC; i++) {
+                Text attr = new Text("STR: " + player.getBaseAttribute(i) + "+" + player.getBonusAttribute(i));
+                attr.setFont(font);
+                attrBox.getChildren().add(attr);
+            }
+
+            //            Text attrSTR = new Text("STR: " + player.getBaseAttribute(GameCharacter.STR) + "+" + "0");
+            //            Text attrVIT = new Text("VIT: " + player.getBaseAttribute(GameCharacter.VIT) + "+" + "0");
+            //            Text attrDEX = new Text("DEX: " + player.getBaseAttribute(GameCharacter.DEX) + "+" + "0");
+            //
+            //            attrSTR.setFont(font);
+            //            attrVIT.setFont(font);
+            //            attrDEX.setFont(font);
+            //
+            //            attrBox.getChildren().addAll(attrSTR, attrVIT, attrDEX);
+
+
+
+
+            VBox statBox = new VBox(10);
+            statBox.setPadding(new Insets(20, 0, 0, 140));
+
+            Text statName = new Text(player.name);
+            Text statLevel = new Text(player.getHP() + "");
+
+            statName.setFont(font);
+            statLevel.setFont(font);
+
+            statBox.getChildren().addAll(statName, statLevel);
+
+
+            hbox.getChildren().addAll(attrBox, statBox);
+            stack.getChildren().add(hbox);
+            getChildren().add(stack);
+        }
     }
 
     private class Menu extends Parent {
@@ -205,7 +312,6 @@ public class GameWindow extends FXWindow {
                 e.printStackTrace();
             }
 
-            Font font = null;
             try {
                 font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
             }
@@ -309,6 +415,13 @@ public class GameWindow extends FXWindow {
     class ServerResponseParser extends ServerPacketParser {
         @Override
         public void parseServerPacket(DataPacket packet) {
+            if (packet.byteData != null && packet.byteData.length > 0 && packet.byteData[0] == -127) {
+                // raw data of players containing drawing data
+                ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+
+                // number of players
+                int size = packet.byteData.length / 32;
+            }
 
             //Out.d("packet recv", packet.objectData == null ? "null" : packet.objectData.getClass().getSimpleName());
 
@@ -324,6 +437,9 @@ public class GameWindow extends FXWindow {
 
             if (packet.objectData instanceof Player) {
                 Player player = (Player) packet.objectData;
+
+                // update client's player
+                // this.player.update(player);
 
                 Platform.runLater(() -> {
                     message.setTranslateX(player.getX());
