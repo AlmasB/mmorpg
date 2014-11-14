@@ -19,9 +19,12 @@ import java.util.ArrayList;
 
 
 
+
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -36,6 +39,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.effect.Light;
@@ -88,7 +92,7 @@ public class GameWindow extends FXWindow {
 
     private Font font;
 
-    private Player player = new Player("Debug", GameCharacterClass.KNIGHT, 0, 0, "", 0);
+    private Player player = new Player("Player Name", GameCharacterClass.KNIGHT, 0, 0, "", 0);
 
     public GameWindow(String ip, String playerName) {
         name = playerName;
@@ -199,40 +203,74 @@ public class GameWindow extends FXWindow {
 
             HBox hbox = new HBox(50);
 
+            // ATTRS
+
             VBox attrBox = new VBox(10);
-            attrBox.setRotate(2);
-            attrBox.setPadding(new Insets(20, 0, 0, 120));
+            attrBox.setRotate(1);
+            attrBox.setPadding(new Insets(60, 0, 0, 100));
 
             for (int i = GameCharacter.STR; i <= GameCharacter.LUC; i++) {
-                Text attr = new Text("STR: " + player.getBaseAttribute(i) + "+" + player.getBonusAttribute(i));
+                HBox hLine = new HBox(10);
+                hLine.setAlignment(Pos.CENTER_RIGHT);
+                Text attr = new Text();
                 attr.setFont(font);
-                attrBox.getChildren().add(attr);
+                attr.textProperty().bind(
+                        new SimpleStringProperty(Attribute.values()[i].name() + ": " )
+                        .concat(player.attributeProperties[i]).concat("+")
+                        .concat(player.bonusAttributeProperties[i]));
+
+                Button btn = new Button("+");
+                // TODO: btn impl
+                //btn.setFont(font);
+
+                hLine.getChildren().addAll(attr, btn);
+                attrBox.getChildren().add(hLine);
             }
 
-            //            Text attrSTR = new Text("STR: " + player.getBaseAttribute(GameCharacter.STR) + "+" + "0");
-            //            Text attrVIT = new Text("VIT: " + player.getBaseAttribute(GameCharacter.VIT) + "+" + "0");
-            //            Text attrDEX = new Text("DEX: " + player.getBaseAttribute(GameCharacter.DEX) + "+" + "0");
-            //
-            //            attrSTR.setFont(font);
-            //            attrVIT.setFont(font);
-            //            attrDEX.setFont(font);
-            //
-            //            attrBox.getChildren().addAll(attrSTR, attrVIT, attrDEX);
 
-
-
+            // STATS
 
             VBox statBox = new VBox(10);
-            statBox.setPadding(new Insets(20, 0, 0, 140));
+            statBox.setRotate(1);
+            statBox.setPadding(new Insets(20, 0, 0, 70));
 
             Text statName = new Text(player.name);
-            Text statLevel = new Text(player.getHP() + "");
 
-            statName.setFont(font);
-            statLevel.setFont(font);
+            Text statClass = new Text();
+            statClass.textProperty().bind(new SimpleStringProperty("Class: ").concat(player.classProperty));
 
-            statBox.getChildren().addAll(statName, statLevel);
+            Text statLevel = new Text();
+            statLevel.textProperty().bind(new SimpleStringProperty("Level: ").concat(player.baseLevelProperty)
+                    .concat("/").concat(player.jobLevelProperty)
+                    .concat("/").concat(player.statLevelProperty));
 
+            Text statHPSP = new Text();
+            statHPSP.textProperty().bind(new SimpleStringProperty("HP: ").concat(player.hpProperty)
+                    .concat(" SP: ").concat(player.spProperty));
+
+            Text statATK = new Text();
+            statATK.textProperty().bind(new SimpleStringProperty("ATK: ").concat(player.statProperties[Player.ATK]));
+
+            Text statMATK = new Text();
+            statMATK.textProperty().bind(new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK]));
+
+            Text statDEF = new Text();
+            statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF]));
+
+            Text statMDEF = new Text();
+            statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF]));
+
+            Text statARM = new Text();
+            statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM]));
+
+            Text statMARM = new Text();
+            statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM]));
+
+            Text statCrit = new Text();
+            statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE]).concat("%"));
+
+            statBox.getChildren().addAll(statName, statClass, statLevel, statHPSP, statATK, statMATK, statDEF, statMDEF, statARM, statMARM, statCrit);
+            statBox.getChildren().forEach(child -> ((Text)child).setFont(font));
 
             hbox.getChildren().addAll(attrBox, statBox);
             stack.getChildren().add(hbox);

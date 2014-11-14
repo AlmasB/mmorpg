@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
@@ -96,6 +97,11 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public transient SimpleIntegerProperty hpProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty spProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty baseLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty jobLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty statLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
+
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
@@ -104,7 +110,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             bonusAttributeProperties[i] = new SimpleIntegerProperty();
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
-            statProperties[i] = new SimpleDoubleProperty();
+            statProperties[i] = new SimpleDoubleProperty(123.45);
             bonusStatProperties[i] = new SimpleDoubleProperty();
         }
 
@@ -131,6 +137,12 @@ public class Player extends GameCharacter implements PseudoHTML {
 
             hpProperty.set(player.getHP());
             spProperty.set(player.getSP());
+
+            baseLevelProperty.set(player.baseLevel);
+            statLevelProperty.set(player.statLevel);
+            jobLevelProperty.set(player.jobLevel);
+
+            classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
         });
     }
 
