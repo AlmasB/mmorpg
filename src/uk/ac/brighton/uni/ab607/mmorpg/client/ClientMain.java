@@ -29,6 +29,11 @@ public class ClientMain {
             return;
         }
 
+        if (args[0].equals("-local")) {
+            new GameWindow("", "").init();
+            return;
+        }
+
         boolean local = false, server = false;
 
         switch (args[0]) {

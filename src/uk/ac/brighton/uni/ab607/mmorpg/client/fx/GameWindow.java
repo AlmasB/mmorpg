@@ -1,6 +1,9 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
@@ -16,11 +19,22 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.Camera;
 import javafx.scene.ParallelCamera;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -40,18 +54,21 @@ public class GameWindow extends FXWindow {
     private Text message = new Text();
 
     private Scene scene;
+    private SubScene uiScene;
     private Camera camera = new ParallelCamera();
+
+    private Pane uiRoot;
 
     public GameWindow(String ip, String playerName) {
         name = playerName;
 
-        try {
+        /*        try {
             client = new UDPClient(ip, 55555, new ServerResponseParser());
             client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
         }
         catch (IOException e) {
             Out.e(e);
-        }
+        }*/
 
     }
 
@@ -67,6 +84,151 @@ public class GameWindow extends FXWindow {
 
 
         root.getChildren().add(message);
+
+        uiRoot = new Pane();
+        uiScene = new SubScene(uiRoot, 1280, 720);
+        uiScene.translateXProperty().bind(camera.translateXProperty());
+
+
+        Font font = null;
+        try {
+            font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
+        }
+        catch (IOException e) {
+            Out.e(e);
+        }
+
+
+
+        VBox vbox = new VBox(10);
+        Button btnOptions = new Button("Options");
+        if (font != null) {
+            btnOptions.setFont(font);
+            Out.d("font", "added");
+        }
+        vbox.getChildren().add(btnOptions);
+        uiRoot.getChildren().addAll(vbox);
+
+
+        root.getChildren().add(uiScene);
+
+        // MENU
+
+        Stage menu = new Stage(StageStyle.UNDECORATED);
+        menu.setWidth(300);
+        menu.setHeight(400);
+        menu.setAlwaysOnTop(true);
+
+        VBox menuBox = new VBox(15);
+        menuBox.setAlignment(Pos.CENTER);
+        Scene menuScene = new Scene(menuBox);
+
+        Button menuBtnBack = new Button("Back to game");
+
+        ImageView img = null;
+        ImageView img2 = null;
+        try {
+            img = new ImageView(ResourceManager.loadFXImage("ui_menu_button.png"));
+            img2 = new ImageView(ResourceManager.loadFXImage("ui_menu_button.png"));
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        //if (img != null)
+        menuBtnBack.setGraphic(img2);
+
+        Rectangle clip = new Rectangle();
+        clip.setX(5);
+        clip.setY(5);
+        clip.widthProperty().bind(menuBtnBack.widthProperty().subtract(10));
+        clip.heightProperty().bind(menuBtnBack.heightProperty().subtract(10));
+        clip.setArcWidth(30);
+        clip.setArcHeight(30);
+
+        img.fitWidthProperty().bind(menuBtnBack.widthProperty());
+        img.fitHeightProperty().bind(menuBtnBack.heightProperty());
+
+
+        //img2.fitWidthProperty().bind(menuBtnBack.widthProperty());
+        //img2.fitHeightProperty().bind(menuBtnBack.heightProperty());
+
+
+        menuBtnBack.setClip(img);
+        //menuBtnBack.setAlignment(Pos.);
+
+
+        if (font != null) {
+            menuBtnBack.setFont(font);
+            Out.d("font", "added");
+        }
+
+        Button menuBtnOptions = new Button("Options");
+        if (font != null) {
+            menuBtnOptions.setFont(font);
+            Out.d("font", "added");
+        }
+
+        Button menuBtnExit = new Button("Exit");
+        if (font != null) {
+            menuBtnExit.setFont(font);
+            Out.d("font", "added");
+        }
+
+        menuBox.getChildren().addAll(new StyledButton(), menuBtnOptions, menuBtnExit);
+
+        menu.setScene(menuScene);
+        menu.show();
+    }
+
+    class StyledButton extends Parent {
+
+        private ImageView imgView;
+
+        private Image entered, exited;
+
+        public StyledButton() {
+            try {
+                entered = ResourceManager.loadFXImage("ui_menu_button2.png");
+                exited = ResourceManager.loadFXImage("ui_menu_button.png");
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Font font = null;
+            try {
+                font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
+            }
+            catch (IOException e) {
+                Out.e(e);
+            }
+
+
+            imgView = new ImageView(exited);
+
+            StackPane stack = new StackPane();
+            stack.setAlignment(Pos.CENTER);
+            Text text = new Text("Resume");
+            text.setFont(font);
+            stack.getChildren().addAll(imgView, text);
+
+            getChildren().add(stack);
+
+            this.setOnMouseClicked(event -> {
+                Out.d("mouse", "clicked");
+            });
+
+            this.setOnMouseEntered(event -> {
+                imgView.setImage(entered);
+            });
+
+            this.setOnMouseExited(event -> {
+                imgView.setImage(exited);
+            });
+        }
     }
 
     @Override
@@ -81,18 +243,18 @@ public class GameWindow extends FXWindow {
 
 
         scene.setOnMouseClicked(event -> {
-            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
-            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)event.getX(), (int)event.getY()));
-
-            try {
-                ActionRequest[] thisGUI = this.clearPendingActionRequests();
-
-                if (thisGUI.length > 0)
-                    client.send(new DataPacket(thisGUI));
-            }
-            catch (IOException e) {
-                Out.e("updateGameClient", "Failed to send a packet", this, e);
-            }
+            //            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
+            //            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)event.getX(), (int)event.getY()));
+            //
+            //            try {
+            //                ActionRequest[] thisGUI = this.clearPendingActionRequests();
+            //
+            //                if (thisGUI.length > 0)
+            //                    client.send(new DataPacket(thisGUI));
+            //            }
+            //            catch (IOException e) {
+            //                Out.e("updateGameClient", "Failed to send a packet", this, e);
+            //            }
         });
     }
 
@@ -154,12 +316,6 @@ public class GameWindow extends FXWindow {
                     message.setTranslateX(player.getX());
                     message.setTranslateY(player.getY());
 
-                    //camera.
-
-                    // manually trigger camera translate property to fire
-                    //                    camera.setTranslateX(message.getTranslateX());
-                    //                    camera.setTranslateY(message.getTranslateY());
-                    //                    scene.setCamera(camera);
 
                     message.setText(player.name + " " + player.getX() + " " + player.getY() + " " + player.getHP());
 
