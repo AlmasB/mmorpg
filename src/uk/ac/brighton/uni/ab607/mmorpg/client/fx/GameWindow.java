@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+
+
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
@@ -18,6 +21,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.effect.Light;
@@ -33,11 +38,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
@@ -58,6 +65,8 @@ public class GameWindow extends FXWindow {
     private Camera camera = new ParallelCamera();
 
     private Pane uiRoot;
+
+    private Stage menu;
 
     public GameWindow(String ip, String playerName) {
         name = playerName;
@@ -101,12 +110,12 @@ public class GameWindow extends FXWindow {
 
 
         VBox vbox = new VBox(10);
-        Button btnOptions = new Button("Options");
+        Button btnOptions2 = new Button("Options");
         if (font != null) {
-            btnOptions.setFont(font);
+            btnOptions2.setFont(font);
             Out.d("font", "added");
         }
-        vbox.getChildren().add(btnOptions);
+        vbox.getChildren().add(btnOptions2);
         uiRoot.getChildren().addAll(vbox);
 
 
@@ -114,85 +123,83 @@ public class GameWindow extends FXWindow {
 
         // MENU
 
-        Stage menu = new Stage(StageStyle.UNDECORATED);
-        menu.setWidth(300);
-        menu.setHeight(400);
+        menu = new Stage(StageStyle.TRANSPARENT);
+        //menu.setHeight(375);
         menu.setAlwaysOnTop(true);
 
-        VBox menuBox = new VBox(15);
-        menuBox.setAlignment(Pos.CENTER);
-        Scene menuScene = new Scene(menuBox);
-
-        Button menuBtnBack = new Button("Back to game");
-
-        ImageView img = null;
-        ImageView img2 = null;
-        try {
-            img = new ImageView(ResourceManager.loadFXImage("ui_menu_button.png"));
-            img2 = new ImageView(ResourceManager.loadFXImage("ui_menu_button.png"));
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-
-        //if (img != null)
-        menuBtnBack.setGraphic(img2);
-
-        Rectangle clip = new Rectangle();
-        clip.setX(5);
-        clip.setY(5);
-        clip.widthProperty().bind(menuBtnBack.widthProperty().subtract(10));
-        clip.heightProperty().bind(menuBtnBack.heightProperty().subtract(10));
-        clip.setArcWidth(30);
-        clip.setArcHeight(30);
-
-        img.fitWidthProperty().bind(menuBtnBack.widthProperty());
-        img.fitHeightProperty().bind(menuBtnBack.heightProperty());
-
-
-        //img2.fitWidthProperty().bind(menuBtnBack.widthProperty());
-        //img2.fitHeightProperty().bind(menuBtnBack.heightProperty());
-
-
-        menuBtnBack.setClip(img);
-        //menuBtnBack.setAlignment(Pos.);
-
-
-        if (font != null) {
-            menuBtnBack.setFont(font);
-            Out.d("font", "added");
-        }
-
-        Button menuBtnOptions = new Button("Options");
-        if (font != null) {
-            menuBtnOptions.setFont(font);
-            Out.d("font", "added");
-        }
-
-        Button menuBtnExit = new Button("Exit");
-        if (font != null) {
-            menuBtnExit.setFont(font);
-            Out.d("font", "added");
-        }
-
-        menuBox.getChildren().addAll(new StyledButton(), menuBtnOptions, menuBtnExit);
+        Scene menuScene = new Scene(new Menu(), 450, 375, Color.TRANSPARENT);
 
         menu.setScene(menuScene);
         menu.show();
     }
 
-    class StyledButton extends Parent {
+    private class Menu extends Parent {
+
+        private double dx, dy;
+
+        public Menu() {
+            VBox menuBox = new VBox(15);
+            menuBox.setAlignment(Pos.CENTER);
+
+            StyledButton btnResume = new StyledButton("Resume");
+            btnResume.setOnMouseClicked(event -> {
+                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), this);
+                ft.setFromValue(1);
+                ft.setToValue(0);
+                ft.play();
+
+                ScaleTransition st = new ScaleTransition(Duration.seconds(1), this);
+                st.setFromY(1);
+                st.setToY(0);
+                st.play();
+            });
+            StyledButton btnOptions = new StyledButton("Options");
+            StyledButton btnExit = new StyledButton("Exit");
+            btnExit.setOnMouseClicked(event -> {
+                System.exit(0);
+            });
+
+            StackPane stack = new StackPane();
+
+            try {
+                ImageView bg = new ImageView(ResourceManager.loadFXImage("ui_menu_bg3.png"));
+
+                //bg.setFitWidth(300);
+                //bg.setFitHeight(400);
+                stack.getChildren().add(bg);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            menuBox.getChildren().addAll(btnResume, btnOptions, btnExit);
+            stack.getChildren().add(menuBox);
+
+            getChildren().addAll(stack);
+
+            this.setOnMousePressed(event -> {
+                dx = event.getSceneX();
+                dy = event.getSceneY();
+            });
+
+            this.setOnMouseDragged(event -> {
+                menu.setX(event.getScreenX() - dx);
+                menu.setY(event.getScreenY() - dy);
+            });
+        }
+    }
+
+    private class StyledButton extends Parent {
 
         private ImageView imgView;
 
-        private Image entered, exited;
+        private Image entered, exited, pressed;
 
-        public StyledButton() {
+        public StyledButton(String name) {
             try {
                 entered = ResourceManager.loadFXImage("ui_menu_button2.png");
                 exited = ResourceManager.loadFXImage("ui_menu_button.png");
+                pressed = ResourceManager.loadFXImage("ui_menu_button3.png");
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -211,14 +218,20 @@ public class GameWindow extends FXWindow {
 
             StackPane stack = new StackPane();
             stack.setAlignment(Pos.CENTER);
-            Text text = new Text("Resume");
+            Text text = new Text(name);
+            text.setFill(Color.WHITESMOKE);
             text.setFont(font);
             stack.getChildren().addAll(imgView, text);
 
             getChildren().add(stack);
 
-            this.setOnMouseClicked(event -> {
-                Out.d("mouse", "clicked");
+
+            this.setOnMousePressed(event -> {
+                imgView.setImage(pressed);
+            });
+
+            this.setOnMouseReleased(event -> {
+                imgView.setImage(entered);
             });
 
             this.setOnMouseEntered(event -> {
