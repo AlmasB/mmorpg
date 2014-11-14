@@ -3,9 +3,13 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+
+
 
 
 
@@ -45,6 +49,7 @@ import javafx.geometry.Pos;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 import javafx.scene.Camera;
+import javafx.scene.Group;
 import javafx.scene.ParallelCamera;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -52,6 +57,7 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -86,7 +92,7 @@ public class GameWindow extends FXWindow {
     private SubScene uiScene;
     private Camera camera = new ParallelCamera();
 
-    private Pane uiRoot;
+    private Group uiRoot;
 
     private Stage menu, stats;
 
@@ -136,12 +142,19 @@ public class GameWindow extends FXWindow {
 
         root.getChildren().add(message);
 
-        uiRoot = new Pane();
+        uiRoot = new Group();
         uiScene = new SubScene(uiRoot, 1280, 720);
+
+        uiScene.setFill(Color.TRANSPARENT);
+
+
         uiScene.translateXProperty().bind(camera.translateXProperty());
+        uiScene.translateYProperty().bind(camera.translateYProperty());
 
         try {
-            font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
+            InputStream is = ResourceManager.loadResourceAsStream("Vecna.otf").get();
+            font = Font.loadFont(is, 28);
+            is.close();
         }
         catch (IOException e) {
             Out.e(e);
@@ -149,25 +162,36 @@ public class GameWindow extends FXWindow {
 
 
 
-        VBox vbox = new VBox(10);
-        Button btnOptions2 = new Button("Options");
-        if (font != null) {
-            btnOptions2.setFont(font);
-            Out.d("font", "added");
-        }
-        vbox.getChildren().add(btnOptions2);
-        uiRoot.getChildren().addAll(vbox);
-
-
         root.getChildren().add(uiScene);
+
+        try {
+            ImageView img = new ImageView(ResourceManager.loadFXImage("ui_hotbar.png"));
+
+            img.setTranslateX(300);
+            img.setTranslateY(580);
+            //img.translateYProperty().bind(camera.translateYProperty().add(580));
+            //img.translateXProperty().bind(camera.translateXProperty().add(300));
+
+            uiRoot.getChildren().add(img);
+
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+
+
+
 
         // MENU
 
         menu = new Stage(StageStyle.TRANSPARENT);
-        //menu.setHeight(375);
         menu.setAlwaysOnTop(true);
 
-        Scene menuScene = new Scene(new Menu(), 450, 375, Color.TRANSPARENT);
+        Menu menuRoot = new Menu();
+        Scene menuScene = new Scene(menuRoot, 450, 375, Color.TRANSPARENT);
 
         menu.setScene(menuScene);
         //menu.show();
@@ -183,7 +207,43 @@ public class GameWindow extends FXWindow {
         Scene attrScene = new Scene(new StatsWindow(), 770, 620, Color.TRANSPARENT);
 
         stats.setScene(attrScene);
-        stats.show();
+        //stats.show();
+
+
+
+
+
+
+
+
+        // UI elements
+
+        Button btnOptions2 = new Button("Options");
+        btnOptions2.setTranslateX(1000);
+        btnOptions2.setTranslateY(640);
+        //btnOptions2.translateXProperty().bind(img.translateXProperty().add(590).add(10));
+        //btnOptions2.translateYProperty().bind(img.translateYProperty().add(30));
+        btnOptions2.setFont(font);
+        btnOptions2.setOnAction(event -> {
+            menu.show();
+            ScaleTransition st = new ScaleTransition(Duration.seconds(1), menuRoot);
+            st.setFromY(0);
+            st.setToY(1);
+            st.play();
+
+            FadeTransition ft = new FadeTransition(Duration.seconds(1.5), menuRoot);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+        });
+
+        uiRoot.getChildren().add(btnOptions2);
+
+
+
+
+
+
     }
 
     private class StatsWindow extends Parent {
@@ -221,7 +281,6 @@ public class GameWindow extends FXWindow {
 
                 Button btn = new Button("+");
                 // TODO: btn impl
-                //btn.setFont(font);
 
                 hLine.getChildren().addAll(attr, btn);
                 attrBox.getChildren().add(hLine);
@@ -291,7 +350,11 @@ public class GameWindow extends FXWindow {
                 FadeTransition ft = new FadeTransition(Duration.seconds(1.5), this);
                 ft.setFromValue(1);
                 ft.setToValue(0);
+                ft.setOnFinished(evt -> {
+                    menu.hide();
+                });
                 ft.play();
+
 
                 ScaleTransition st = new ScaleTransition(Duration.seconds(1), this);
                 st.setFromY(1);
@@ -350,13 +413,6 @@ public class GameWindow extends FXWindow {
                 e.printStackTrace();
             }
 
-            try {
-                font = Font.loadFont(Files.newInputStream(Paths.get("res/Vecna.otf")), 28);
-            }
-            catch (IOException e) {
-                Out.e(e);
-            }
-
 
             imgView = new ImageView(exited);
 
@@ -394,10 +450,25 @@ public class GameWindow extends FXWindow {
         //scene.cameraProperty().set(camera);
 
         scene.setCamera(camera);
-        camera.translateXProperty().bind(message.translateXProperty().subtract(640));
-        camera.translateYProperty().bind(message.translateYProperty().subtract(360));
+        camera.translateXProperty().bind(message.translateXProperty().subtract(0));
+        camera.translateYProperty().bind(message.translateYProperty().subtract(0));
 
 
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.RIGHT) {
+                message.setTranslateX(message.getTranslateX() + 15);
+            }
+            if (event.getCode() == KeyCode.LEFT) {
+                message.setTranslateX(message.getTranslateX() - 15);
+            }
+            if (event.getCode() == KeyCode.UP) {
+                message.setTranslateY(message.getTranslateY() - 15);
+            }
+            if (event.getCode() == KeyCode.DOWN) {
+                message.setTranslateY(message.getTranslateY() + 15);
+            }
+        });
 
         scene.setOnMouseClicked(event -> {
             //            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
