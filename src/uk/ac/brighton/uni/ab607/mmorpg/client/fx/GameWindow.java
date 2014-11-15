@@ -25,6 +25,10 @@ import java.util.ArrayList;
 
 
 
+
+
+
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
@@ -50,11 +54,13 @@ import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 import javafx.scene.Camera;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.ParallelCamera;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -80,6 +86,7 @@ import com.almasb.common.util.Out;
 import com.almasb.common.util.ZIPCompressor;
 import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
+import com.almasb.java.util.RuntimeProperties;
 
 public class GameWindow extends FXWindow {
 
@@ -99,6 +106,10 @@ public class GameWindow extends FXWindow {
     private Font font;
 
     private Player player = new Player("Player Name", GameCharacterClass.KNIGHT, 0, 0, "", 0);
+
+    private Group players = new Group();
+
+    private ArrayList<Player> playersList = new ArrayList<Player>();
 
     public GameWindow(String ip, String playerName) {
         name = playerName;
@@ -161,6 +172,10 @@ public class GameWindow extends FXWindow {
         }
 
 
+        playersList.add(player);
+        players.getChildren().add(player.sprite);
+
+        root.getChildren().add(players);
 
         root.getChildren().add(uiScene);
 
@@ -176,7 +191,6 @@ public class GameWindow extends FXWindow {
 
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -199,12 +213,10 @@ public class GameWindow extends FXWindow {
         // STATS
 
         stats = new Stage(StageStyle.TRANSPARENT);
-        //stats.setX(0);
-        //stats.setY(0);
         stats.setAlwaysOnTop(true);
 
-
-        Scene attrScene = new Scene(new StatsWindow(), 770, 620, Color.TRANSPARENT);
+        StatsWindow statsRoot = new StatsWindow();
+        Scene attrScene = new Scene(statsRoot, 770, 620, Color.TRANSPARENT);
 
         stats.setScene(attrScene);
         //stats.show();
@@ -218,8 +230,8 @@ public class GameWindow extends FXWindow {
 
         // UI elements
 
-        Button btnOptions2 = new Button("Options");
-        btnOptions2.setTranslateX(1000);
+        Button btnOptions2 = new Button("Menu");
+        btnOptions2.setTranslateX(900);
         btnOptions2.setTranslateY(640);
         //btnOptions2.translateXProperty().bind(img.translateXProperty().add(590).add(10));
         //btnOptions2.translateYProperty().bind(img.translateYProperty().add(30));
@@ -241,12 +253,58 @@ public class GameWindow extends FXWindow {
 
 
 
+        ProgressBar xpBar = new ProgressBar(0);
+        xpBar.setPrefWidth(600);
+        xpBar.setTranslateX(350);
+        xpBar.setStyle("-fx-accent: rgb(255, 215, 0)");
+        xpBar.progressProperty().bind(player.baseXPProperty);
 
+        uiRoot.getChildren().add(xpBar);
+
+
+        Button btnStats = new Button("Stats");
+        btnStats.setTranslateX(1000);
+        btnStats.setTranslateY(640);
+        btnStats.setFont(font);
+        btnStats.setOnAction(event -> {
+            stats.show();
+            ScaleTransition st = new ScaleTransition(Duration.seconds(1), statsRoot);
+            st.setFromX(0);
+            st.setToX(1);
+            st.play();
+
+            FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+        });
+
+        uiRoot.getChildren().add(btnStats);
+
+        //        HBox hbox = new HBox(10);
+        //
+        //        ProgressBar memoryUsageBar = new ProgressBar();
+        //        memoryUsageBar.progressProperty().bind(RuntimeProperties.usedMemoryProperty().divide(RuntimeProperties.totalJVMMemoryProperty()));
+        //        memoryUsageBar.progressProperty().addListener((obs, old, newValue) -> {
+        //            int r = (int)(255*newValue.doubleValue());
+        //            if (r > 255) r = 255;
+        //            int g = (int)(255 - r);
+        //            memoryUsageBar.setStyle(String.format("-fx-accent: rgb(%d, %d, 25)", r, g));
+        //        });
+        //
+        //        Text memoryText = new Text();
+        //        memoryText.textProperty().bind(RuntimeProperties.usedMemoryProperty().asString("%.0f")
+        //                .concat(" / ").concat(RuntimeProperties.totalJVMMemoryProperty().asString("%.0f").concat(" MB")));
+        //
+        //        hbox.getChildren().addAll(new Text("Memory Usage: "), memoryUsageBar, memoryText);
+        //        getChildren().add(hbox);
 
 
     }
 
     private class StatsWindow extends Parent {
+
+        private double dx, dy;
 
         public StatsWindow() {
 
@@ -334,6 +392,16 @@ public class GameWindow extends FXWindow {
             hbox.getChildren().addAll(attrBox, statBox);
             stack.getChildren().add(hbox);
             getChildren().add(stack);
+
+            this.setOnMousePressed(event -> {
+                dx = event.getSceneX();
+                dy = event.getSceneY();
+            });
+
+            this.setOnMouseDragged(event -> {
+                stats.setX(event.getScreenX() - dx);
+                stats.setY(event.getScreenY() - dy);
+            });
         }
     }
 
@@ -525,16 +593,67 @@ public class GameWindow extends FXWindow {
         @Override
         public void parseServerPacket(DataPacket packet) {
             if (packet.byteData != null && packet.byteData.length > 0 && packet.byteData[0] == -127) {
+
+                for (Player p : playersList)
+                    p.sprite.setValid(false);
+
+
                 // raw data of players containing drawing data
                 ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
 
                 // number of players
                 int size = packet.byteData.length / 32;
+                for (int i = 0; i < size; i++) {
+                    byte[] data = new byte[16];
+                    byte[] name = new byte[16];
+
+                    try {
+                        in.read(data);
+                        in.read(name);
+
+                        String playerName = new String(name).replace(new String(new byte[] {0}), "");
+
+                        // search list of players for name
+                        // if found update their data
+                        // else create new player with data
+
+                        boolean newPlayer = true;
+
+                        for (Player p : playersList) {
+                            if (p.name.equals(playerName)) {
+                                newPlayer = false;
+                                p.loadFromByteArray(data);
+                                p.sprite.setValid(true);
+                                break;
+                            }
+                        }
+
+                        if (newPlayer) {
+                            Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
+                            p.loadFromByteArray(data);
+                            playersList.add(p);
+                            players.getChildren().add(p.sprite);
+                        }
+                    }
+                    catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
+                // END FOR
+
+
+                // TODO: test
+                players.getChildren().removeIf(node -> {
+                    Sprite s = (Sprite)node;
+                    return !s.isValid();
+                });
+
+                playersList.removeIf(player -> !player.sprite.isValid());
+
             }
 
-            //Out.d("packet recv", packet.objectData == null ? "null" : packet.objectData.getClass().getSimpleName());
-
-            //Out.d("recv", new String(packet.byteData));
             if (packet.objectData instanceof ServerResponse) {
                 ServerResponse res = (ServerResponse) packet.objectData;
 
@@ -545,10 +664,10 @@ public class GameWindow extends FXWindow {
             }
 
             if (packet.objectData instanceof Player) {
-                Player player = (Player) packet.objectData;
+                Player p = (Player) packet.objectData;
 
                 // update client's player
-                // this.player.update(player);
+                player.update(p);
 
                 Platform.runLater(() -> {
                     message.setTranslateX(player.getX());
@@ -560,16 +679,6 @@ public class GameWindow extends FXWindow {
 
 
                 });
-
-                //Out.d("update", message.getText());
-
-                //                            // login complete, all set, we can now show GUI
-                //                            // and start drawing
-                //                            inv = new InventoryGUI(player);
-                //                            st = new StatsGUI(player);
-                //
-                //                            setVisible(true);
-                //                            requestFocusInWindow();
             }
 
             if (packet.multipleObjectData instanceof Player[]) {
@@ -602,8 +711,6 @@ public class GameWindow extends FXWindow {
             Platform.runLater(() -> {
                 message.setTranslateX(player.getX());
                 message.setTranslateY(player.getY());
-
-                //camera.
 
                 // manually trigger camera translate property to fire
                 //                    camera.setTranslateX(message.getTranslateX());

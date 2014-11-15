@@ -100,6 +100,10 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleIntegerProperty baseLevelProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty jobLevelProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty statLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleDoubleProperty baseXPProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty jobXPProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty statXPProperty = new SimpleDoubleProperty();
+
     public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
 
 
@@ -141,6 +145,10 @@ public class Player extends GameCharacter implements PseudoHTML {
             baseLevelProperty.set(player.baseLevel);
             statLevelProperty.set(player.statLevel);
             jobLevelProperty.set(player.jobLevel);
+
+            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
+            jobXPProperty.set(player.xp.job);
+            statXPProperty.set(player.xp.stat);
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
         });

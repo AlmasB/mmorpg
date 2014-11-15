@@ -11,6 +11,7 @@ import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.util.ByteStream;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
@@ -717,7 +718,9 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         spriteID = ByteStream.byteArrayToInt(data, 11);
         direction = Dir.values()[data[15]];
 
-        name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
+        sprite.setTranslateX(x);
+        sprite.setTranslateY(y);
+        //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
     }
 
     @Override
@@ -740,4 +743,6 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
         return data;
     }
+
+    public transient Sprite sprite = new Sprite("player1.png");
 }
