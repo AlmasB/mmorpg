@@ -29,6 +29,9 @@ import java.util.ArrayList;
 
 
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
@@ -93,8 +96,6 @@ public class GameWindow extends FXWindow {
     private String name;
     private UDPClient client = null;
 
-    private Text message = new Text();
-
     private Scene scene;
     private SubScene uiScene;
     private Camera camera = new ParallelCamera();
@@ -105,22 +106,20 @@ public class GameWindow extends FXWindow {
 
     private Font font;
 
-    private Player player = new Player("Player Name", GameCharacterClass.KNIGHT, 0, 0, "", 0);
+    private Player player;
 
     private Group players = new Group();
+
+    private String ip;
 
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
     public GameWindow(String ip, String playerName) {
-        name = playerName;
+        this.ip = ip;
 
-        /*        try {
-            client = new UDPClient(ip, 55555, new ServerResponseParser());
-            client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
-        }
-        catch (IOException e) {
-            Out.e(e);
-        }*/
+        player = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
+
+        name = playerName;
 
 
         /*       int size = SocketConnection.calculatePacketSize(new DataPacket(player));
@@ -150,8 +149,6 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }
 
-
-        root.getChildren().add(message);
 
         uiRoot = new Group();
         uiScene = new SubScene(uiRoot, 1280, 720);
@@ -238,7 +235,7 @@ public class GameWindow extends FXWindow {
         btnOptions2.setFont(font);
         btnOptions2.setOnAction(event -> {
             menu.show();
-            ScaleTransition st = new ScaleTransition(Duration.seconds(1), menuRoot);
+            ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), menuRoot);
             st.setFromY(0);
             st.setToY(1);
             st.play();
@@ -268,7 +265,7 @@ public class GameWindow extends FXWindow {
         btnStats.setFont(font);
         btnStats.setOnAction(event -> {
             stats.show();
-            ScaleTransition st = new ScaleTransition(Duration.seconds(1), statsRoot);
+            ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
             st.setFromX(0);
             st.setToX(1);
             st.play();
@@ -328,6 +325,9 @@ public class GameWindow extends FXWindow {
             attrBox.setPadding(new Insets(60, 0, 0, 100));
 
             for (int i = GameCharacter.STR; i <= GameCharacter.LUC; i++) {
+
+                final int attrNum = i;
+
                 HBox hLine = new HBox(10);
                 hLine.setAlignment(Pos.CENTER_RIGHT);
                 Text attr = new Text();
@@ -338,7 +338,11 @@ public class GameWindow extends FXWindow {
                         .concat(player.bonusAttributeProperties[i]));
 
                 Button btn = new Button("+");
-                // TODO: btn impl
+                btn.setOnAction(event -> {
+                    addActionRequest(new ActionRequest(Action.ATTR_UP, player.name, attrNum));
+                });
+                btn.visibleProperty().bind(player.attributePointsProperty.greaterThan(0)
+                        .and(player.attributeProperties[i].lessThan(100)));
 
                 hLine.getChildren().addAll(attr, btn);
                 attrBox.getChildren().add(hLine);
@@ -515,42 +519,43 @@ public class GameWindow extends FXWindow {
     @Override
     protected void initScene(Scene scene) {
         this.scene = scene;
-        //scene.cameraProperty().set(camera);
-
         scene.setCamera(camera);
-        camera.translateXProperty().bind(message.translateXProperty().subtract(0));
-        camera.translateYProperty().bind(message.translateYProperty().subtract(0));
+        camera.translateXProperty().bind(player.xProperty.subtract(640));
+        camera.translateYProperty().bind(player.yProperty.subtract(360));
 
+        player.xProperty.addListener((obs, old, newValue) -> {
+            Out.d("val", newValue.intValue() + "");
+        });
 
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
-                message.setTranslateX(message.getTranslateX() + 15);
+                //message.setTranslateX(message.getTranslateX() + 15);
             }
             if (event.getCode() == KeyCode.LEFT) {
-                message.setTranslateX(message.getTranslateX() - 15);
+                //message.setTranslateX(message.getTranslateX() - 15);
             }
             if (event.getCode() == KeyCode.UP) {
-                message.setTranslateY(message.getTranslateY() - 15);
+                //message.setTranslateY(message.getTranslateY() - 15);
             }
             if (event.getCode() == KeyCode.DOWN) {
-                message.setTranslateY(message.getTranslateY() + 15);
+                //message.setTranslateY(message.getTranslateY() + 15);
             }
         });
 
         scene.setOnMouseClicked(event -> {
-            //            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
-            //            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)event.getX(), (int)event.getY()));
-            //
-            //            try {
-            //                ActionRequest[] thisGUI = this.clearPendingActionRequests();
-            //
-            //                if (thisGUI.length > 0)
-            //                    client.send(new DataPacket(thisGUI));
-            //            }
-            //            catch (IOException e) {
-            //                Out.e("updateGameClient", "Failed to send a packet", this, e);
-            //            }
+            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
+            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)event.getX(), (int)event.getY()));
+
+            try {
+                ActionRequest[] thisGUI = this.clearPendingActionRequests();
+
+                if (thisGUI.length > 0)
+                    client.send(new DataPacket(thisGUI));
+            }
+            catch (IOException e) {
+                Out.e("updateGameClient", "Failed to send a packet", this, e);
+            }
         });
     }
 
@@ -566,6 +571,25 @@ public class GameWindow extends FXWindow {
         });
 
         primaryStage.show();
+
+        try {
+            client = new UDPClient(ip, 55555, new ServerResponseParser());
+            client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
+
+            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
+        }
+        catch (IOException e) {
+            Out.e(e);
+        }
+    }
+
+    private void showTraffic() {
+        // 10 seconds
+        float kbs = client.resetAC() / 10240.0f;
+        Out.d("showTraffic", kbs + " KB/s (IN). Required bandwidth: " + kbs * 10 + " kbit/s");
+
+        kbs = client.resetACSent() / 10240.0f;
+        Out.d("showTraffic", kbs + " KB/s (OUT). Required bandwidth: " + kbs * 10 + " kbit/s");
     }
 
     private ArrayList<ActionRequest> requests = new ArrayList<ActionRequest>();
@@ -629,6 +653,9 @@ public class GameWindow extends FXWindow {
                         }
 
                         if (newPlayer) {
+
+                            Out.d("player", "new");
+
                             Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
                             p.loadFromByteArray(data);
                             playersList.add(p);
@@ -669,16 +696,6 @@ public class GameWindow extends FXWindow {
                 // update client's player
                 player.update(p);
 
-                Platform.runLater(() -> {
-                    message.setTranslateX(player.getX());
-                    message.setTranslateY(player.getY());
-
-
-                    message.setText(player.name + " " + player.getX() + " " + player.getY() + " " + player.getHP());
-
-
-
-                });
             }
 
             if (packet.multipleObjectData instanceof Player[]) {
@@ -709,15 +726,15 @@ public class GameWindow extends FXWindow {
             Player player = sPlayers[0];
 
             Platform.runLater(() -> {
-                message.setTranslateX(player.getX());
-                message.setTranslateY(player.getY());
+                //message.setTranslateX(player.getX());
+                //message.setTranslateY(player.getY());
 
                 // manually trigger camera translate property to fire
                 //                    camera.setTranslateX(message.getTranslateX());
                 //                    camera.setTranslateY(message.getTranslateY());
                 //                    scene.setCamera(camera);
 
-                message.setText(player.name + " " + player.getX() + " " + player.getY() + " " + player.getHP());
+                //message.setText(player.name + " " + player.getX() + " " + player.getY() + " " + player.getHP());
 
 
 

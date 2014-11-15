@@ -6,10 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.shape.Rectangle;
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.util.ByteStream;
+import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
@@ -123,6 +128,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
     protected GameCharacterClass charClass;
 
     protected Experience xp = new Experience(0, 0, 0);
+
+
+    public transient SimpleIntegerProperty xProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty yProperty = new SimpleIntegerProperty();
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
         //this.id = id;
@@ -718,8 +727,22 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         spriteID = ByteStream.byteArrayToInt(data, 11);
         direction = Dir.values()[data[15]];
 
-        sprite.setTranslateX(x);
-        sprite.setTranslateY(y);
+        Platform.runLater(() -> {
+            sprite.setTranslateX(x);
+            sprite.setTranslateY(y);
+
+            xProperty.set(x);
+            yProperty.set(y);
+
+            //Out.d("xy", x + "  " + y);
+
+            //Rectangle rect = new Rectangle(place*40, getRow()*40, 40, 40);
+
+            Rectangle rect = new Rectangle(0,0, 40, 40);
+            //sprite.imageView.setClip(rect);
+
+            //sprite.setClip(rect);
+        });
         //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
     }
 

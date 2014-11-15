@@ -9,7 +9,7 @@ import javafx.scene.image.ImageView;
 
 public class Sprite extends Parent {
 
-    private ImageView imageView;
+    public ImageView imageView;
     private boolean valid = true;
 
     public Sprite(String fileName) {

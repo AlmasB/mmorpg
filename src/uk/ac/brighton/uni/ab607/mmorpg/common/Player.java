@@ -95,6 +95,9 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleDoubleProperty[] statProperties = new SimpleDoubleProperty[16];
     public transient SimpleDoubleProperty[] bonusStatProperties = new SimpleDoubleProperty[16];
 
+    public transient SimpleIntegerProperty attributePointsProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty skillPointsProperty = new SimpleIntegerProperty();
+
     public transient SimpleIntegerProperty hpProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty spProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty baseLevelProperty = new SimpleIntegerProperty();
@@ -114,7 +117,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             bonusAttributeProperties[i] = new SimpleIntegerProperty();
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
-            statProperties[i] = new SimpleDoubleProperty(123.45);
+            statProperties[i] = new SimpleDoubleProperty();
             bonusStatProperties[i] = new SimpleDoubleProperty();
         }
 
@@ -142,6 +145,9 @@ public class Player extends GameCharacter implements PseudoHTML {
             hpProperty.set(player.getHP());
             spProperty.set(player.getSP());
 
+            attributePointsProperty.set(player.attributePoints);
+            skillPointsProperty.set(player.skillPoints);
+
             baseLevelProperty.set(player.baseLevel);
             statLevelProperty.set(player.statLevel);
             jobLevelProperty.set(player.jobLevel);
@@ -149,6 +155,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
             jobXPProperty.set(player.xp.job);
             statXPProperty.set(player.xp.stat);
+
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
         });

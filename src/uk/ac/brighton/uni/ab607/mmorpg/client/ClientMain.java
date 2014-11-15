@@ -24,10 +24,10 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
-        if (args.length == 0) {
-            new GameWindow("", "").init();
-            return;
-        }
+        //        if (args.length == 0) {
+        //            new GameWindow("", "").init();
+        //            return;
+        //        }
 
         if (args.length != 1) {
             usage();
