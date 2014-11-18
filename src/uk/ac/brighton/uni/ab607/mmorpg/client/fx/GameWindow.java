@@ -181,11 +181,8 @@ public class GameWindow extends FXWindow {
 
             img.setTranslateX(300);
             img.setTranslateY(580);
-            //img.translateYProperty().bind(camera.translateYProperty().add(580));
-            //img.translateXProperty().bind(camera.translateXProperty().add(300));
 
             uiRoot.getChildren().add(img);
-
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -205,7 +202,6 @@ public class GameWindow extends FXWindow {
         Scene menuScene = new Scene(menuRoot, 450, 375, Color.TRANSPARENT);
 
         menu.setScene(menuScene);
-        //menu.show();
 
         // STATS
 
@@ -216,13 +212,6 @@ public class GameWindow extends FXWindow {
         Scene attrScene = new Scene(statsRoot, 770, 620, Color.TRANSPARENT);
 
         stats.setScene(attrScene);
-        //stats.show();
-
-
-
-
-
-
 
 
         // UI elements
@@ -230,8 +219,6 @@ public class GameWindow extends FXWindow {
         Button btnOptions2 = new Button("Menu");
         btnOptions2.setTranslateX(900);
         btnOptions2.setTranslateY(640);
-        //btnOptions2.translateXProperty().bind(img.translateXProperty().add(590).add(10));
-        //btnOptions2.translateYProperty().bind(img.translateYProperty().add(30));
         btnOptions2.setFont(font);
         btnOptions2.setOnAction(event -> {
             menu.show();
@@ -264,16 +251,30 @@ public class GameWindow extends FXWindow {
         btnStats.setTranslateY(640);
         btnStats.setFont(font);
         btnStats.setOnAction(event -> {
-            stats.show();
-            ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
-            st.setFromX(0);
-            st.setToX(1);
-            st.play();
+            if (!stats.isShowing()) {
+                stats.show();
+                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
+                st.setFromX(0);
+                st.setToX(1);
+                st.play();
 
-            FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
-            ft.setFromValue(0);
-            ft.setToValue(1);
-            ft.play();
+                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
+                ft.setFromValue(0);
+                ft.setToValue(1);
+                ft.play();
+            }
+            else {
+                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
+                st.setFromX(1);
+                st.setToX(0);
+                st.play();
+
+                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
+                ft.setFromValue(1);
+                ft.setToValue(0);
+                ft.setOnFinished(evt -> stats.hide());
+                ft.play();
+            }
         });
 
         uiRoot.getChildren().add(btnStats);
@@ -417,7 +418,7 @@ public class GameWindow extends FXWindow {
             VBox menuBox = new VBox(15);
             menuBox.setAlignment(Pos.CENTER);
 
-            StyledButton btnResume = new StyledButton("Resume");
+            UIButton btnResume = new UIButton("Resume");
             btnResume.setOnMouseClicked(event -> {
                 FadeTransition ft = new FadeTransition(Duration.seconds(1.5), this);
                 ft.setFromValue(1);
@@ -433,8 +434,8 @@ public class GameWindow extends FXWindow {
                 st.setToY(0);
                 st.play();
             });
-            StyledButton btnOptions = new StyledButton("Options");
-            StyledButton btnExit = new StyledButton("Exit");
+            UIButton btnOptions = new UIButton("Options");
+            UIButton btnExit = new UIButton("Exit");
             btnExit.setOnMouseClicked(event -> {
                 System.exit(0);
             });
@@ -443,9 +444,6 @@ public class GameWindow extends FXWindow {
 
             try {
                 ImageView bg = new ImageView(ResourceManager.loadFXImage("ui_menu_bg3.png"));
-
-                //bg.setFitWidth(300);
-                //bg.setFitHeight(400);
                 stack.getChildren().add(bg);
             }
             catch (IOException e) {
@@ -465,53 +463,6 @@ public class GameWindow extends FXWindow {
             this.setOnMouseDragged(event -> {
                 menu.setX(event.getScreenX() - dx);
                 menu.setY(event.getScreenY() - dy);
-            });
-        }
-    }
-
-    private class StyledButton extends Parent {
-
-        private ImageView imgView;
-
-        private Image entered, exited, pressed;
-
-        public StyledButton(String name) {
-            try {
-                entered = ResourceManager.loadFXImage("ui_menu_button2.png");
-                exited = ResourceManager.loadFXImage("ui_menu_button.png");
-                pressed = ResourceManager.loadFXImage("ui_menu_button3.png");
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            imgView = new ImageView(exited);
-
-            StackPane stack = new StackPane();
-            stack.setAlignment(Pos.CENTER);
-            Text text = new Text(name);
-            text.setFill(Color.WHITESMOKE);
-            text.setFont(font);
-            stack.getChildren().addAll(imgView, text);
-
-            getChildren().add(stack);
-
-
-            this.setOnMousePressed(event -> {
-                imgView.setImage(pressed);
-            });
-
-            this.setOnMouseReleased(event -> {
-                imgView.setImage(entered);
-            });
-
-            this.setOnMouseEntered(event -> {
-                imgView.setImage(entered);
-            });
-
-            this.setOnMouseExited(event -> {
-                imgView.setImage(exited);
             });
         }
     }
@@ -576,7 +527,7 @@ public class GameWindow extends FXWindow {
             client = new UDPClient(ip, 55555, new ServerResponseParser());
             client.send(new DataPacket(new QueryRequest(Query.LOGIN, name)));
 
-            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
+            //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
         }
         catch (IOException e) {
             Out.e(e);
