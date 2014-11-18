@@ -102,8 +102,6 @@ public class GameWindow extends FXWindow {
 
     private Group uiRoot;
 
-    private Stage menu, stats;
-
     private Font font;
 
     private Player player;
@@ -189,29 +187,8 @@ public class GameWindow extends FXWindow {
         }
 
 
-
-
-
-
-        // MENU
-
-        menu = new Stage(StageStyle.TRANSPARENT);
-        menu.setAlwaysOnTop(true);
-
-        Menu menuRoot = new Menu();
-        Scene menuScene = new Scene(menuRoot, 450, 375, Color.TRANSPARENT);
-
-        menu.setScene(menuScene);
-
-        // STATS
-
-        stats = new Stage(StageStyle.TRANSPARENT);
-        stats.setAlwaysOnTop(true);
-
-        StatsWindow statsRoot = new StatsWindow();
-        Scene attrScene = new Scene(statsRoot, 770, 620, Color.TRANSPARENT);
-
-        stats.setScene(attrScene);
+        UIMenuWindow menuWindow = new UIMenuWindow();
+        UIStatsWindow statsWindow = new UIStatsWindow(player);
 
 
         // UI elements
@@ -221,16 +198,10 @@ public class GameWindow extends FXWindow {
         btnOptions2.setTranslateY(640);
         btnOptions2.setFont(font);
         btnOptions2.setOnAction(event -> {
-            menu.show();
-            ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), menuRoot);
-            st.setFromY(0);
-            st.setToY(1);
-            st.play();
-
-            FadeTransition ft = new FadeTransition(Duration.seconds(1.5), menuRoot);
-            ft.setFromValue(0);
-            ft.setToValue(1);
-            ft.play();
+            if (menuWindow.isShowing())
+                menuWindow.minimize();
+            else
+                menuWindow.restore();
         });
 
         uiRoot.getChildren().add(btnOptions2);
@@ -251,29 +222,11 @@ public class GameWindow extends FXWindow {
         btnStats.setTranslateY(640);
         btnStats.setFont(font);
         btnStats.setOnAction(event -> {
-            if (!stats.isShowing()) {
-                stats.show();
-                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
-                st.setFromX(0);
-                st.setToX(1);
-                st.play();
-
-                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
-                ft.setFromValue(0);
-                ft.setToValue(1);
-                ft.play();
+            if (statsWindow.isShowing()) {
+                statsWindow.minimize();
             }
             else {
-                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), statsRoot);
-                st.setFromX(1);
-                st.setToX(0);
-                st.play();
-
-                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), statsRoot);
-                ft.setFromValue(1);
-                ft.setToValue(0);
-                ft.setOnFinished(evt -> stats.hide());
-                ft.play();
+                statsWindow.restore();
             }
         });
 
@@ -296,175 +249,6 @@ public class GameWindow extends FXWindow {
         //
         //        hbox.getChildren().addAll(new Text("Memory Usage: "), memoryUsageBar, memoryText);
         //        getChildren().add(hbox);
-
-
-    }
-
-    private class StatsWindow extends Parent {
-
-        private double dx, dy;
-
-        public StatsWindow() {
-
-            StackPane stack = new StackPane();
-            stack.setAlignment(Pos.TOP_LEFT);
-
-            try {
-                ImageView img = new ImageView(ResourceManager.loadFXImage("ui_stats_bg.png"));
-                stack.getChildren().add(img);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            HBox hbox = new HBox(50);
-
-            // ATTRS
-
-            VBox attrBox = new VBox(10);
-            attrBox.setRotate(1);
-            attrBox.setPadding(new Insets(60, 0, 0, 100));
-
-            for (int i = GameCharacter.STR; i <= GameCharacter.LUC; i++) {
-
-                final int attrNum = i;
-
-                HBox hLine = new HBox(10);
-                hLine.setAlignment(Pos.CENTER_RIGHT);
-                Text attr = new Text();
-                attr.setFont(font);
-                attr.textProperty().bind(
-                        new SimpleStringProperty(Attribute.values()[i].name() + ": " )
-                        .concat(player.attributeProperties[i]).concat("+")
-                        .concat(player.bonusAttributeProperties[i]));
-
-                Button btn = new Button("+");
-                btn.setOnAction(event -> {
-                    addActionRequest(new ActionRequest(Action.ATTR_UP, player.name, attrNum));
-                });
-                btn.visibleProperty().bind(player.attributePointsProperty.greaterThan(0)
-                        .and(player.attributeProperties[i].lessThan(100)));
-
-                hLine.getChildren().addAll(attr, btn);
-                attrBox.getChildren().add(hLine);
-            }
-
-
-            // STATS
-
-            VBox statBox = new VBox(10);
-            statBox.setRotate(1);
-            statBox.setPadding(new Insets(20, 0, 0, 70));
-
-            Text statName = new Text(player.name);
-
-            Text statClass = new Text();
-            statClass.textProperty().bind(new SimpleStringProperty("Class: ").concat(player.classProperty));
-
-            Text statLevel = new Text();
-            statLevel.textProperty().bind(new SimpleStringProperty("Level: ").concat(player.baseLevelProperty)
-                    .concat("/").concat(player.jobLevelProperty)
-                    .concat("/").concat(player.statLevelProperty));
-
-            Text statHPSP = new Text();
-            statHPSP.textProperty().bind(new SimpleStringProperty("HP: ").concat(player.hpProperty)
-                    .concat(" SP: ").concat(player.spProperty));
-
-            Text statATK = new Text();
-            statATK.textProperty().bind(new SimpleStringProperty("ATK: ").concat(player.statProperties[Player.ATK]));
-
-            Text statMATK = new Text();
-            statMATK.textProperty().bind(new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK]));
-
-            Text statDEF = new Text();
-            statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF]));
-
-            Text statMDEF = new Text();
-            statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF]));
-
-            Text statARM = new Text();
-            statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM]));
-
-            Text statMARM = new Text();
-            statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM]));
-
-            Text statCrit = new Text();
-            statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE]).concat("%"));
-
-            statBox.getChildren().addAll(statName, statClass, statLevel, statHPSP, statATK, statMATK, statDEF, statMDEF, statARM, statMARM, statCrit);
-            statBox.getChildren().forEach(child -> ((Text)child).setFont(font));
-
-            hbox.getChildren().addAll(attrBox, statBox);
-            stack.getChildren().add(hbox);
-            getChildren().add(stack);
-
-            this.setOnMousePressed(event -> {
-                dx = event.getSceneX();
-                dy = event.getSceneY();
-            });
-
-            this.setOnMouseDragged(event -> {
-                stats.setX(event.getScreenX() - dx);
-                stats.setY(event.getScreenY() - dy);
-            });
-        }
-    }
-
-    private class Menu extends Parent {
-
-        private double dx, dy;
-
-        public Menu() {
-            VBox menuBox = new VBox(15);
-            menuBox.setAlignment(Pos.CENTER);
-
-            UIButton btnResume = new UIButton("Resume");
-            btnResume.setOnMouseClicked(event -> {
-                FadeTransition ft = new FadeTransition(Duration.seconds(1.5), this);
-                ft.setFromValue(1);
-                ft.setToValue(0);
-                ft.setOnFinished(evt -> {
-                    menu.hide();
-                });
-                ft.play();
-
-
-                ScaleTransition st = new ScaleTransition(Duration.seconds(1), this);
-                st.setFromY(1);
-                st.setToY(0);
-                st.play();
-            });
-            UIButton btnOptions = new UIButton("Options");
-            UIButton btnExit = new UIButton("Exit");
-            btnExit.setOnMouseClicked(event -> {
-                System.exit(0);
-            });
-
-            StackPane stack = new StackPane();
-
-            try {
-                ImageView bg = new ImageView(ResourceManager.loadFXImage("ui_menu_bg3.png"));
-                stack.getChildren().add(bg);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            menuBox.getChildren().addAll(btnResume, btnOptions, btnExit);
-            stack.getChildren().add(menuBox);
-
-            getChildren().addAll(stack);
-
-            this.setOnMousePressed(event -> {
-                dx = event.getSceneX();
-                dy = event.getSceneY();
-            });
-
-            this.setOnMouseDragged(event -> {
-                menu.setX(event.getScreenX() - dx);
-                menu.setY(event.getScreenY() - dy);
-            });
-        }
     }
 
     @Override
