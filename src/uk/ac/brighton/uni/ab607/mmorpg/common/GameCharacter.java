@@ -729,20 +729,16 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         direction = Dir.values()[data[15]];
 
         Platform.runLater(() -> {
-            sprite.setTranslateX(x);
-            sprite.setTranslateY(y);
+            sprite.setTranslateX(x - place * 40);
+            sprite.setTranslateY(y - getRow()*40);
 
             xProperty.set(x);
             yProperty.set(y);
 
-            //Out.d("xy", x + "  " + y);
+            Rectangle rect = new Rectangle(place*40, getRow()*40, 40, 40);
 
-            //Rectangle rect = new Rectangle(place*40, getRow()*40, 40, 40);
-
-            Rectangle rect = new Rectangle(0,0, 40, 40);
-            //sprite.imageView.setClip(rect);
-
-            //sprite.setClip(rect);
+            sprite.imageView.setClip(rect);
+            //sprite.name.setText(name);
         });
         //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
     }

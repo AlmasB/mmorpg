@@ -1,98 +1,47 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.InventoryGUI;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.StatsGUI;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
-import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
-import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
-import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
-import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
-import javafx.scene.Camera;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.ParallelCamera;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-import com.almasb.common.compression.LZMACompressor;
+import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
+
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
-import com.almasb.common.net.SocketConnection;
 import com.almasb.common.net.UDPClient;
-import com.almasb.common.net.UDPConnection;
 import com.almasb.common.util.Out;
-import com.almasb.common.util.ZIPCompressor;
 import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
-import com.almasb.java.util.RuntimeProperties;
 
 public class GameWindow extends FXWindow {
 
@@ -100,8 +49,6 @@ public class GameWindow extends FXWindow {
     private UDPClient client = null;
 
     private Scene scene;
-    //private SubScene uiScene;
-    //private Camera camera = new ParallelCamera();
 
     private Group gameRoot = new Group(), uiRoot = new Group();
 
@@ -114,6 +61,8 @@ public class GameWindow extends FXWindow {
     private String ip;
 
     private ArrayList<Player> playersList = new ArrayList<Player>();
+
+    private int selX = 1000, selY = 600;
 
     private SimpleIntegerProperty money = new SimpleIntegerProperty();
     Button inventory = new Button("Inventory");
@@ -134,12 +83,6 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }
 
-
-        //uiScene = new SubScene(uiRoot, 1280, 720);
-        //uiScene.setFill(Color.TRANSPARENT);
-        //uiScene.translateXProperty().bind(camera.translateXProperty());
-        //uiScene.translateYProperty().bind(camera.translateYProperty());
-
         try {
             InputStream is = ResourceManager.loadResourceAsStream("Vecna.otf").get();
             font = Font.loadFont(is, 28);
@@ -154,7 +97,6 @@ public class GameWindow extends FXWindow {
         players.getChildren().add(player.sprite);
 
         gameRoot.getChildren().add(players);
-        //root.getChildren().add(uiScene);
 
         try {
             ImageView img = new ImageView(ResourceManager.loadFXImage("ui_hotbar.png"));
@@ -174,7 +116,7 @@ public class GameWindow extends FXWindow {
         // UI elements
 
         Button btnOptions2 = new Button("Menu");
-        btnOptions2.setTranslateX(900);
+        btnOptions2.setTranslateX(950);
         btnOptions2.setTranslateY(640);
         btnOptions2.setFont(font);
         btnOptions2.setOnAction(event -> {
@@ -196,9 +138,39 @@ public class GameWindow extends FXWindow {
 
         uiRoot.getChildren().add(xpBar);
 
+        ProgressBar hpBar = new ProgressBar(0);
+        hpBar.setTranslateX(240);
+        hpBar.setTranslateY(635);
+        hpBar.setRotate(-90);
+        hpBar.progressProperty().bind(player.hpProperty.divide(
+                player.statProperties[Player.MAX_HP].add(player.bonusStatProperties[Player.MAX_HP]).multiply(1.0f)));
+        hpBar.progressProperty().addListener((obs, old, newValue) -> {
+            int r = 255 - (int) (147*newValue.doubleValue());
+            int g = (int)(200 * newValue.doubleValue());
+            int b = 10;
+            hpBar.setStyle(String.format("-fx-accent: rgb(%d, %d, %d)", r, g, b));
+        });
+
+        uiRoot.getChildren().add(hpBar);
+
+        ProgressBar spBar = new ProgressBar(0);
+        spBar.setTranslateX(850);
+        spBar.setTranslateY(635);
+        spBar.setRotate(-90);
+        spBar.progressProperty().bind(player.spProperty.divide(
+                player.statProperties[Player.MAX_SP].add(player.bonusStatProperties[Player.MAX_SP]).multiply(1.0f)));
+        spBar.progressProperty().addListener((obs, old, newValue) -> {
+            int r = 173 - (int)(42*newValue.doubleValue());
+            int g = 223 - (int)(154*newValue.doubleValue());
+            int b = 255;
+            spBar.setStyle(String.format("-fx-accent: rgb(%d, %d, %d)", r, g, b));
+        });
+
+        uiRoot.getChildren().add(spBar);
+
 
         Button btnStats = new Button("Stats");
-        btnStats.setTranslateX(1000);
+        btnStats.setTranslateX(1070);
         btnStats.setTranslateY(640);
         btnStats.setFont(font);
         btnStats.setOnAction(event -> {
@@ -214,7 +186,7 @@ public class GameWindow extends FXWindow {
 
 
         inventory.textProperty().bind(money.asString().concat("G"));
-        inventory.setTranslateX(1100);
+        inventory.setTranslateX(1180);
         inventory.setTranslateY(640);
         inventory.setFont(font);
         inventory.setOnAction(event -> {
@@ -267,45 +239,25 @@ public class GameWindow extends FXWindow {
         gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
         gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
 
-        //scene.setCamera(camera);
-        //camera.translateXProperty().bind(player.xProperty.subtract(640));
-        //camera.translateYProperty().bind(player.yProperty.subtract(360));
-
-        //camera.relocate(500, 200);
-
-        player.xProperty.addListener((obs, old, newValue) -> {
-            Out.d("val", newValue.intValue() + "");
-        });
-
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
-                //message.setTranslateX(message.getTranslateX() + 15);
+
             }
             if (event.getCode() == KeyCode.LEFT) {
-                //message.setTranslateX(message.getTranslateX() - 15);
+
             }
             if (event.getCode() == KeyCode.UP) {
-                //message.setTranslateY(message.getTranslateY() - 15);
+
             }
             if (event.getCode() == KeyCode.DOWN) {
-                //message.setTranslateY(message.getTranslateY() + 15);
+
             }
         });
 
         scene.setOnMouseClicked(event -> {
-            Out.d("clicked", (int)(event.getX() - gameRoot.getLayoutX()) + " " + (int)(event.getY() - gameRoot.getLayoutY()));
-            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)(event.getX() - gameRoot.getLayoutX()), (int)(event.getY() - gameRoot.getLayoutY())));
-
-            try {
-                ActionRequest[] thisGUI = this.clearPendingActionRequests();
-
-                if (thisGUI.length > 0)
-                    client.send(new DataPacket(thisGUI));
-            }
-            catch (IOException e) {
-                Out.e("updateGameClient", "Failed to send a packet", this, e);
-            }
+            selX = (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40;
+            selY = (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40;
         });
     }
 
@@ -336,13 +288,6 @@ public class GameWindow extends FXWindow {
 
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
-        //        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-        //            Platform.runLater(() -> {
-        //                player.yProperty.set(player.yProperty.doubleValue() + (test ? 0.01f : -0.01f));
-        //
-        //                test = !test;
-        //            });
-        //        }, 0, 16, TimeUnit.MILLISECONDS);
     }
 
     private void showTraffic() {
@@ -442,6 +387,7 @@ public class GameWindow extends FXWindow {
 
                 playersList.removeIf(player -> !player.sprite.isValid());
 
+                updateGameClient();
             }
 
             if (packet.objectData instanceof ServerResponse) {
@@ -478,6 +424,21 @@ public class GameWindow extends FXWindow {
             }
         }
 
+        private void updateGameClient() {
+            if (player.getX() != selX || player.getY() != selY)
+                addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", selX, selY));
+
+            try {
+                ActionRequest[] thisGUI = clearPendingActionRequests();
+
+                if (thisGUI.length > 0)
+                    client.send(new DataPacket(thisGUI));
+            }
+            catch (IOException e) {
+                Out.e("updateGameClient", "Failed to send a packet", this, e);
+            }
+        }
+
         /**
          * Update info about players
          *
@@ -485,44 +446,7 @@ public class GameWindow extends FXWindow {
          *                 players from server
          */
         private void update(Player[] sPlayers) {
-
             Player player = sPlayers[0];
-
-            Platform.runLater(() -> {
-                //message.setTranslateX(player.getX());
-                //message.setTranslateY(player.getY());
-
-                // manually trigger camera translate property to fire
-                //                    camera.setTranslateX(message.getTranslateX());
-                //                    camera.setTranslateY(message.getTranslateY());
-                //                    scene.setCamera(camera);
-
-                //message.setText(player.name + " " + player.getX() + " " + player.getY() + " " + player.getHP());
-
-
-
-            });
-
-
-            //                    for (Player p : sPlayers) {
-            //                        if (p.name.equals(name)) {
-            //                            player = p;
-            //                            break;
-            //                        }
-            //                    }
-            //
-            //                    gameObjects.set(INDEX_PLAYERS, sPlayers);
-            //                    // clear others in case they don't get updated
-            //                    gameObjects.set(INDEX_ANIMATIONS, new Drawable[]{ });
-            //                    gameObjects.set(INDEX_CHESTS, new Drawable[]{ });
-            //                    gameObjects.set(INDEX_ENEMIES, new Drawable[]{ });
-            //
-            //                    // update main window
-            //                    updateGameClient();
-            //
-            //                    // update other windows
-            //                    inv.update(player);
-            //                    st.update(player);
         }
 
         /**

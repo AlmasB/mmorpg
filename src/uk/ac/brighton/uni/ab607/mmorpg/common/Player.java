@@ -92,8 +92,8 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public transient SimpleIntegerProperty[] attributeProperties = new SimpleIntegerProperty[9];
     public transient SimpleIntegerProperty[] bonusAttributeProperties = new SimpleIntegerProperty[9];
-    public transient SimpleDoubleProperty[] statProperties = new SimpleDoubleProperty[16];
-    public transient SimpleDoubleProperty[] bonusStatProperties = new SimpleDoubleProperty[16];
+    public transient SimpleIntegerProperty[] statProperties = new SimpleIntegerProperty[16];
+    public transient SimpleIntegerProperty[] bonusStatProperties = new SimpleIntegerProperty[16];
 
     public transient SimpleIntegerProperty attributePointsProperty = new SimpleIntegerProperty();
     public transient SimpleIntegerProperty skillPointsProperty = new SimpleIntegerProperty();
@@ -112,13 +112,15 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
+
+        // init everything to 1 to avoid division by 0
         for (int i = STR; i <= LUC; i++) {
             attributeProperties[i] = new SimpleIntegerProperty(1);
-            bonusAttributeProperties[i] = new SimpleIntegerProperty();
+            bonusAttributeProperties[i] = new SimpleIntegerProperty(1);
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
-            statProperties[i] = new SimpleDoubleProperty();
-            bonusStatProperties[i] = new SimpleDoubleProperty();
+            statProperties[i] = new SimpleIntegerProperty(1);
+            bonusStatProperties[i] = new SimpleIntegerProperty(1);
         }
 
         this.x = x;
@@ -138,8 +140,8 @@ public class Player extends GameCharacter implements PseudoHTML {
                 bonusAttributeProperties[i].set(player.getBonusAttribute(i));
             }
             for (int i = MAX_HP; i <= SP_REGEN; i++) {
-                statProperties[i].set(player.getBaseStat(Stat.values()[i]));
-                bonusStatProperties[i].set(player.getBonusStat(Stat.values()[i]));
+                statProperties[i].set((int)(player.getBaseStat(Stat.values()[i])));
+                bonusStatProperties[i].set((int)(player.getBonusStat(Stat.values()[i])));
             }
 
             hpProperty.set(player.getHP());
@@ -153,8 +155,8 @@ public class Player extends GameCharacter implements PseudoHTML {
             jobLevelProperty.set(player.jobLevel);
 
             baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
-            jobXPProperty.set(player.xp.job);
-            statXPProperty.set(player.xp.stat);
+            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[jobLevel-1]);
+            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[statLevel-1]);
 
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());

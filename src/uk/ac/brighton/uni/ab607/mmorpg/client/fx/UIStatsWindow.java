@@ -90,29 +90,39 @@ public class UIStatsWindow extends UIFragmentWindow {
                 .concat("/").concat(player.statLevelProperty));
 
         Text statHPSP = new Text();
-        statHPSP.textProperty().bind(new SimpleStringProperty("HP: ").concat(player.hpProperty)
-                .concat(" SP: ").concat(player.spProperty));
+        statHPSP.textProperty().bind(new SimpleStringProperty("HP: ").concat(player.hpProperty).concat("/")
+                .concat(player.statProperties[Player.MAX_HP].add(player.bonusStatProperties[Player.MAX_HP]))
+                .concat(" SP: ").concat(player.spProperty).concat("/")
+                .concat(player.statProperties[Player.MAX_SP].add(player.bonusStatProperties[Player.MAX_SP])));
 
         Text statATK = new Text();
-        statATK.textProperty().bind(new SimpleStringProperty("ATK: ").concat(player.statProperties[Player.ATK]));
+        statATK.textProperty().bind(
+                new SimpleStringProperty("ATK: ").concat(player.statProperties[Player.ATK].add(player.bonusStatProperties[Player.ATK]))
+                .concat(" (").concat(player.statProperties[Player.ATK]).concat("+").concat(player.bonusStatProperties[Player.ATK]).concat(")"));
 
         Text statMATK = new Text();
-        statMATK.textProperty().bind(new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK]));
+        statMATK.textProperty().bind(new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK])
+                .concat("+").concat(player.bonusStatProperties[Player.MATK]));
 
         Text statDEF = new Text();
-        statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF]));
+        statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF])
+                .concat("+").concat(player.bonusStatProperties[Player.DEF]));
 
         Text statMDEF = new Text();
-        statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF]));
+        statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF])
+                .concat("+").concat(player.bonusStatProperties[Player.MDEF]));
 
         Text statARM = new Text();
-        statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM]));
+        statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM])
+                .concat("+").concat(player.bonusStatProperties[Player.ARM]));
 
         Text statMARM = new Text();
-        statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM]));
+        statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM])
+                .concat("+").concat(player.bonusStatProperties[Player.MARM]));
 
         Text statCrit = new Text();
-        statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE]).concat("%"));
+        statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE])
+                .concat("+").concat(player.bonusStatProperties[Player.CRIT_CHANCE]).concat("%"));
 
         statBox.getChildren().addAll(statName, statClass, statLevel, statHPSP, statATK, statMATK, statDEF, statMDEF, statARM, statMARM, statCrit);
         statBox.getChildren().forEach(child -> ((Text)child).setFont(UIConst.FONT));
