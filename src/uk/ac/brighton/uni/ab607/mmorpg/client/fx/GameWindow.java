@@ -12,19 +12,22 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -65,7 +68,9 @@ public class GameWindow extends FXWindow {
     private int selX = 1000, selY = 600;
 
     private SimpleIntegerProperty money = new SimpleIntegerProperty();
-    Button inventory = new Button("Inventory");
+    private Button inventory = new Button("Inventory");
+
+    private ArrayList<ImageView> skillImages = new ArrayList<ImageView>();
 
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
@@ -103,6 +108,15 @@ public class GameWindow extends FXWindow {
             img.setTranslateX(300);
             img.setTranslateY(580);
             uiRoot.getChildren().add(img);
+
+            for (int i = 0; i < 9; i++) {
+                SkillView skill = new SkillView(i);
+                skill.setTranslateX(338 + i * 60);
+                skill.setTranslateY(625);
+                uiRoot.getChildren().add(skill);
+            }
+
+
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -190,7 +204,7 @@ public class GameWindow extends FXWindow {
         inventory.setTranslateY(640);
         inventory.setFont(font);
         inventory.setOnAction(event -> {
-
+            addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
         });
 
         uiRoot.getChildren().add(inventory);
@@ -288,6 +302,29 @@ public class GameWindow extends FXWindow {
 
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
+    }
+
+    private class SkillView extends Parent {
+
+        private ImageView imageView = new ImageView();
+        private Text text = new Text();
+
+        public SkillView(int pos) {
+            text.setFont(text.getFont().font(16));
+            text.setFill(Color.DARKBLUE);
+
+            text.textProperty().bind(new SimpleStringProperty("Lv ").concat(player.skillLevelProperties[pos]));
+            imageView.imageProperty().bind(player.skillImageProperties.get(pos));
+
+            imageView.setFitWidth(45);
+            imageView.setFitHeight(45);
+
+
+            VBox vbox = new VBox();
+            vbox.getChildren().addAll(imageView, text);
+
+            getChildren().add(vbox);
+        }
     }
 
     private void showTraffic() {

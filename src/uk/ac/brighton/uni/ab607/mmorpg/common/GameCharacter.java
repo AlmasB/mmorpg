@@ -9,6 +9,7 @@ import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.shape.Rectangle;
 
 import com.almasb.common.graphics.Color;
@@ -729,15 +730,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         direction = Dir.values()[data[15]];
 
         Platform.runLater(() -> {
-            sprite.setTranslateX(x - place * 40);
-            sprite.setTranslateY(y - getRow()*40);
+            sprite.setTranslateX(x);
+            sprite.setTranslateY(y);
 
             xProperty.set(x);
             yProperty.set(y);
 
-            Rectangle rect = new Rectangle(place*40, getRow()*40, 40, 40);
+            Rectangle2D rect = new Rectangle2D(place*40, getRow()*40, 40, 40);
 
-            sprite.imageView.setClip(rect);
+            sprite.imageView.setViewport(rect);
             //sprite.name.setText(name);
         });
         //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");

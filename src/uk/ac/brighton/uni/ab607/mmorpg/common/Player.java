@@ -1,9 +1,14 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import java.util.ArrayList;
+
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.image.Image;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
@@ -11,6 +16,7 @@ import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.R;
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
@@ -109,6 +115,12 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
 
+    /**
+     * Properties for displaying skills
+     */
+    public transient SimpleIntegerProperty[] skillLevelProperties = new SimpleIntegerProperty[9];
+    public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
+
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
@@ -117,6 +129,11 @@ public class Player extends GameCharacter implements PseudoHTML {
         for (int i = STR; i <= LUC; i++) {
             attributeProperties[i] = new SimpleIntegerProperty(1);
             bonusAttributeProperties[i] = new SimpleIntegerProperty(1);
+
+            // just so happens STR = 0 and LUC = 8
+            skillLevelProperties[i] = new SimpleIntegerProperty(0);
+            ObjectProperty<Image> img = new SimpleObjectProperty<Image>(UIConst.Images.IC_SKILL_DUMMY);
+            skillImageProperties.add(img);
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
             statProperties[i] = new SimpleIntegerProperty(1);
@@ -143,6 +160,10 @@ public class Player extends GameCharacter implements PseudoHTML {
                 statProperties[i].set((int)(player.getBaseStat(Stat.values()[i])));
                 bonusStatProperties[i].set((int)(player.getBonusStat(Stat.values()[i])));
             }
+            for (int i = 0; i < player.skills.length; i++) {
+                skillLevelProperties[i].set(player.skills[i].getLevel());
+                skillImageProperties.get(i).set(UIConst.Images.getByID(player.skills[i].id));
+            }
 
             hpProperty.set(player.getHP());
             spProperty.set(player.getSP());
@@ -160,6 +181,8 @@ public class Player extends GameCharacter implements PseudoHTML {
 
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
+
+
         });
     }
 
