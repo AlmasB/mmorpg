@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import java.util.ArrayList;
 
+
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -10,10 +11,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.image.Image;
 
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
+
 
 import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
@@ -22,6 +25,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
@@ -119,6 +123,7 @@ public class Player extends GameCharacter implements PseudoHTML {
      * Properties for displaying skills
      */
     public transient SimpleIntegerProperty[] skillLevelProperties = new SimpleIntegerProperty[9];
+    public transient SimpleStringProperty[] skillDescProperties = new SimpleStringProperty[9];
     public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
 
 
@@ -132,6 +137,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
             // just so happens STR = 0 and LUC = 8
             skillLevelProperties[i] = new SimpleIntegerProperty(0);
+            skillDescProperties[i] = new SimpleStringProperty("");
             ObjectProperty<Image> img = new SimpleObjectProperty<Image>(UIConst.Images.IC_SKILL_DUMMY);
             skillImageProperties.add(img);
         }
@@ -161,8 +167,11 @@ public class Player extends GameCharacter implements PseudoHTML {
                 bonusStatProperties[i].set((int)(player.getBonusStat(Stat.values()[i])));
             }
             for (int i = 0; i < player.skills.length; i++) {
-                skillLevelProperties[i].set(player.skills[i].getLevel());
-                skillImageProperties.get(i).set(UIConst.Images.getByID(player.skills[i].id));
+                Skill skill = player.skills[i];
+
+                skillLevelProperties[i].set(skill.getLevel());
+                skillImageProperties.get(i).set(UIConst.Images.getByID(skill.id));
+                skillDescProperties[i].set(skill.name + "\n" + "SP: " + skill.getManaCost() + "\n" + skill.description);
             }
 
             hpProperty.set(player.getHP());

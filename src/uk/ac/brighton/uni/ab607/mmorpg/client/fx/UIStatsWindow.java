@@ -77,7 +77,7 @@ public class UIStatsWindow extends UIFragmentWindow {
 
         VBox statBox = new VBox(10);
         statBox.setRotate(1);
-        statBox.setPadding(new Insets(20, 0, 0, 70));
+        statBox.setPadding(new Insets(20, 0, 0, 40));
 
         Text statName = new Text(player.name);
 
@@ -101,8 +101,9 @@ public class UIStatsWindow extends UIFragmentWindow {
                 .concat(" (").concat(player.statProperties[Player.ATK]).concat("+").concat(player.bonusStatProperties[Player.ATK]).concat(")"));
 
         Text statMATK = new Text();
-        statMATK.textProperty().bind(new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK])
-                .concat("+").concat(player.bonusStatProperties[Player.MATK]));
+        statMATK.textProperty().bind(
+                new SimpleStringProperty("MATK: ").concat(player.statProperties[Player.MATK].add(player.bonusStatProperties[Player.MATK]))
+                .concat(" (").concat(player.statProperties[Player.MATK]).concat("+").concat(player.bonusStatProperties[Player.MATK]).concat(")"));
 
         Text statDEF = new Text();
         statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF])

@@ -13,19 +13,26 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
@@ -204,7 +211,14 @@ public class GameWindow extends FXWindow {
         inventory.setTranslateY(640);
         inventory.setFont(font);
         inventory.setOnAction(event -> {
-            addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
+            if (test == 0) {
+                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
+                test++;
+            }
+            else if (test == 1) {
+                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "CRUSADER"));
+                test++;
+            }
         });
 
         uiRoot.getChildren().add(inventory);
@@ -214,6 +228,8 @@ public class GameWindow extends FXWindow {
 
         root.getChildren().addAll(gameRoot, uiRoot);
     }
+
+    int test = 0;
 
     private Random rand = new Random();
 
@@ -318,6 +334,41 @@ public class GameWindow extends FXWindow {
 
             imageView.setFitWidth(45);
             imageView.setFitHeight(45);
+
+            DropShadow drop = new DropShadow(14, Color.GOLD);
+            drop.setInput(new Glow());
+
+            final Popup popup = new Popup();
+
+
+            Rectangle rect = new Rectangle(250, 150);
+            rect.setArcWidth(30);
+            rect.setArcHeight(30);
+            rect.setFill(Color.AQUA);
+
+            VBox box = new VBox();
+            box.setPadding(new Insets(5, 5, 5, 5));
+            box.setAlignment(Pos.CENTER);
+
+            Text fullText = new Text();
+            fullText.setFont(fullText.getFont().font(18));
+            fullText.setWrappingWidth(200);
+            fullText.textProperty().bind(player.skillDescProperties[pos]);
+            box.getChildren().add(fullText);
+
+            popup.getContent().addAll(rect, box);
+
+            imageView.setOnMouseEntered(event -> {
+                imageView.setEffect(drop);
+                popup.setX(getTranslateX() + 200);
+                popup.setY(getTranslateY() - 50);
+                popup.show(getStage());
+            });
+
+            imageView.setOnMouseExited(event -> {
+                imageView.setEffect(null);
+                popup.hide();
+            });
 
 
             VBox vbox = new VBox();

@@ -78,10 +78,17 @@ public final class UIConst {
             try {
                 IC_SKILL_DUMMY = ResourceManager.loadFXImage("ic_skill_dummy.png");
 
+                // WARRIOR
                 IC_SKILL_7010 = ResourceManager.loadFXImage("ic_skill_mighty_swing.png");
                 IC_SKILL_7011 = ResourceManager.loadFXImage("ic_skill_roar.png");
                 IC_SKILL_7012 = ResourceManager.loadFXImage("ic_skill_warrior_heart.png");
                 IC_SKILL_7013 = ResourceManager.loadFXImage("ic_skill_armor_mastery.png");
+
+                IC_SKILL_7110 = ResourceManager.loadFXImage("ic_skill_holy_light.png");
+                IC_SKILL_7111 = ResourceManager.loadFXImage("ic_skill_faith.png");
+                IC_SKILL_7112 = ResourceManager.loadFXImage("ic_skill_divine_armor.png");
+                IC_SKILL_7113 = ResourceManager.loadFXImage("ic_skill_precision_strike.png");
+                IC_SKILL_7114 = ResourceManager.loadFXImage("ic_skill_last_stand.png");
             }
             catch (IOException e) {
                 Sys.logExceptionAndExit(e);

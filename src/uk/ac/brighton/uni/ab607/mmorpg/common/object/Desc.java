@@ -35,7 +35,7 @@ public class Desc {
         public class Crusader {
             public static final String HOLY_LIGHT = "Heals and increases VIT for the duration";
             public static final String FAITH = "Further increases bonus given by Heart of a Warrior skill";
-            public static final String DIVINE_ARMOR = "Further increases bonus give by Armor Mastery skill";
+            public static final String DIVINE_ARMOR = "Further increases bonus given by Armor Mastery skill";
             public static final String PRECISION_STRIKE = "Deals armor ignoring damage based on STR";
             public static final String LAST_STAND = "Deals double base damage for the duration";
         }
