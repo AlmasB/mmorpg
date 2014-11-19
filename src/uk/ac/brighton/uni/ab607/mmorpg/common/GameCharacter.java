@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.shape.Rectangle;
 
@@ -130,8 +131,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
     protected Experience xp = new Experience(0, 0, 0);
 
 
-    public transient SimpleIntegerProperty xProperty = new SimpleIntegerProperty();
-    public transient SimpleIntegerProperty yProperty = new SimpleIntegerProperty();
+    public transient SimpleDoubleProperty xProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty yProperty = new SimpleDoubleProperty();
 
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
         //this.id = id;

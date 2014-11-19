@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 
 
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +50,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -97,10 +100,10 @@ public class GameWindow extends FXWindow {
     private UDPClient client = null;
 
     private Scene scene;
-    private SubScene uiScene;
-    private Camera camera = new ParallelCamera();
+    //private SubScene uiScene;
+    //private Camera camera = new ParallelCamera();
 
-    private Group uiRoot;
+    private Group gameRoot = new Group(), uiRoot = new Group();
 
     private Font font;
 
@@ -112,50 +115,30 @@ public class GameWindow extends FXWindow {
 
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
+    private SimpleIntegerProperty money = new SimpleIntegerProperty();
+    Button inventory = new Button("Inventory");
+
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
-
         player = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
-
         name = playerName;
-
-
-        /*       int size = SocketConnection.calculatePacketSize(new DataPacket(player));
-
-        int size2 = UDPConnection.toByteArray(player).length;
-
-        Out.d("datapacket", size + "");
-        Out.d("rawish", size2 + "");
-
-        byte[] data = UDPConnection.toByteArray(new DataPacket(player));
-        byte[] data2 = UDPConnection.toByteArray(player);
-
-        Out.d("zip", new ZIPCompressor().compress(data).length + "");
-        Out.d("zip2", new ZIPCompressor().compress(data2).length + "");
-
-        Out.d("lzma", LZMACompressor.compress(data).length + "");
-        Out.d("lzma2", LZMACompressor.compress(data2).length + "");*/
     }
 
     @Override
     protected void createContent(Pane root) {
         try {
             ImageView background = new ImageView(ResourceManager.loadFXImage("map1.png"));
-            root.getChildren().add(background);
+            gameRoot.getChildren().add(background);
         }
         catch (Exception e) {
             Out.e(e);
         }
 
 
-        uiRoot = new Group();
-        uiScene = new SubScene(uiRoot, 1280, 720);
-
-        uiScene.setFill(Color.TRANSPARENT);
-
-
-        uiScene.translateXProperty().bind(camera.translateXProperty());
-        uiScene.translateYProperty().bind(camera.translateYProperty());
+        //uiScene = new SubScene(uiRoot, 1280, 720);
+        //uiScene.setFill(Color.TRANSPARENT);
+        //uiScene.translateXProperty().bind(camera.translateXProperty());
+        //uiScene.translateYProperty().bind(camera.translateYProperty());
 
         try {
             InputStream is = ResourceManager.loadResourceAsStream("Vecna.otf").get();
@@ -170,16 +153,13 @@ public class GameWindow extends FXWindow {
         playersList.add(player);
         players.getChildren().add(player.sprite);
 
-        root.getChildren().add(players);
-
-        root.getChildren().add(uiScene);
+        gameRoot.getChildren().add(players);
+        //root.getChildren().add(uiScene);
 
         try {
             ImageView img = new ImageView(ResourceManager.loadFXImage("ui_hotbar.png"));
-
             img.setTranslateX(300);
             img.setTranslateY(580);
-
             uiRoot.getChildren().add(img);
         }
         catch (IOException e) {
@@ -232,31 +212,66 @@ public class GameWindow extends FXWindow {
 
         uiRoot.getChildren().add(btnStats);
 
-        //        HBox hbox = new HBox(10);
-        //
-        //        ProgressBar memoryUsageBar = new ProgressBar();
-        //        memoryUsageBar.progressProperty().bind(RuntimeProperties.usedMemoryProperty().divide(RuntimeProperties.totalJVMMemoryProperty()));
-        //        memoryUsageBar.progressProperty().addListener((obs, old, newValue) -> {
-        //            int r = (int)(255*newValue.doubleValue());
-        //            if (r > 255) r = 255;
-        //            int g = (int)(255 - r);
-        //            memoryUsageBar.setStyle(String.format("-fx-accent: rgb(%d, %d, 25)", r, g));
-        //        });
-        //
-        //        Text memoryText = new Text();
-        //        memoryText.textProperty().bind(RuntimeProperties.usedMemoryProperty().asString("%.0f")
-        //                .concat(" / ").concat(RuntimeProperties.totalJVMMemoryProperty().asString("%.0f").concat(" MB")));
-        //
-        //        hbox.getChildren().addAll(new Text("Memory Usage: "), memoryUsageBar, memoryText);
-        //        getChildren().add(hbox);
+
+        inventory.textProperty().bind(money.asString().concat("G"));
+        inventory.setTranslateX(1100);
+        inventory.setTranslateY(640);
+        inventory.setFont(font);
+        inventory.setOnAction(event -> {
+
+        });
+
+        uiRoot.getChildren().add(inventory);
+
+
+
+
+        root.getChildren().addAll(gameRoot, uiRoot);
+    }
+
+    private Random rand = new Random();
+
+    private void moneyTest() {
+        Platform.runLater(() -> {
+            final int val = rand.nextInt(1000);
+            Text text = new Text(val + "G");
+            text.setFont(font);
+            text.setFill(Color.GOLD);
+            TranslateTransition tt = new TranslateTransition(Duration.seconds(1.66), text);
+            tt.setFromX(player.getX() + rand.nextInt(1280) - 640);
+            tt.setFromY(player.getY() + rand.nextInt(720) - 360);
+
+            tt.setToX(player.getX() + 500);
+            tt.setToY(player.getY() + 320);
+            tt.setOnFinished(event -> {
+                gameRoot.getChildren().remove(text);
+                money.set(money.get() + val);
+                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), inventory);
+                st.setFromY(1);
+                st.setToY(1.3);
+                st.setAutoReverse(true);
+                st.setCycleCount(2);
+                st.play();
+            });
+
+            gameRoot.getChildren().add(text);
+
+            tt.play();
+        });
     }
 
     @Override
     protected void initScene(Scene scene) {
         this.scene = scene;
-        scene.setCamera(camera);
-        camera.translateXProperty().bind(player.xProperty.subtract(640));
-        camera.translateYProperty().bind(player.yProperty.subtract(360));
+
+        gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
+        gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
+
+        //scene.setCamera(camera);
+        //camera.translateXProperty().bind(player.xProperty.subtract(640));
+        //camera.translateYProperty().bind(player.yProperty.subtract(360));
+
+        //camera.relocate(500, 200);
 
         player.xProperty.addListener((obs, old, newValue) -> {
             Out.d("val", newValue.intValue() + "");
@@ -279,8 +294,8 @@ public class GameWindow extends FXWindow {
         });
 
         scene.setOnMouseClicked(event -> {
-            Out.d("clicked", (int)event.getX() + " " + (int)event.getY());
-            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)event.getX(), (int)event.getY()));
+            Out.d("clicked", (int)(event.getX() - gameRoot.getLayoutX()) + " " + (int)(event.getY() - gameRoot.getLayoutY()));
+            addActionRequest(new ActionRequest(Action.MOVE, name, "map1.txt", (int)(event.getX() - gameRoot.getLayoutX()), (int)(event.getY() - gameRoot.getLayoutY())));
 
             try {
                 ActionRequest[] thisGUI = this.clearPendingActionRequests();
@@ -293,6 +308,8 @@ public class GameWindow extends FXWindow {
             }
         });
     }
+
+    //boolean test = true;
 
     @Override
     protected void initStage(Stage primaryStage) {
@@ -316,6 +333,16 @@ public class GameWindow extends FXWindow {
         catch (IOException e) {
             Out.e(e);
         }
+
+
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
+        //        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        //            Platform.runLater(() -> {
+        //                player.yProperty.set(player.yProperty.doubleValue() + (test ? 0.01f : -0.01f));
+        //
+        //                test = !test;
+        //            });
+        //        }, 0, 16, TimeUnit.MILLISECONDS);
     }
 
     private void showTraffic() {
@@ -327,6 +354,7 @@ public class GameWindow extends FXWindow {
         Out.d("showTraffic", kbs + " KB/s (OUT). Required bandwidth: " + kbs * 10 + " kbit/s");
     }
 
+    // TODO: add a single message sending from all UIs
     private ArrayList<ActionRequest> requests = new ArrayList<ActionRequest>();
 
     public void addActionRequest(ActionRequest action) {
