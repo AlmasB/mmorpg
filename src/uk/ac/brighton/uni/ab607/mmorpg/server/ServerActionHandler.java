@@ -21,6 +21,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
@@ -185,8 +186,17 @@ public class ServerActionHandler {
         server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data.split(",")[1], Color.WHITE, 3.0f), req.data.split(",")[0]);
     }
 
-    public void serverActionMove(Player p, ActionRequest req) {
-        server.moveObject(p, req.data, req.value1, req.value2);
+    public void serverActionMove(Player p, ActionRequest req) throws BadActionRequestException {
+        GameMap map = server.getMapByName(req.data);
+        Enemy e = map.getEnemyByXY(req.value1, req.value2);
+
+        if (e == null)
+            server.moveObject(p, req.data, req.value1, req.value2);
+        else
+            serverActionAttack(p, new ActionRequest(Action.ATTACK, p.name, req.data, e.getRuntimeID()));
+
+
+        //Out.d("serverActionMove", e != null ? "NOT NULL" : "NULL");
         //RTS click animation sprite
         //server.addAnimation(new ImageAnimation());
     }

@@ -55,21 +55,17 @@ import com.almasb.java.ui.FXWindow;
 
 public class GameWindow extends FXWindow {
 
-    private String name;
+    private String name, ip;
     private UDPClient client = null;
 
-    private Scene scene;
+    //private Scene scene;
 
     private Group gameRoot = new Group(), uiRoot = new Group();
 
     private Font font;
 
     private Player player;
-
-    private Group players = new Group();
-
-    private String ip;
-
+    private Group playerSprites = new Group();
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
     private int selX = 1000, selY = 600;
@@ -78,6 +74,9 @@ public class GameWindow extends FXWindow {
     private Button inventory = new Button("Inventory");
 
     private ArrayList<ImageView> skillImages = new ArrayList<ImageView>();
+
+    private Group enemySprites = new Group();
+    private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
 
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
@@ -106,9 +105,9 @@ public class GameWindow extends FXWindow {
 
 
         playersList.add(player);
-        players.getChildren().add(player.sprite);
+        playerSprites.getChildren().add(player.sprite);
 
-        gameRoot.getChildren().add(players);
+        gameRoot.getChildren().addAll(playerSprites, enemySprites);
 
         try {
             ImageView img = new ImageView(ResourceManager.loadFXImage("ui_hotbar.png"));
@@ -264,7 +263,7 @@ public class GameWindow extends FXWindow {
 
     @Override
     protected void initScene(Scene scene) {
-        this.scene = scene;
+        //this.scene = scene;
 
         gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
         gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
@@ -449,17 +448,15 @@ public class GameWindow extends FXWindow {
                         }
 
                         if (newPlayer) {
-
-                            Out.d("player", "new");
+                            //Out.d("player", "new");
 
                             Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
                             p.loadFromByteArray(data);
                             playersList.add(p);
-                            players.getChildren().add(p.sprite);
+                            Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
                         }
                     }
                     catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -467,10 +464,11 @@ public class GameWindow extends FXWindow {
                 // END FOR
 
 
-                // TODO: test
-                players.getChildren().removeIf(node -> {
-                    Sprite s = (Sprite)node;
-                    return !s.isValid();
+                Platform.runLater(() -> {
+                    playerSprites.getChildren().removeIf(node -> {
+                        Sprite s = (Sprite)node;
+                        return !s.isValid();
+                    });
                 });
 
                 playersList.removeIf(player -> !player.sprite.isValid());

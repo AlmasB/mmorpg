@@ -759,7 +759,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
         // MAX is 16
         byte[] bName = name.getBytes();
-        for (int i = 0; i < bName.length; i++)
+        for (int i = 0; i < Math.min(bName.length, 16); i++)
             data[16 + i] = bName[i];
 
         return data;

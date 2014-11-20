@@ -173,22 +173,28 @@ public class GameMap {
                 if (tick == 0)
                     server.send(new DataPacket(player), player.ip, player.port);
 
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
                 if (playersToSend.length > 0) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     for (int i = 0; i < playersToSend.length; i++) {
                         baos.write(playersToSend[i].toByteArray());
-                        //baos.write(-128);
                     }
-
-                    server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
                 }
+                if (enemiesToSend.length > 0) {
+                    for (int i = 0; i < enemiesToSend.length; i++) {
+                        baos.write(enemiesToSend[i].toByteArray());
+                    }
+                }
+
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
+
                 //server.send(new DataPacket(playersToSend), player.ip, player.port);
 
 
                 if (chestsToSend.length > 0)
                     server.send(new DataPacket(chestsToSend), player.ip, player.port);
-                if (enemiesToSend.length > 0)
-                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
+                //                if (enemiesToSend.length > 0)
+                //                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
                 if (animationsToSend.length > 0)
                     server.send(new DataPacket(animationsToSend), player.ip, player.port);
 
@@ -207,6 +213,16 @@ public class GameMap {
         for (ArrayList<Enemy> list : enemies) {
             for (Enemy e : list)
                 if (e.getRuntimeID() == id)
+                    return e;
+        }
+
+        return null;
+    }
+
+    public Enemy getEnemyByXY(int x, int y) {
+        for (ArrayList<Enemy> list : enemies) {
+            for (Enemy e : list)
+                if (e.getX() == x && e.getY() == y)
                     return e;
         }
 
