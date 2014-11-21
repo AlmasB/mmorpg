@@ -73,6 +73,9 @@ public class GameWindow extends FXWindow {
     //private Group enemySprites = new Group();
     //private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
 
+    private UIStatsWindow statsWindow;
+    private UIInventoryWindow inventoryWindow;
+
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
         player = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
@@ -110,8 +113,8 @@ public class GameWindow extends FXWindow {
 
 
         UIMenuWindow menuWindow = new UIMenuWindow();
-        UIStatsWindow statsWindow = new UIStatsWindow(player);
-        UIInventoryWindow inventoryWindow = new UIInventoryWindow(player);
+        statsWindow = new UIStatsWindow(player);
+        inventoryWindow = new UIInventoryWindow(player);
 
 
         // UI elements
@@ -500,9 +503,15 @@ public class GameWindow extends FXWindow {
 
             try {
                 ActionRequest[] thisGUI = clearPendingActionRequests();
+                ActionRequest[] statsGUI = statsWindow.clearPendingActionRequests();
+                ActionRequest[] invGUI = inventoryWindow.clearPendingActionRequests();
 
                 if (thisGUI.length > 0)
                     client.send(new DataPacket(thisGUI));
+                if (statsGUI.length > 0)
+                    client.send(new DataPacket(statsGUI));
+                if (invGUI.length > 0)
+                    client.send(new DataPacket(invGUI));
             }
             catch (IOException e) {
                 Out.e("updateGameClient", "Failed to send a packet", this, e);

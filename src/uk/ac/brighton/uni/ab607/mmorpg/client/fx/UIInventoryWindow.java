@@ -1,8 +1,15 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 
 import com.almasb.java.io.ResourceManager;
 
@@ -148,14 +155,27 @@ public class UIInventoryWindow extends UIFragmentWindow {
 
             imageView.setOnMouseEntered(event -> {
                 imageView.setEffect(drop);
-                popup.setX(getTranslateX() + 200);
-                popup.setY(getTranslateY() - 50);
+                popup.setX(getX() + 400);
+                popup.setY(getY());
                 popup.show(UIInventoryWindow.this);
             });
 
             imageView.setOnMouseExited(event -> {
                 imageView.setEffect(null);
                 popup.hide();
+            });
+
+            imageView.setOnMouseClicked(event -> {
+                Optional<GameItem> item = player.getInventory().getItem(pos);
+                item.ifPresent(it -> {
+                    // if weapon or armor
+                    if (it instanceof Weapon || it instanceof Armor) {
+                        addActionRequest(new ActionRequest(Action.EQUIP, player.name, pos));
+                    }
+                    else if (it instanceof UsableItem) {
+                        addActionRequest(new ActionRequest(Action.USE_ITEM, player.name, pos));
+                    }
+                });
             });
 
 

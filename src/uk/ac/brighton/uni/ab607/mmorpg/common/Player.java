@@ -212,6 +212,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
 
 
+            this.inventory = player.inventory;
         });
     }
 
