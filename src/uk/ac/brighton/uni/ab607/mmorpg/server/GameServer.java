@@ -288,6 +288,8 @@ public class GameServer {
 
         List<AStarNode> closed = new AStarLogic().getPath(grid, startN, targetNode, busy);
 
+        //Out.d("moveObject", closed.size() + "");
+
         if (closed.size() > 0) {
             AStarNode n = closed.get(0);
 

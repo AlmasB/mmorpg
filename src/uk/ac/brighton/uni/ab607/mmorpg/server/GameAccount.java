@@ -7,6 +7,8 @@ import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 
 /**
  * One client's account
@@ -39,6 +41,10 @@ public class GameAccount extends Account {
     private GameAccount(String username, String password, String key) {
         super(username, password, key);
         player = new Player(getUserName(), GameCharacterClass.NOVICE, 1000, 600, "" , 0);
+        // here we create a genuinely new player
+        // so we can provide him with starting items
+        player.getInventory().addItem(ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD));
+        player.getInventory().addItem(ObjectManager.getArmorByID(ID.Armor.CHAINMAL));
         mapName = "map1.txt";
     }
 

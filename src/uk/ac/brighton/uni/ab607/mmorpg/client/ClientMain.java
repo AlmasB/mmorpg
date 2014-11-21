@@ -4,6 +4,7 @@ import com.almasb.java.io.Resources;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.R;
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.GameWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
@@ -23,10 +24,17 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
+        //        if (args.length == 0) {
+        //            new GameWindow("", "").init();
+        //            return;
+        //        }
+
         if (args.length != 1) {
             usage();
             return;
         }
+
+
 
         boolean local = false, server = false;
 
@@ -58,7 +66,8 @@ public class ClientMain {
                 new GameServer();
 
             if (local) {
-                new GameGUI("127.0.0.1", "Debug");
+                //new GameGUI("127.0.0.1", "Debug");
+                new GameWindow("127.0.0.1", "Debug").init();
             }
             else {
                 LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls

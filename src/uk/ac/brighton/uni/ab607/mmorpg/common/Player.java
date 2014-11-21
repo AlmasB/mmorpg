@@ -1,16 +1,31 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.R;
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 
@@ -68,7 +83,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     private int statLevel = 1, jobLevel = 1;
 
-    private int attributePoints = 0,
+    private byte attributePoints = 0,
             skillPoints = 0;
 
     private int money = 0;
@@ -85,8 +100,60 @@ public class Player extends GameCharacter implements PseudoHTML {
     public String ip;
     public int port;
 
+    public transient SimpleIntegerProperty[] attributeProperties = new SimpleIntegerProperty[9];
+    public transient SimpleIntegerProperty[] bonusAttributeProperties = new SimpleIntegerProperty[9];
+    public transient SimpleIntegerProperty[] statProperties = new SimpleIntegerProperty[16];
+    public transient SimpleIntegerProperty[] bonusStatProperties = new SimpleIntegerProperty[16];
+
+    public transient SimpleIntegerProperty attributePointsProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty skillPointsProperty = new SimpleIntegerProperty();
+
+    public transient SimpleIntegerProperty hpProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty spProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty baseLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty jobLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleIntegerProperty statLevelProperty = new SimpleIntegerProperty();
+    public transient SimpleDoubleProperty baseXPProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty jobXPProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty statXPProperty = new SimpleDoubleProperty();
+
+    public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
+
+    /**
+     * Properties for displaying skills
+     */
+    public transient SimpleIntegerProperty[] skillLevelProperties = new SimpleIntegerProperty[9];
+    public transient SimpleStringProperty[] skillDescProperties = new SimpleStringProperty[9];
+    public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
+
+    public transient SimpleStringProperty[] itemDescProperties = new SimpleStringProperty[Inventory.MAX_SIZE];
+    public transient ArrayList<ObjectProperty<Rectangle2D>> itemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
+
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
+
+        // init everything to 1 to avoid division by 0
+        for (int i = STR; i <= LUC; i++) {
+            attributeProperties[i] = new SimpleIntegerProperty(1);
+            bonusAttributeProperties[i] = new SimpleIntegerProperty(1);
+
+            // just so happens STR = 0 and LUC = 8
+            skillLevelProperties[i] = new SimpleIntegerProperty(0);
+            skillDescProperties[i] = new SimpleStringProperty("");
+            ObjectProperty<Image> img = new SimpleObjectProperty<Image>(UIConst.Images.IC_SKILL_DUMMY);
+            skillImageProperties.add(img);
+        }
+        for (int i = MAX_HP; i <= SP_REGEN; i++) {
+            statProperties[i] = new SimpleIntegerProperty(1);
+            bonusStatProperties[i] = new SimpleIntegerProperty(1);
+        }
+
+        for (int i = 0; i < itemDescProperties.length; i++) {
+            itemDescProperties[i] = new SimpleStringProperty("");
+            itemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
+        }
+
+
         this.x = x;
         this.y = y;
         this.ip = ip;
@@ -95,6 +162,57 @@ public class Player extends GameCharacter implements PseudoHTML {
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
+    }
+
+    public void update(Player player) {
+        Platform.runLater(() -> {
+            for (int i = STR; i <= LUC; i++) {
+                attributeProperties[i].set(player.getBaseAttribute(i));
+                bonusAttributeProperties[i].set(player.getBonusAttribute(i));
+            }
+            for (int i = MAX_HP; i <= SP_REGEN; i++) {
+                statProperties[i].set((int)(player.getBaseStat(Stat.values()[i])));
+                bonusStatProperties[i].set((int)(player.getBonusStat(Stat.values()[i])));
+            }
+            for (int i = 0; i < player.skills.length; i++) {
+                Skill skill = player.skills[i];
+
+                skillLevelProperties[i].set(skill.getLevel());
+                skillImageProperties.get(i).set(UIConst.Images.getSkillImageByID(skill.id));
+                skillDescProperties[i].set(skill.name + "\n" + "SP: " + skill.getManaCost() + "\n" + skill.description);
+            }
+
+            for (int i = 0; i < itemDescProperties.length; i++) {
+                Optional<GameItem> item = player.inventory.getItem(i);
+                if (item.isPresent()) {
+                    itemDescProperties[i].set(item.get().description);
+                    itemSpriteProperties.get(i).set(new Rectangle2D(item.get().ssX*34, item.get().ssY*34, 34, 34));
+                }
+                else {
+                    itemDescProperties[i].set("");
+                    itemSpriteProperties.get(i).set(new Rectangle2D(0, 0, 34, 34));
+                }
+            }
+
+            hpProperty.set(player.getHP());
+            spProperty.set(player.getSP());
+
+            attributePointsProperty.set(player.attributePoints);
+            skillPointsProperty.set(player.skillPoints);
+
+            baseLevelProperty.set(player.baseLevel);
+            statLevelProperty.set(player.statLevel);
+            jobLevelProperty.set(player.jobLevel);
+
+            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
+            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[jobLevel-1]);
+            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[statLevel-1]);
+
+
+            classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
+
+
+        });
     }
 
     /**
@@ -306,4 +424,22 @@ public class Player extends GameCharacter implements PseudoHTML {
         g.setColor(Color.GOLD);
         g.fillRect(tmpX + 1, tmpY + 66, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
+
+    // BYTE STREAM IMPL
+
+    //    @Override
+    //    public void loadFromByteArray(byte[] data) {
+    //
+    //    }
+    //
+    //    @Override
+    //    public byte[] toByteArray() {
+    //        byte[] data = new byte[100];
+    //
+    //        data[0] = "P".getBytes()[0];
+    //
+    //
+    //
+    //        return data;
+    //    }
 }

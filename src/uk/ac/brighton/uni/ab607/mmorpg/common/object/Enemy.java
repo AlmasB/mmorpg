@@ -3,6 +3,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
@@ -33,15 +34,15 @@ public class Enemy extends GameCharacter {
         this.xp = xp;
         this.spriteID = spriteID;
         this.drops = drops;
-        attributes[STR] = attrs.str;
-        attributes[VIT] = attrs.vit;
-        attributes[DEX] = attrs.dex;
-        attributes[AGI] = attrs.agi;
-        attributes[INT] = attrs.int_;
-        attributes[WIS] = attrs.wis;
-        attributes[WIL] = attrs.wil;
-        attributes[PER] = attrs.per;
-        attributes[LUC] = attrs.luc;
+        attributes[STR] = (byte) attrs.str;
+        attributes[VIT] = (byte) attrs.vit;
+        attributes[DEX] = (byte) attrs.dex;
+        attributes[AGI] = (byte) attrs.agi;
+        attributes[INT] = (byte) attrs.int_;
+        attributes[WIS] = (byte) attrs.wis;
+        attributes[WIL] = (byte) attrs.wil;
+        attributes[PER] = (byte) attrs.per;
+        attributes[LUC] = (byte) attrs.luc;
         calculateStats();
         setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
         setSP((int)getTotalStat(MAX_SP));
@@ -66,6 +67,25 @@ public class Enemy extends GameCharacter {
         for (DroppableItem item : drops) {
             if (GameMath.checkChance(item.dropChance)) {
                 drop.addItem(ObjectManager.getItemByID(item.itemID));
+            }
+        }
+        return drop;
+    }
+
+    /**
+     *
+     * @param p
+     *           The player who landed the killing blow
+     * @return
+     */
+    public Chest onDeath(Player p) {
+        alive = false;
+        Chest drop = new Chest(x, y, GameMath.random(this.baseLevel * 100));
+        for (DroppableItem item : drops) {
+            if (GameMath.checkChance(item.dropChance)) {
+                drop.addItem(ObjectManager.getItemByID(item.itemID));
+
+                p.getInventory().addItem(ObjectManager.getItemByID(item.itemID));
             }
         }
         return drop;

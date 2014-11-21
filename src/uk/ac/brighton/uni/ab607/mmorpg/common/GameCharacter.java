@@ -2,15 +2,23 @@ package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import static com.almasb.common.parsing.PseudoHTML.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.shape.Rectangle;
+
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
+import com.almasb.common.util.ByteStream;
+import com.almasb.common.util.Out;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
@@ -25,7 +33,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
  * @author Almas Baimagambetov
  *
  */
-public abstract class GameCharacter implements java.io.Serializable, Drawable {
+public abstract class GameCharacter implements java.io.Serializable, Drawable, ByteStream {
     private static final long serialVersionUID = -4840633591092062960L;
 
     public static class Experience implements java.io.Serializable {
@@ -100,8 +108,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
             HP_REGEN = 14,
             SP_REGEN = 15;
 
-    protected int[] attributes = new int[9];    // we have 9 attributes
-    protected int[] bAttributes = new int[9];   // on top of native attributes items can give bonuses
+    protected byte[] attributes = new byte[9];    // we have 9 attributes
+    protected byte[] bAttributes = new byte[9];   // on top of native attributes items can give bonuses
     protected float[] stats = new float[16];        // 16 stats
     protected float[] bStats = new float[16];       // bonus stats given by item
 
@@ -123,6 +131,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     protected Experience xp = new Experience(0, 0, 0);
 
+
+    public transient SimpleDoubleProperty xProperty = new SimpleDoubleProperty();
+    public transient SimpleDoubleProperty yProperty = new SimpleDoubleProperty();
+
     public GameCharacter(String name, String description, GameCharacterClass charClass) {
         //this.id = id;
         this.name = name;
@@ -137,7 +149,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         for (int i = 0; i < skills.length; i++)
             skills[i] = ObjectManager.getSkillByID(charClass.skillIDs[i]);
 
-        Arrays.fill(attributes, 1); // set all attributes to 1, that's the minimum
+        Arrays.fill(attributes, (byte)1); // set all attributes to 1, that's the minimum
 
         calculateStats();
         setHP((int)getTotalStat(MAX_HP));   // set current hp/sp to max
@@ -150,6 +162,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     public float getBaseStat(Stat stat) {
         return stats[stat.ordinal()];
+    }
+
+    public int getBonusAttribute(int attr) {
+        return bAttributes[attr];
+    }
+
+    public float getBonusStat(Stat stat) {
+        return bStats[stat.ordinal()];
     }
 
     /**
@@ -613,10 +633,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
     public transient int xSpeed, ySpeed;
 
-    public int frame = 0;
-    public int place = 0;
-    public int sprite = 0;
-    private int factor = 3;
+    public byte frame = 0;
+    public byte place = 0;
+    //public int sprite = 0;
+    private static final byte FACTOR = 3;
 
     protected int spriteID;
 
@@ -659,14 +679,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
 
         frame++;
 
-        if (frame == 4 * factor)
+        if (frame == 4 * FACTOR)
             frame = 0;
 
-        if (frame / factor == 0 || frame / factor == 2)
+        if (frame / FACTOR == 0 || frame / FACTOR == 2)
             place = 0;
-        if (frame / factor == 1)
+        if (frame / FACTOR == 1)
             place = 1;
-        if (frame / factor == 3)
+        if (frame / FACTOR == 3)
             place = 2;
     }
 
@@ -698,4 +718,52 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable {
         g.setColor(Color.RED);
         g.fillRect(tmpX + 1, tmpY + 56, (int)(40 * (hp*1.0f/(int)(getTotalStat(MAX_HP)))) - 1, 3);
     }
+
+    @Override
+    public void loadFromByteArray(byte[] data) {
+        x = ByteStream.byteArrayToInt(data, 1);
+        y = ByteStream.byteArrayToInt(data, 5);
+        frame = data[9];
+        place = data[10];
+
+        spriteID = ByteStream.byteArrayToInt(data, 11);
+        direction = Dir.values()[data[15]];
+
+        Platform.runLater(() -> {
+            sprite.setTranslateX(x);
+            sprite.setTranslateY(y);
+
+            xProperty.set(x);
+            yProperty.set(y);
+
+            Rectangle2D rect = new Rectangle2D(place*40, getRow()*40, 40, 40);
+
+            sprite.imageView.setViewport(rect);
+            //sprite.name.setText(name);
+        });
+        //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        byte[] data = new byte[32];
+
+        data[0] = -127;
+        ByteStream.intToByteArray(data, 1, x);
+        ByteStream.intToByteArray(data, 5, y);
+        data[9] = frame;
+        data[10] = place;
+        ByteStream.intToByteArray(data, 11, spriteID);
+
+        data[15] = (byte)direction.ordinal();
+
+        // MAX is 16
+        byte[] bName = name.getBytes();
+        for (int i = 0; i < Math.min(bName.length, 16); i++)
+            data[16 + i] = bName[i];
+
+        return data;
+    }
+
+    public transient Sprite sprite = new Sprite("player1.png");
 }

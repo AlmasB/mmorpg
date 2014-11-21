@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +35,12 @@ public class GameMap {
     private SpawnInfo[] spawnInfo;
     private int enemyRuntimeID = 1; // it will keep going up
 
-    private int enemyNumbers = 0;
-
     private ArrayList<Player> players = new ArrayList<Player>();
     public ArrayList<Chest> chests = new ArrayList<Chest>();
 
     public ArrayList<Animation> animations = new ArrayList<Animation>();
+
+    private int tick = 0;
 
     /*package-private*/ GameMap(String name, int spriteID, SpawnInfo... info) {
         this.name = name;
@@ -70,7 +71,6 @@ public class GameMap {
                 e.setY((int) p.getY());
                 e.setRuntimeID(enemyRuntimeID++);
                 list.add(e);
-                enemyNumbers++;
             }
             enemies.add(list);
         }
@@ -155,6 +155,9 @@ public class GameMap {
         Stream<Enemy> enemyStream = tmpList.stream();
 
         tmpPlayers.forEach(player -> {
+
+
+
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
             Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
@@ -162,15 +165,43 @@ public class GameMap {
             Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
             Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
 
+
+            //Out.d("map update", playersToSend.length + "");
+
+
             try {
-                if (playersToSend.length > 0)
-                    server.send(new DataPacket(playersToSend), player.ip, player.port);
+                if (tick == 0)
+                    server.send(new DataPacket(player), player.ip, player.port);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                if (playersToSend.length > 0) {
+                    for (int i = 0; i < playersToSend.length; i++) {
+                        baos.write(playersToSend[i].toByteArray());
+                    }
+                }
+                if (enemiesToSend.length > 0) {
+                    for (int i = 0; i < enemiesToSend.length; i++) {
+                        baos.write(enemiesToSend[i].toByteArray());
+                    }
+                }
+
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
+
+                //server.send(new DataPacket(playersToSend), player.ip, player.port);
+
+
                 if (chestsToSend.length > 0)
                     server.send(new DataPacket(chestsToSend), player.ip, player.port);
-                if (enemiesToSend.length > 0)
-                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
+                //                if (enemiesToSend.length > 0)
+                //                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
                 if (animationsToSend.length > 0)
                     server.send(new DataPacket(animationsToSend), player.ip, player.port);
+
+                tick++;
+
+                if (tick == 50)
+                    tick = 0;
             }
             catch (Exception e) {
                 Out.e("update", "Failed to send a packet", this, e);
@@ -182,6 +213,16 @@ public class GameMap {
         for (ArrayList<Enemy> list : enemies) {
             for (Enemy e : list)
                 if (e.getRuntimeID() == id)
+                    return e;
+        }
+
+        return null;
+    }
+
+    public Enemy getEnemyByXY(int x, int y) {
+        for (ArrayList<Enemy> list : enemies) {
+            for (Enemy e : list)
+                if (e.getX() == x && e.getY() == y)
                     return e;
         }
 

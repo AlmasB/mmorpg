@@ -31,15 +31,15 @@ public class Desc {
             public static final String WARRIOR_HEART = "Passively increases max HP";
             public static final String ARMOR_MASTERY = "Increases armor rating";
         }
-        
+
         public class Crusader {
             public static final String HOLY_LIGHT = "Heals and increases VIT for the duration";
             public static final String FAITH = "Further increases bonus given by Heart of a Warrior skill";
-            public static final String DIVINE_ARMOR = "Further increases bonus give by Armor Mastery skill";
+            public static final String DIVINE_ARMOR = "Further increases bonus given by Armor Mastery skill";
             public static final String PRECISION_STRIKE = "Deals armor ignoring damage based on STR";
             public static final String LAST_STAND = "Deals double base damage for the duration";
         }
-        
+
         public class Gladiator {
             public static final String BLOODLUST = "Increases ATK based on the missing % HP";
             public static final String BASH = "A powerful physical attack that stuns the target for 5 seconds";
@@ -62,7 +62,7 @@ public class Desc {
             public static final String THUNDERBOLT_FIRESTORM = "Deals magic damage with air and fire element";
             public static final String ICICLE_AVALANCHE = "Deals magic damage with water and earth element";
         }
-        
+
         public class Enchanter {
             public static final String MAGIC_SHIELD = "Increases Armor rating for the duration";
             public static final String ASTRAL_PROTECTION = "Passively increases MDEF";
@@ -70,14 +70,14 @@ public class Desc {
             public static final String CURSE_OF_WITCHCRAFT = "Target cannot use skills for the duration";
             public static final String MANA_BURN = "Burns target's SP and deals damage based on the SP burnt";
         }
-        
+
         public class Scout {
             public static final String POISON_ATTACK = "Attacks the target with high chance to poison him";
             public static final String TRICK_ATTACK = "Deals physical damage and steals gold equal to damage dealt";
             public static final String WEAPON_MASTERY = "Passively increases ATK";
             public static final String EXPERIENCED_FIGHTER = "Passively increases AGI and DEX";
         }
-        
+
         public class Rogue {
             public static final String SHAMELESS = "Deals more damage if target's % HP is lower than yours. No cooldown but consumes mana";
             public static final String DOUBLE_STRIKE = "Quickly performs two attacks with a chance to stun the target";
@@ -85,7 +85,7 @@ public class Desc {
             public static final String CRITICAL_STRIKE = "Strikes the target with high chance of crit. Crit damage is greater for this skill";
             public static final String FIVE_FINGER_DEATH_PUNCH = "Deals devastating damage to unarmoured targets";
         }
-        
+
         public class Ranger {
             public static final String FAST_REFLEXES = "Increases ASPD for the duration";
             public static final String ENCHANTED_ARROW = "Stuns target. Stun lasts longer for target's with high armor rating";
@@ -107,14 +107,14 @@ public class Desc {
         public static final String IRON_SWORD = "A standard warrior's sword with decent attack damage";
         public static final String KNIFE = "A simple knife with poor blade";
 
-        public static final String PRACTICE_SWORD = "4010";
-        public static final String CLAYMORE = "4011";
-        public static final String BROADSWORD = "4012";
-        public static final String HALLSTATT_SWORD = "4013";
-        public static final String KAMPILAN_SWORD = "4014";
-        public static final String MACHETE = "4015";
-        public static final String TEGA_SWORD = "4016";
-        public static final String BATTLESWORD = "4017";
+        public static final String PRACTICE_SWORD = "A basic one-handed sword";
+        public static final String CLAYMORE = "Large, double-edged broad sword that was used by the Scottish highlanders";
+        public static final String BROADSWORD = "A sword with a wide, double sided blade";
+        public static final String HALLSTATT_SWORD = "A sword favored by gladiators, it is especially designed for battles against armored enemies";
+        public static final String KAMPILAN_SWORD = "A thin sword designed to be easily bent, light, and very elastic";
+        public static final String MACHETE = "A strong cleaver-like sword";
+        public static final String TEGA_SWORD = "A ceremonial sword used by gravekeeper's to lead the dead to the great beyond";
+        public static final String BATTLESWORD = "A terrifying two-handed sword that is said to stimulate the nerves in order to kill, once it's in the wearer's hands";
         public static final String LONGSWORD = "A two-handed sword with straight double-edged blade";
         public static final String SCHIAVONA_SWORD = "A popular sword among mercenary soldiers";
         public static final String COLICHERMARDE_SWORD = "Small sword with good parrying characteristics";
