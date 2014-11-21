@@ -2,7 +2,6 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -15,7 +14,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,9 +26,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -62,9 +58,8 @@ public class GameWindow extends FXWindow {
 
     private Group gameRoot = new Group(), uiRoot = new Group();
 
-    private Font font;
-
     private Player player;
+    // currently also uses enemy sprites, maybe store in 1 group
     private Group playerSprites = new Group();
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
@@ -75,8 +70,8 @@ public class GameWindow extends FXWindow {
 
     private ArrayList<ImageView> skillImages = new ArrayList<ImageView>();
 
-    private Group enemySprites = new Group();
-    private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
+    //private Group enemySprites = new Group();
+    //private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
 
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
@@ -94,43 +89,29 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }
 
-        try {
-            InputStream is = ResourceManager.loadResourceAsStream("Vecna.otf").get();
-            font = Font.loadFont(is, 28);
-            is.close();
-        }
-        catch (IOException e) {
-            Out.e(e);
-        }
-
 
         playersList.add(player);
         playerSprites.getChildren().add(player.sprite);
 
-        gameRoot.getChildren().addAll(playerSprites, enemySprites);
+        gameRoot.getChildren().addAll(playerSprites);
 
-        try {
-            ImageView img = new ImageView(ResourceManager.loadFXImage("ui_hotbar.png"));
-            img.setTranslateX(300);
-            img.setTranslateY(580);
-            uiRoot.getChildren().add(img);
+        ImageView img = new ImageView(UIConst.Images.UI_HOTBAR);
+        img.setTranslateX(300);
+        img.setTranslateY(580);
+        uiRoot.getChildren().add(img);
 
-            for (int i = 0; i < 9; i++) {
-                SkillView skill = new SkillView(i);
-                skill.setTranslateX(338 + i * 60);
-                skill.setTranslateY(625);
-                uiRoot.getChildren().add(skill);
-            }
-
-
+        for (int i = 0; i < 9; i++) {
+            SkillView skill = new SkillView(i);
+            skill.setTranslateX(338 + i * 60);
+            skill.setTranslateY(625);
+            uiRoot.getChildren().add(skill);
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
 
         UIMenuWindow menuWindow = new UIMenuWindow();
         UIStatsWindow statsWindow = new UIStatsWindow(player);
+        UIInventoryWindow inventoryWindow = new UIInventoryWindow(player);
 
 
         // UI elements
@@ -138,7 +119,7 @@ public class GameWindow extends FXWindow {
         Button btnOptions2 = new Button("Menu");
         btnOptions2.setTranslateX(950);
         btnOptions2.setTranslateY(640);
-        btnOptions2.setFont(font);
+        btnOptions2.setFont(UIConst.FONT);
         btnOptions2.setOnAction(event -> {
             if (menuWindow.isShowing())
                 menuWindow.minimize();
@@ -192,7 +173,7 @@ public class GameWindow extends FXWindow {
         Button btnStats = new Button("Stats");
         btnStats.setTranslateX(1070);
         btnStats.setTranslateY(640);
-        btnStats.setFont(font);
+        btnStats.setFont(UIConst.FONT);
         btnStats.setOnAction(event -> {
             if (statsWindow.isShowing()) {
                 statsWindow.minimize();
@@ -208,15 +189,21 @@ public class GameWindow extends FXWindow {
         inventory.textProperty().bind(money.asString().concat("G"));
         inventory.setTranslateX(1180);
         inventory.setTranslateY(640);
-        inventory.setFont(font);
+        inventory.setFont(UIConst.FONT);
         inventory.setOnAction(event -> {
-            if (test == 0) {
-                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
-                test++;
+            //            if (test == 0) {
+            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
+            //                test++;
+            //            }
+            //            else if (test == 1) {
+            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "CRUSADER"));
+            //                test++;
+            //            }
+            if (inventoryWindow.isShowing()) {
+                inventoryWindow.minimize();
             }
-            else if (test == 1) {
-                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "CRUSADER"));
-                test++;
+            else {
+                inventoryWindow.restore();
             }
         });
 
@@ -230,36 +217,36 @@ public class GameWindow extends FXWindow {
 
     int test = 0;
 
-    private Random rand = new Random();
-
-    private void moneyTest() {
-        Platform.runLater(() -> {
-            final int val = rand.nextInt(1000);
-            Text text = new Text(val + "G");
-            text.setFont(font);
-            text.setFill(Color.GOLD);
-            TranslateTransition tt = new TranslateTransition(Duration.seconds(1.66), text);
-            tt.setFromX(player.getX() + rand.nextInt(1280) - 640);
-            tt.setFromY(player.getY() + rand.nextInt(720) - 360);
-
-            tt.setToX(player.getX() + 500);
-            tt.setToY(player.getY() + 320);
-            tt.setOnFinished(event -> {
-                gameRoot.getChildren().remove(text);
-                money.set(money.get() + val);
-                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), inventory);
-                st.setFromY(1);
-                st.setToY(1.3);
-                st.setAutoReverse(true);
-                st.setCycleCount(2);
-                st.play();
-            });
-
-            gameRoot.getChildren().add(text);
-
-            tt.play();
-        });
-    }
+    //    private Random rand = new Random();
+    //
+    //    private void moneyTest() {
+    //        Platform.runLater(() -> {
+    //            final int val = rand.nextInt(1000);
+    //            Text text = new Text(val + "G");
+    //            text.setFont(UIConst.FONT);
+    //            text.setFill(Color.GOLD);
+    //            TranslateTransition tt = new TranslateTransition(Duration.seconds(1.66), text);
+    //            tt.setFromX(player.getX() + rand.nextInt(1280) - 640);
+    //            tt.setFromY(player.getY() + rand.nextInt(720) - 360);
+    //
+    //            tt.setToX(player.getX() + 500);
+    //            tt.setToY(player.getY() + 320);
+    //            tt.setOnFinished(event -> {
+    //                gameRoot.getChildren().remove(text);
+    //                money.set(money.get() + val);
+    //                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), inventory);
+    //                st.setFromY(1);
+    //                st.setToY(1.3);
+    //                st.setAutoReverse(true);
+    //                st.setCycleCount(2);
+    //                st.play();
+    //            });
+    //
+    //            gameRoot.getChildren().add(text);
+    //
+    //            tt.play();
+    //        });
+    //    }
 
     @Override
     protected void initScene(Scene scene) {
@@ -290,8 +277,6 @@ public class GameWindow extends FXWindow {
         });
     }
 
-    //boolean test = true;
-
     @Override
     protected void initStage(Stage primaryStage) {
         primaryStage.setWidth(1280);
@@ -316,7 +301,7 @@ public class GameWindow extends FXWindow {
         }
 
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
+        //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
     }
 
     private class SkillView extends Parent {
@@ -479,10 +464,10 @@ public class GameWindow extends FXWindow {
             if (packet.objectData instanceof ServerResponse) {
                 ServerResponse res = (ServerResponse) packet.objectData;
 
-                //                            map = ObjectManager.getMapByName(res.data);
-                //
-                //                            selX = res.value1;
-                //                            selY = res.value2;
+                //map = ObjectManager.getMapByName(res.data);
+
+                selX = res.value1;
+                selY = res.value2;
             }
 
             if (packet.objectData instanceof Player) {
@@ -490,7 +475,6 @@ public class GameWindow extends FXWindow {
 
                 // update client's player
                 player.update(p);
-
             }
 
             if (packet.multipleObjectData instanceof Player[]) {

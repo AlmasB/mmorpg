@@ -1,14 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
-import java.io.IOException;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -18,13 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
-
-import com.almasb.java.io.ResourceManager;
 
 public class UIStatsWindow extends UIFragmentWindow {
 
@@ -32,13 +27,8 @@ public class UIStatsWindow extends UIFragmentWindow {
         StackPane stack = new StackPane();
         stack.setAlignment(Pos.TOP_LEFT);
 
-        try {
-            ImageView img = new ImageView(ResourceManager.loadFXImage("ui_stats_bg.png"));
-            stack.getChildren().add(img);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        ImageView bgImage = new ImageView(UIConst.Images.UI_STATS_BG);
+        stack.getChildren().add(bgImage);
 
         HBox hbox = new HBox(50);
 

@@ -195,8 +195,6 @@ public class ServerActionHandler {
         else
             serverActionAttack(p, new ActionRequest(Action.ATTACK, p.name, req.data, e.getRuntimeID()));
 
-
-        //Out.d("serverActionMove", e != null ? "NOT NULL" : "NULL");
         //RTS click animation sprite
         //server.addAnimation(new ImageAnimation());
     }

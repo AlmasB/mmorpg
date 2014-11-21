@@ -19,6 +19,16 @@ public final class UIConst {
     public static Font FONT = null;
 
     public static final class Images {
+        public static Image SS_ITEMS;
+
+        // UI
+        public static Image UI_HOTBAR;
+        public static Image UI_STATS_BG;
+
+
+
+
+        // SKILLS
         public static Image IC_SKILL_DUMMY;
         // WARRIOR
         public static Image IC_SKILL_7010;
@@ -76,6 +86,15 @@ public final class UIConst {
 
         static {
             try {
+                SS_ITEMS = ResourceManager.loadFXImage("spritesheet.png");
+
+
+                UI_HOTBAR = ResourceManager.loadFXImage("ui_hotbar.png");
+                UI_STATS_BG = ResourceManager.loadFXImage("ui_stats_bg.png");
+
+
+
+
                 IC_SKILL_DUMMY = ResourceManager.loadFXImage("ic_skill_dummy.png");
 
                 // WARRIOR
@@ -95,7 +114,7 @@ public final class UIConst {
             }
         }
 
-        public static Image getByID(String id) {
+        public static Image getSkillImageByID(String id) {
             try {
                 Field field = Images.class.getDeclaredField("IC_SKILL_" + id);
                 return (Image)field.get(null);

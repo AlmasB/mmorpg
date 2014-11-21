@@ -1,7 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common;
 
 import java.util.ArrayList;
-
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -9,18 +9,18 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
-
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
-
 import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
@@ -126,6 +126,8 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleStringProperty[] skillDescProperties = new SimpleStringProperty[9];
     public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
 
+    public transient SimpleStringProperty[] itemDescProperties = new SimpleStringProperty[Inventory.MAX_SIZE];
+    public transient ArrayList<ObjectProperty<Rectangle2D>> itemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
@@ -145,6 +147,12 @@ public class Player extends GameCharacter implements PseudoHTML {
             statProperties[i] = new SimpleIntegerProperty(1);
             bonusStatProperties[i] = new SimpleIntegerProperty(1);
         }
+
+        for (int i = 0; i < itemDescProperties.length; i++) {
+            itemDescProperties[i] = new SimpleStringProperty("");
+            itemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
+        }
+
 
         this.x = x;
         this.y = y;
@@ -170,8 +178,20 @@ public class Player extends GameCharacter implements PseudoHTML {
                 Skill skill = player.skills[i];
 
                 skillLevelProperties[i].set(skill.getLevel());
-                skillImageProperties.get(i).set(UIConst.Images.getByID(skill.id));
+                skillImageProperties.get(i).set(UIConst.Images.getSkillImageByID(skill.id));
                 skillDescProperties[i].set(skill.name + "\n" + "SP: " + skill.getManaCost() + "\n" + skill.description);
+            }
+
+            for (int i = 0; i < itemDescProperties.length; i++) {
+                Optional<GameItem> item = player.inventory.getItem(i);
+                if (item.isPresent()) {
+                    itemDescProperties[i].set(item.get().description);
+                    itemSpriteProperties.get(i).set(new Rectangle2D(item.get().ssX*34, item.get().ssY*34, 34, 34));
+                }
+                else {
+                    itemDescProperties[i].set("");
+                    itemSpriteProperties.get(i).set(new Rectangle2D(0, 0, 34, 34));
+                }
             }
 
             hpProperty.set(player.getHP());
