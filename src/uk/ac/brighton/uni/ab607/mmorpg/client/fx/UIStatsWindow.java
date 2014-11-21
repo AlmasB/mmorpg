@@ -96,20 +96,24 @@ public class UIStatsWindow extends UIFragmentWindow {
                 .concat(" (").concat(player.statProperties[Player.MATK]).concat("+").concat(player.bonusStatProperties[Player.MATK]).concat(")"));
 
         Text statDEF = new Text();
-        statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF])
-                .concat("+").concat(player.bonusStatProperties[Player.DEF]));
+        statDEF.textProperty().bind(
+                new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF].add(player.bonusStatProperties[Player.DEF]))
+                .concat(" (").concat(player.statProperties[Player.DEF]).concat("+").concat(player.bonusStatProperties[Player.DEF]).concat(")"));
 
         Text statMDEF = new Text();
-        statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF])
-                .concat("+").concat(player.bonusStatProperties[Player.MDEF]));
+        statMDEF.textProperty().bind(
+                new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF].add(player.bonusStatProperties[Player.MDEF]))
+                .concat(" (").concat(player.statProperties[Player.MDEF]).concat("+").concat(player.bonusStatProperties[Player.MDEF]).concat(")"));
 
         Text statARM = new Text();
-        statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM])
-                .concat("+").concat(player.bonusStatProperties[Player.ARM]));
+        statARM.textProperty().bind(
+                new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM].add(player.bonusStatProperties[Player.ARM]))
+                .concat(" (").concat(player.statProperties[Player.ARM]).concat("+").concat(player.bonusStatProperties[Player.ARM]).concat(")"));
 
         Text statMARM = new Text();
-        statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM])
-                .concat("+").concat(player.bonusStatProperties[Player.MARM]));
+        statMARM.textProperty().bind(
+                new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM].add(player.bonusStatProperties[Player.MARM]))
+                .concat(" (").concat(player.statProperties[Player.MARM]).concat("+").concat(player.bonusStatProperties[Player.MARM]).concat(")"));
 
         Text statCrit = new Text();
         statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE])

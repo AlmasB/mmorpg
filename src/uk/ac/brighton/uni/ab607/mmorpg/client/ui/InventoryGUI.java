@@ -19,7 +19,6 @@ import javax.swing.SwingUtilities;
 
 import com.almasb.java.io.Resources;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
@@ -99,7 +98,7 @@ public class InventoryGUI extends GUI {
         drawItem(player.getEquip(Player.HELM),       g, 90, 85);
         drawItem(player.getEquip(Player.SHOES),      g, 90, 180);
 
-        g.drawImage(Resources.getImage(R.drawable.inventory_left), 2, 27, this);
+        //g.drawImage(Resources.getImage(R.drawable.inventory_left), 2, 27, this);
     }
 
     private void createPicture2(Graphics2D g) {
@@ -113,7 +112,7 @@ public class InventoryGUI extends GUI {
             drawItem(items.get(i), g, 2 + (i%5)*40, 29 + (i/5)*40);
         }
 
-        g.drawImage(Resources.getImage(R.drawable.inventory_right), 0, 27, this);
+        //g.drawImage(Resources.getImage(R.drawable.inventory_right), 0, 27, this);
 
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Courier", Font.PLAIN, 20));
@@ -150,8 +149,7 @@ public class InventoryGUI extends GUI {
     }
 
     private void drawItem(GameItem item, Graphics2D g, int x, int y) {
-        g.drawImage(Resources.getImage(R.drawable.spritesheet), x, y, x + 34, y + 34,
-                item.ssX*34, item.ssY*34, item.ssX*34 + 34, item.ssY*34 + 34, this);
+        //g.drawImage(Resources.getImage(R.drawable.spritesheet), x, y, x + 34, y + 34, tem.ssX*34, item.ssY*34, item.ssX*34 + 34, item.ssY*34 + 34, this);
     }
 
     private Rectangle rightHand = new Rectangle(45, 130, 34, 34),

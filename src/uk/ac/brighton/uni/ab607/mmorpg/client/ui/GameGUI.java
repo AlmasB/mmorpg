@@ -29,7 +29,6 @@ import com.almasb.common.util.Out;
 import com.almasb.java.io.Resources;
 import com.almasb.java.ui.AWTGraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
@@ -151,7 +150,7 @@ public class GameGUI extends GUI {
         });
         this.add(chat);
 
-        walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage(R.drawable.cursor_walk), new Point(16, 16), "WALK");
+        //walkCursor = Toolkit.getDefaultToolkit().createCustomCursor(Resources.getImage(R.drawable.cursor_walk), new Point(16, 16), "WALK");
         setCursor(walkCursor);
 
         client = new UDPClient(ip, 55555, new ServerResponseParser());

@@ -3,7 +3,6 @@ package uk.ac.brighton.uni.ab607.mmorpg.client;
 import com.almasb.java.io.Resources;
 import com.almasb.common.util.Out;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.GameWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
@@ -56,7 +55,7 @@ public class ClientMain {
         }
 
         // load game resources
-        Resources.init(R.drawable.class, R.raw.class);
+        //Resources.init(R.drawable.class, R.raw.class);
 
         // load game data
         ObjectManager.load();

@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import com.almasb.common.graphics.Color;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
@@ -328,9 +327,9 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
-                useResult = new SkillUseResult(Target.ENEMY, d,
-                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, R.drawable.level_up),
-                        new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
+                //                useResult = new SkillUseResult(Target.ENEMY, d,
+                //                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, R.drawable.level_up),
+                //                        new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
             }
         });
 
@@ -992,15 +991,15 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), R.drawable.enemy1, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.KNIFE, 50)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), R.drawable.enemy2, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), R.drawable.enemy3, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Armor.CHAINMAL, 25)));
 
 
         // ESSENCES
@@ -1009,7 +1008,7 @@ public class ObjectManager {
 
         // MAPS
 
-        addMap(new GameMap("map1.txt", R.drawable.map1,
+        addMap(new GameMap("map1.txt", 0,
                 new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
                 new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
                 new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));

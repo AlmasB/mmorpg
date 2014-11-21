@@ -11,6 +11,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
@@ -21,6 +22,7 @@ import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
+import com.almasb.java.io.ResourceManager;
 import com.almasb.java.io.Resources;
 
 public class GameMap {
@@ -46,7 +48,10 @@ public class GameMap {
         this.name = name;
         this.spriteID = spriteID;
 
-        data = Resources.getText(name);
+        data = ResourceManager.loadText(name);
+
+        if (data == null)
+            Sys.logExceptionAndExit(new Exception("no map data"));
 
         height = data.size();
         width = data.get(0).length();

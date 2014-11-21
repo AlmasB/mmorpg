@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
-
 public class Chest implements java.io.Serializable, Drawable {
     /**
      *
@@ -59,6 +57,6 @@ public class Chest implements java.io.Serializable, Drawable {
     @Override
     public void draw(GraphicsContext g) {
         // + 10, so that image looks nicer on grid
-        g.drawImage(R.drawable.chest, x - g.getRenderX(), y - g.getRenderY() + 10);
+        //g.drawImage(R.drawable.chest, x - g.getRenderX(), y - g.getRenderY() + 10);
     }
 }
