@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -117,6 +118,7 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleDoubleProperty statXPProperty = new SimpleDoubleProperty();
 
     public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
+    public transient SimpleBooleanProperty classChangeProperty = new SimpleBooleanProperty(false);
 
     public transient SimpleIntegerProperty moneyProperty = new SimpleIntegerProperty(-1);
 
@@ -173,6 +175,10 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public void update(Player player) {
+        this.baseLevel = player.baseLevel;
+        this.jobLevel = player.jobLevel;
+        this.statLevel = player.statLevel;
+        this.charClass = player.charClass;
         this.inventory = player.inventory;
         this.equip = player.equip;
         this.skills = player.skills;
@@ -229,6 +235,7 @@ public class Player extends GameCharacter implements PseudoHTML {
 
 
             moneyProperty.set(player.money);
+            classChangeProperty.set(GameCharacterClassChanger.canChangeClass(player));
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
         });
     }

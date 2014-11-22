@@ -193,10 +193,10 @@ public class GameMap {
 
                 server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
-                tick++;
-
-                if (tick == 50)
-                    tick = 0;
+                //                tick++;
+                //
+                //                if (tick == 50)
+                //                    tick = 0;
             }
             catch (Exception e) {
                 Out.e("update", "Failed to send a packet", this, e);

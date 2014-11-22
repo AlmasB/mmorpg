@@ -72,7 +72,7 @@ public class Enemy extends GameCharacter {
     public void addAttackerRuntimeID(int runtimeID) {
         if (!attackers.contains(runtimeID)) {
             attackers.add(runtimeID);
-            Out.d("added", runtimeID + "");
+            //Out.d("added", runtimeID + "");
         }
     }
 
@@ -96,7 +96,7 @@ public class Enemy extends GameCharacter {
     public void onDeath(Player p, ArrayList<Player> players) {
         alive = false;
 
-        Out.d("onDeath", players.size() + "");
+        //Out.d("onDeath", players.size() + "");
 
         for (Player attacker : players) {
             // if the killer
