@@ -431,7 +431,8 @@ public class GameWindow extends FXWindow {
                                 newPlayer = false;
                                 p.loadFromByteArray(data);
                                 p.sprite.setValid(true);
-                                break;
+                                // no break coz of enemies being in the same list
+                                //break;
                             }
                         }
 

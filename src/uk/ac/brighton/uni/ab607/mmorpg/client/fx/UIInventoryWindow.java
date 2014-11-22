@@ -263,7 +263,8 @@ public class UIInventoryWindow extends UIFragmentWindow {
             });
 
             imageView.setOnMouseClicked(event -> {
-                // TODO:
+                if (!player.isFree(pos))
+                    addActionRequest(new ActionRequest(Action.UNEQUIP, player.name, pos));
             });
 
 

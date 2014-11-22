@@ -216,15 +216,16 @@ public class Player extends GameCharacter implements PseudoHTML {
             statLevelProperty.set(player.statLevel);
             jobLevelProperty.set(player.jobLevel);
 
-            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
-            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[jobLevel-1]);
-            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[statLevel-1]);
+            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[player.baseLevel-1]);
+            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[player.jobLevel-1]);
+            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[player.statLevel-1]);
 
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
 
 
             this.inventory = player.inventory;
+            this.equip = player.equip;
         });
     }
 
