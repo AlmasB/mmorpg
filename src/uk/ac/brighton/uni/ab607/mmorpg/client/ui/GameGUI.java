@@ -64,8 +64,8 @@ public class GameGUI extends GUI {
 
     private JTextField chat = new JTextField();
 
-    private InventoryGUI inv;
-    private StatsGUI st;
+    //private InventoryGUI inv;
+    //private StatsGUI st;
 
     private Cursor walkCursor = null;
 
@@ -95,8 +95,8 @@ public class GameGUI extends GUI {
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                inv.setLocation(GameGUI.this.getX()+640, GameGUI.this.getY()+22);
-                st.setLocation(GameGUI.this.getX(), GameGUI.this.getY()+22);
+                //inv.setLocation(GameGUI.this.getX()+640, GameGUI.this.getY()+22);
+                //st.setLocation(GameGUI.this.getX(), GameGUI.this.getY()+22);
             }
 
             @Override
@@ -109,8 +109,8 @@ public class GameGUI extends GUI {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                inv.setVisible(false);
-                st.setVisible(false);
+                //inv.setVisible(false);
+                //st.setVisible(false);
 
                 // development version
                 System.exit(0);
@@ -197,8 +197,8 @@ public class GameGUI extends GUI {
                 player = (Player) packet.objectData;
                 // login complete, all set, we can now show GUI
                 // and start drawing
-                inv = new InventoryGUI(player);
-                st = new StatsGUI(player);
+                //inv = new InventoryGUI(player);
+                //st = new StatsGUI(player);
 
                 setVisible(true);
                 requestFocusInWindow();
@@ -241,8 +241,8 @@ public class GameGUI extends GUI {
             updateGameClient();
 
             // update other windows
-            inv.update(player);
-            st.update(player);
+            //inv.update(player);
+            //st.update(player);
         }
 
         /**
@@ -287,14 +287,14 @@ public class GameGUI extends GUI {
 
         if (!stop) {
             try {
-                ActionRequest[] invGUI = inv.clearPendingActionRequests();
-                ActionRequest[] stGUI = st.clearPendingActionRequests();
+                //ActionRequest[] invGUI = inv.clearPendingActionRequests();
+                //ActionRequest[] stGUI = st.clearPendingActionRequests();
                 ActionRequest[] thisGUI = this.clearPendingActionRequests();
 
-                if (invGUI.length > 0)
-                    client.send(new DataPacket(invGUI));
-                if (stGUI.length > 0)
-                    client.send(new DataPacket(stGUI));
+                //if (invGUI.length > 0)
+                //client.send(new DataPacket(invGUI));
+                //if (stGUI.length > 0)
+                //client.send(new DataPacket(stGUI));
                 if (thisGUI.length > 0)
                     client.send(new DataPacket(thisGUI));
             }
@@ -384,10 +384,10 @@ public class GameGUI extends GUI {
                     chat.requestFocusInWindow();
                     break;
                 case KeyEvent.VK_I:
-                    inv.setVisible(!inv.isVisible());
+                    //inv.setVisible(!inv.isVisible());
                     break;
                 case KeyEvent.VK_S:
-                    st.setVisible(!st.isVisible());
+                    //st.setVisible(!st.isVisible());
                     break;
             }
         }

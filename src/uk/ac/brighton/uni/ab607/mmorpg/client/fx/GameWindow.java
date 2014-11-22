@@ -29,6 +29,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
@@ -62,6 +63,7 @@ public class GameWindow extends FXWindow {
 
     private UIStatsWindow statsWindow;
     private UIInventoryWindow inventoryWindow;
+    private UIMenuWindow menuWindow;
 
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
@@ -105,13 +107,13 @@ public class GameWindow extends FXWindow {
         for (int i = 0; i < 9; i++) {
             SkillView skill = new SkillView(i);
             skill.setTranslateX(338 + i * 60);
-            skill.setTranslateY(625);
+            skill.setTranslateY(600);
             uiRoot.getChildren().add(skill);
         }
 
 
 
-        UIMenuWindow menuWindow = new UIMenuWindow();
+        menuWindow = new UIMenuWindow();
         statsWindow = new UIStatsWindow(player);
         inventoryWindow = new UIInventoryWindow(player);
 
@@ -269,6 +271,44 @@ public class GameWindow extends FXWindow {
             if (event.getCode() == KeyCode.DOWN) {
 
             }
+            if (event.getCode() == KeyCode.I) {
+                if (inventoryWindow.isShowing()) {
+                    inventoryWindow.minimize();
+                }
+                else {
+                    inventoryWindow.restore();
+                }
+            }
+            if (event.getCode() == KeyCode.S) {
+                if (statsWindow.isShowing()) {
+                    statsWindow.minimize();
+                }
+                else {
+                    statsWindow.restore();
+                }
+            }
+            if (event.getCode() == KeyCode.ESCAPE) {
+                if (menuWindow.isShowing())
+                    menuWindow.minimize();
+                else
+                    menuWindow.restore();
+            }
+
+            if (event.getCode().isDigitKey()) {
+                int digit = 0;
+                try {
+                    digit = Integer.parseInt(
+                            event.getCode().toString().charAt(event.getCode().toString().length()-1) + "");
+                }
+                catch (NumberFormatException e) {
+                }
+                if (digit != 0) {
+                    Out.d("event", digit + "");
+                    // TODO: skill use
+                    //addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
+                    //"map1.txt", digit-1, runtimeID));
+                }
+            }
         });
 
         scene.setOnMouseClicked(event -> {
@@ -349,9 +389,15 @@ public class GameWindow extends FXWindow {
                 popup.hide();
             });
 
+            Button btn = new Button("+");
+            btn.visibleProperty().bind(player.skillPointsProperty.greaterThan(0)
+                    .and(player.skillLevelProperties[pos].lessThan(Skill.MAX_LEVEL)));
+            btn.setOnAction(event -> {
+                addActionRequest(new ActionRequest(Action.SKILL_UP, player.name, pos));
+            });
 
             VBox vbox = new VBox();
-            vbox.getChildren().addAll(imageView, text);
+            vbox.getChildren().addAll(btn, imageView, text);
 
             getChildren().add(vbox);
         }
