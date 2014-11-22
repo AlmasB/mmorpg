@@ -92,6 +92,11 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }
 
+        // test
+        player.baseLevelProperty.addListener((obs, old, newValue) -> {
+            if (newValue.intValue() > old.intValue())
+                new UIAnimations.LevelUpAnimation(gameRoot, player);
+        });
 
         playersList.add(player);
         playerSprites.getChildren().add(player.sprite);
@@ -189,7 +194,7 @@ public class GameWindow extends FXWindow {
         uiRoot.getChildren().add(btnStats);
 
 
-        inventory.textProperty().bind(money.asString().concat("G"));
+        inventory.setText("Inventory");
         inventory.setTranslateX(1180);
         inventory.setTranslateY(640);
         inventory.setFont(UIConst.FONT);
