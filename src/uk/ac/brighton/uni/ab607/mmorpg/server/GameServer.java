@@ -20,7 +20,6 @@ import com.almasb.common.util.Out;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
@@ -52,11 +51,6 @@ public class GameServer {
         // start main server loop
         //new Thread(new ServerLoop()).start();
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::serverLoop, 0, 20, TimeUnit.MILLISECONDS);
-
-        // test
-        spawnChest(new Chest(1000, 680, 1000,
-                ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
-                ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
 
         // call save state to db every 5 mins
         new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
@@ -250,6 +244,10 @@ public class GameServer {
         return getMapByName(mapName).getEnemyByRuntimeID(id);
     }
 
+    /*package-private*/ Player getPlayerByRuntimeID(int id, String mapName) {
+        return getMapByName(mapName).getPlayerByRuntimeID(id);
+    }
+
     /*package-private*/ GameMap getMapByName(String name) {
         for (GameMap m : maps)
             if (m.name.equals(name))
@@ -319,11 +317,6 @@ public class GameServer {
         //addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
     }
 
-    /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
-        getMapByName(mapName).chests.add(chest);
-        return chest;
-    }
-
     /*package-private*/ void addAnimation(Animation a, String mapName) {
         getMapByName(mapName).animations.add(a);
     }
@@ -354,9 +347,5 @@ public class GameServer {
      */
     /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
-    }
-
-    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

@@ -31,7 +31,6 @@ import com.almasb.java.ui.AWTGraphicsContext;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
@@ -209,10 +208,6 @@ public class GameGUI extends GUI {
                 update((Player[]) packet.multipleObjectData);
             }
 
-            if (packet.multipleObjectData instanceof Chest[]) {
-                update((Chest[]) packet.multipleObjectData);
-            }
-
             if (packet.multipleObjectData instanceof Enemy[]) {
                 update((Enemy[]) packet.multipleObjectData);
             }
@@ -248,16 +243,6 @@ public class GameGUI extends GUI {
             // update other windows
             inv.update(player);
             st.update(player);
-        }
-
-        /**
-         * Updates info about chests
-         *
-         * @param sChests
-         *                  chests from server
-         */
-        private void update(Chest[] sChests) {
-            gameObjects.set(INDEX_CHESTS, sChests);
         }
 
         /**

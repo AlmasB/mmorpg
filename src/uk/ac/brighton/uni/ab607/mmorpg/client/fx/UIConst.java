@@ -20,6 +20,7 @@ public final class UIConst {
 
     public static final class Images {
         public static Image SS_ITEMS;
+        public static Image SS_MAP;
 
         // UI
         public static Image UI_HOTBAR;
@@ -87,6 +88,7 @@ public final class UIConst {
         static {
             try {
                 SS_ITEMS = ResourceManager.loadFXImage("spritesheet.png");
+                SS_MAP = ResourceManager.loadFXImage("map1.png");
 
 
                 UI_HOTBAR = ResourceManager.loadFXImage("ui_hotbar.png");

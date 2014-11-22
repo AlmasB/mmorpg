@@ -4,14 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,12 +25,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
@@ -48,18 +40,17 @@ import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
 import com.almasb.common.util.ByteStream;
 import com.almasb.common.util.Out;
-import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
-
-import static uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
 
 public class GameWindow extends FXWindow {
 
     private String name, ip;
     private UDPClient client = null;
 
-    //private Scene scene;
-
+    /**
+     * gameRoot - contains game related nodes
+     * uiRoot - the static node group which overlays the game
+     */
     private Group gameRoot = new Group(), uiRoot = new Group();
 
     private Player player;
@@ -68,14 +59,6 @@ public class GameWindow extends FXWindow {
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
     private int selX = 1000, selY = 600;
-
-    private SimpleIntegerProperty money = new SimpleIntegerProperty();
-    private Button inventory = new Button("Inventory");
-
-    private ArrayList<ImageView> skillImages = new ArrayList<ImageView>();
-
-    //private Group enemySprites = new Group();
-    //private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
 
     private UIStatsWindow statsWindow;
     private UIInventoryWindow inventoryWindow;
@@ -90,13 +73,8 @@ public class GameWindow extends FXWindow {
 
     @Override
     protected void createContent(Pane root) {
-        try {
-            ImageView background = new ImageView(ResourceManager.loadFXImage("map1.png"));
-            gameRoot.getChildren().add(background);
-        }
-        catch (Exception e) {
-            Out.e(e);
-        }
+        ImageView background = new ImageView(UIConst.Images.SS_MAP);
+        gameRoot.getChildren().add(background);
 
         // add animation listeners
         player.baseLevelProperty.addListener((obs, old, newValue) -> {
@@ -107,6 +85,11 @@ public class GameWindow extends FXWindow {
         player.moneyProperty.addListener((obs, old, newValue) -> {
             if (old.intValue() != -1 && newValue.intValue() - old.intValue() > 0)
                 new MoneyGainAnimation(newValue.intValue() - old.intValue());
+        });
+
+        player.baseXPProperty.addListener((obs, old, newValue) -> {
+            if (newValue.doubleValue() != 0)
+                new XPGainAnimation(newValue.doubleValue() - old.doubleValue());
         });
 
         playersList.add(player);
@@ -205,7 +188,7 @@ public class GameWindow extends FXWindow {
         uiRoot.getChildren().add(btnStats);
 
 
-        inventory.setText("Inventory");
+        Button inventory = new Button("Inventory");
         inventory.setTranslateX(1180);
         inventory.setTranslateY(640);
         inventory.setFont(UIConst.FONT);
@@ -269,12 +252,10 @@ public class GameWindow extends FXWindow {
 
     @Override
     protected void initScene(Scene scene) {
-        //this.scene = scene;
-
         gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
         gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
 
-
+        // TODO: add key events
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
 
@@ -302,11 +283,9 @@ public class GameWindow extends FXWindow {
         primaryStage.setHeight(720);
         primaryStage.setTitle("Orion MMORPG");
         primaryStage.setResizable(false);
-        //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setOnCloseRequest(event -> {
             System.exit(0);
         });
-
         primaryStage.show();
 
         try {
@@ -316,11 +295,8 @@ public class GameWindow extends FXWindow {
             //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
         }
         catch (IOException e) {
-            Out.e(e);
+            Sys.logExceptionAndExit(e);
         }
-
-
-        //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
     }
 
     private class SkillView extends Parent {
@@ -412,7 +388,7 @@ public class GameWindow extends FXWindow {
      * @version 1.0
      *
      */
-    class ServerResponseParser extends ServerPacketParser {
+    private class ServerResponseParser extends ServerPacketParser {
         private boolean clientReady = false;
 
         @Override

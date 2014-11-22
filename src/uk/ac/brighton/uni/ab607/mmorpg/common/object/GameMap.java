@@ -12,7 +12,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
 import com.almasb.common.graphics.Color;
@@ -39,7 +38,6 @@ public class GameMap {
     private int enemyRuntimeID = 1; // it will keep going up
 
     private ArrayList<Player> players = new ArrayList<Player>();
-    public ArrayList<Chest> chests = new ArrayList<Chest>();
 
     public ArrayList<Animation> animations = new ArrayList<Animation>();
 
@@ -129,25 +127,6 @@ public class GameMap {
         // process players
         for (Player p : tmpPlayers) {
             p.update();
-
-            // player - chest interaction
-            for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
-                Chest c = it.next();
-                if (c.isOpened()) {
-                    it.remove();
-                }
-                else {
-                    if (distanceBetween(p, c) < 1) {
-                        if (p.getInventory().getSize() + c.getItems().size()
-                                <= Inventory.MAX_SIZE) {
-                            c.open();
-                            c.getItems().forEach(p.getInventory()::addItem);
-                            p.incMoney(c.money);
-                            animations.add(new TextAnimation(c.getX(), c.getY(), c.money + " G", Color.GOLD, 1.0f));
-                        }
-                    }
-                }
-            }
         }
 
         // all objects to send
@@ -156,7 +135,6 @@ public class GameMap {
 
 
         Stream<Player> playerStream = tmpPlayers.stream();
-        Stream<Chest> chestStream = chests.stream();
         Stream<Animation> animationStream = animations.stream();
         Stream<Enemy> enemyStream = tmpList.stream();
 
@@ -164,7 +142,6 @@ public class GameMap {
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
             Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
-            Chest[] chestsToSend = chestStream.filter(chest -> playerVision.contains(new Point2D(chest.getX(), chest.getY()))).toArray(Chest[]::new);
             Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
             Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
 
@@ -287,6 +264,14 @@ public class GameMap {
         return null;
     }
 
+    public Player getPlayerByRuntimeID(int runtimeID) {
+        for (Player p : players)
+            if (p.getRuntimeID() == runtimeID)
+                return p;
+
+        return null;
+    }
+
     /**
      *
      * @param ch1
@@ -298,10 +283,6 @@ public class GameMap {
      */
     /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
-    }
-
-    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 
     static class SpawnInfo {

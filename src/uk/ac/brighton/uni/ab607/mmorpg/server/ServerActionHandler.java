@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -120,17 +121,22 @@ public class ServerActionHandler {
 
                 if (player.canAttack()) {
                     int dmg = player.attack(target);
+                    target.addAttackerRuntimeID(player.getRuntimeID());
+
                     server.addAnimation(new TextAnimation(target.getX(), target.getY(), dmg+"", Color.BLUE, 2.0f), req.data);
 
                     if (target.getHP() <= 0) {
-                        server.addAnimation(new TextAnimation(target.getX(), target.getY(),
-                                target.getXP().base + " XP", Color.YELLOW, 2.0f), req.data);
-
-                        if (player.gainXP(target.getXP())) {
-                            //server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, R.drawable.level_up), req.data);
+                        // process monster's death
+                        // TODO: test
+                        ArrayList<Player> attackers = new ArrayList<Player>();
+                        for (int runtimeID : target.getAttackers()) {
+                            Player p = server.getPlayerByRuntimeID(runtimeID, req.data);
+                            if (p != null) {
+                                attackers.add(p);
+                            }
                         }
 
-                        server.spawnChest(target.onDeath(), req.data);
+                        target.onDeath(player, attackers);
                     }
                 }
 
@@ -161,6 +167,7 @@ public class ServerActionHandler {
                     server.addAnimation(a, req.data);
             }
             else if (result.target == Target.ENEMY) {
+                skTarget.addAttackerRuntimeID(player.getRuntimeID());
                 server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
                 //server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
             }
@@ -169,14 +176,17 @@ public class ServerActionHandler {
             }
 
             if (skTarget.getHP() <= 0) {
-                server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(),
-                        skTarget.getXP().base + " XP", Color.BLUE, 2.0f), req.data);
-
-                if (player.gainXP(skTarget.getXP())) {
-                    //server.addAnimation(new ImageAnimation(player.getX(), player.getY() - 20, 2.0f, R.drawable.level_up), req.data);
+                // process monster's death
+                // TODO: test
+                ArrayList<Player> attackers = new ArrayList<Player>();
+                for (int runtimeID : skTarget.getAttackers()) {
+                    GameCharacter ch = server.getGameCharacterByRuntimeID(runtimeID, req.data);
+                    if (ch != null) {
+                        attackers.add((Player) ch);
+                    }
                 }
 
-                server.spawnChest(skTarget.onDeath(), req.data);
+                skTarget.onDeath(player, attackers);
             }
         }
     }

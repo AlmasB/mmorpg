@@ -175,6 +175,7 @@ public class Player extends GameCharacter implements PseudoHTML {
     public void update(Player player) {
         this.inventory = player.inventory;
         this.equip = player.equip;
+        this.skills = player.skills;
         this.setRuntimeID(player.getRuntimeID());
 
         Platform.runLater(() -> {
