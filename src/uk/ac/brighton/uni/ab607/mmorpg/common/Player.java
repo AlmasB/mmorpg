@@ -118,6 +118,8 @@ public class Player extends GameCharacter implements PseudoHTML {
 
     public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
 
+    public transient SimpleIntegerProperty moneyProperty = new SimpleIntegerProperty(-1);
+
     /**
      * Properties for displaying skills
      */
@@ -225,6 +227,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[player.statLevel-1]);
 
 
+            moneyProperty.set(player.money);
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
         });
     }

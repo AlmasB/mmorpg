@@ -64,4 +64,27 @@ public class UIAnimations {
             });
         }
     }
+
+    public static class MoneyGainAnimation {
+        public MoneyGainAnimation(int money) {
+            Platform.runLater(() -> {
+                Text text = new Text(money + "G");
+                text.setFill(Color.GOLD);
+                text.setFont(UIConst.FONT);
+                root.getChildren().add(text);
+                TranslateTransition tt = new TranslateTransition(Duration.seconds(1.5), text);
+
+                tt.setFromX(player.getX() - 30);
+                tt.setFromY(player.getY());
+                tt.setToX(player.getX() - 30);
+                tt.setToY(player.getY() - 80);
+
+                tt.setOnFinished(event -> {
+                    root.getChildren().remove(text);
+                });
+
+                tt.play();
+            });
+        }
+    }
 }

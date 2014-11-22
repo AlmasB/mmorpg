@@ -120,7 +120,7 @@ public class ServerActionHandler {
 
                 if (player.canAttack()) {
                     int dmg = player.attack(target);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY(), dmg+"", Color.BLUE, 2.0f), req.data);
+                    server.addAnimation(new TextAnimation(target.getX(), target.getY(), dmg+"", Color.BLUE, 2.0f), req.data);
 
                     if (target.getHP() <= 0) {
                         server.addAnimation(new TextAnimation(target.getX(), target.getY(),

@@ -216,13 +216,6 @@ public class GameMap {
 
                 server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
-
-
-                if (chestsToSend.length > 0)
-                    server.send(new DataPacket(chestsToSend), player.ip, player.port);
-                //                if (animationsToSend.length > 0)
-                //                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
-
                 tick++;
 
                 if (tick == 50)

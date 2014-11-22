@@ -98,10 +98,15 @@ public class GameWindow extends FXWindow {
             Out.e(e);
         }
 
-        // test
+        // add animation listeners
         player.baseLevelProperty.addListener((obs, old, newValue) -> {
-            if (newValue.intValue() > old.intValue())
-                new UIAnimations.LevelUpAnimation(gameRoot, player);
+            if (newValue.intValue() > old.intValue() && old.intValue() != 0)
+                new LevelUpAnimation(gameRoot, player);
+        });
+
+        player.moneyProperty.addListener((obs, old, newValue) -> {
+            if (old.intValue() != -1 && newValue.intValue() - old.intValue() > 0)
+                new MoneyGainAnimation(newValue.intValue() - old.intValue());
         });
 
         playersList.add(player);
