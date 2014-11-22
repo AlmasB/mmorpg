@@ -121,7 +121,7 @@ public class GameServer {
 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
-                server.send(new DataPacket(p)); // send player so client can init
+                server.send(new DataPacket(p), packet.getIP(), packet.getPort()); // send player so client can init
 
                 loginPlayer(mapName, p);
             }
@@ -315,8 +315,8 @@ public class GameServer {
         m.addPlayer(p);
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
-        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);
-        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
+        //addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);
+        //addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
     }
 
     /*package-private*/ Chest spawnChest(Chest chest, String mapName) {

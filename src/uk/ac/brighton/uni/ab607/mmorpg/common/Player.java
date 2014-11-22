@@ -171,6 +171,10 @@ public class Player extends GameCharacter implements PseudoHTML {
     }
 
     public void update(Player player) {
+        this.inventory = player.inventory;
+        this.equip = player.equip;
+        this.setRuntimeID(player.getRuntimeID());
+
         Platform.runLater(() -> {
             for (int i = STR; i <= LUC; i++) {
                 attributeProperties[i].set(player.getBaseAttribute(i));
@@ -222,10 +226,6 @@ public class Player extends GameCharacter implements PseudoHTML {
 
 
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
-
-
-            this.inventory = player.inventory;
-            this.equip = player.equip;
         });
     }
 

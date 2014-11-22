@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -45,9 +46,12 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
+import com.almasb.common.util.ByteStream;
 import com.almasb.common.util.Out;
 import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
+
+import static uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
 
 public class GameWindow extends FXWindow {
 
@@ -80,6 +84,8 @@ public class GameWindow extends FXWindow {
         this.ip = ip;
         player = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
         name = playerName;
+
+        UIAnimations.init(gameRoot, player);
     }
 
     @Override
@@ -402,72 +408,109 @@ public class GameWindow extends FXWindow {
      *
      */
     class ServerResponseParser extends ServerPacketParser {
+        private boolean clientReady = false;
+
         @Override
         public void parseServerPacket(DataPacket packet) {
-            if (packet.byteData != null && packet.byteData.length > 0 && packet.byteData[0] == -127) {
+            if (clientReady && packet.byteData != null && packet.byteData.length > 0) {
 
-                for (Player p : playersList)
-                    p.sprite.setValid(false);
+                // PLAYER, ENEMY
+                if (packet.byteData[0] == -127) {
+                    for (Player p : playersList)
+                        p.sprite.setValid(false);
 
 
-                // raw data of players containing drawing data
-                ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    // raw data of players containing drawing data
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
 
-                // number of players
-                int size = packet.byteData.length / 32;
-                for (int i = 0; i < size; i++) {
-                    byte[] data = new byte[16];
-                    byte[] name = new byte[16];
+                    // number of players
+                    int size = packet.byteData.length / 36;
+                    for (int i = 0; i < size; i++) {
+                        byte[] data = new byte[16];
+                        byte[] name = new byte[16];
+                        byte[] id = new byte[4];
 
-                    try {
-                        in.read(data);
-                        in.read(name);
 
-                        String playerName = new String(name).replace(new String(new byte[] {0}), "");
+                        try {
+                            in.read(data);
+                            in.read(name);
+                            in.read(id);
 
-                        // search list of players for name
-                        // if found update their data
-                        // else create new player with data
+                            int runtimeID = ByteStream.byteArrayToInt(id, 0);
 
-                        boolean newPlayer = true;
+                            String playerName = new String(name).replace(new String(new byte[] {0}), "");
 
-                        for (Player p : playersList) {
-                            if (p.name.equals(playerName)) {
-                                newPlayer = false;
+                            //Out.d("runtimeID", runtimeID + " " + playerName);
+
+                            // search list of players for name
+                            // if found update their data
+                            // else create new player with data
+
+                            boolean newPlayer = true;
+
+                            for (Player p : playersList) {
+                                if (p.name.equals(playerName) && p.getRuntimeID() == runtimeID) {
+                                    newPlayer = false;
+                                    p.loadFromByteArray(data);
+                                    p.sprite.setValid(true);
+                                    //Out.d(playerName, "true");
+                                    break;
+                                }
+                            }
+
+                            if (newPlayer) {
+                                Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
                                 p.loadFromByteArray(data);
-                                p.sprite.setValid(true);
-                                // no break coz of enemies being in the same list
-                                //break;
+                                p.setRuntimeID(runtimeID);
+                                playersList.add(p);
+                                Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
                             }
                         }
-
-                        if (newPlayer) {
-                            //Out.d("player", "new");
-
-                            Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
-                            p.loadFromByteArray(data);
-                            playersList.add(p);
-                            Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
+                        catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                    // END FOR
+
+
+                    Platform.runLater(() -> {
+                        playerSprites.getChildren().removeIf(node -> {
+                            Sprite s = (Sprite)node;
+                            return !s.isValid();
+                        });
+                    });
+
+                    playersList.removeIf(player -> !player.sprite.isValid());
+
+                    updateGameClient();
                 }
 
-                // END FOR
+                // ANIMATION
+                if (packet.byteData[0] == -126) {
 
+                    ByteBuffer buf = ByteBuffer.wrap(packet.byteData);
 
-                Platform.runLater(() -> {
-                    playerSprites.getChildren().removeIf(node -> {
-                        Sprite s = (Sprite)node;
-                        return !s.isValid();
-                    });
-                });
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
 
-                playersList.removeIf(player -> !player.sprite.isValid());
+                    // number of players
+                    int size = packet.byteData.length / 13;
+                    for (int i = 0; i < size; i++) {
 
-                updateGameClient();
+                        // skip first byte
+                        buf.get();
+
+                        int x = buf.getInt();
+                        int y = buf.getInt();
+                        int dmg = buf.getInt();
+                        //                        int x = ByteStream.byteArrayToInt(packet.byteData, 1);
+                        //                        int y = ByteStream.byteArrayToInt(packet.byteData, 5);
+                        //
+                        //                        int dmg = ByteStream.byteArrayToInt(packet.byteData, 9);
+
+                        new BasicDamageAnimation(dmg, x, y);
+                    }
+                }
             }
 
             if (packet.objectData instanceof ServerResponse) {
@@ -484,22 +527,8 @@ public class GameWindow extends FXWindow {
 
                 // update client's player
                 player.update(p);
-            }
 
-            if (packet.multipleObjectData instanceof Player[]) {
-                update((Player[]) packet.multipleObjectData);
-            }
-
-            if (packet.multipleObjectData instanceof Chest[]) {
-                update((Chest[]) packet.multipleObjectData);
-            }
-
-            if (packet.multipleObjectData instanceof Enemy[]) {
-                update((Enemy[]) packet.multipleObjectData);
-            }
-
-            if (packet.multipleObjectData instanceof Animation[]) {
-                update((Animation[]) packet.multipleObjectData);
+                clientReady = true;
             }
         }
 
@@ -522,47 +551,6 @@ public class GameWindow extends FXWindow {
             catch (IOException e) {
                 Out.e("updateGameClient", "Failed to send a packet", this, e);
             }
-        }
-
-        /**
-         * Update info about players
-         *
-         * @param sPlayers
-         *                 players from server
-         */
-        private void update(Player[] sPlayers) {
-            Player player = sPlayers[0];
-        }
-
-        /**
-         * Updates info about chests
-         *
-         * @param sChests
-         *                  chests from server
-         */
-        private void update(Chest[] sChests) {
-            //gameObjects.set(INDEX_CHESTS, sChests);
-        }
-
-        /**
-         * Updates info about enemies
-         *
-         * @param sChests
-         *                  enemies from server
-         */
-        private void update(Enemy[] sEnemies) {
-            //                    enemies.clear();
-            //                    for (Enemy e : sEnemies) {
-            //                        enemies.add(e);
-            //                    }
-            //
-            //                    gameObjects.set(INDEX_ENEMIES, sEnemies);
-            //
-            //                    tmpEnemies = new ArrayList<Enemy>(enemies);
-        }
-
-        private void update(Animation[] sAnimations) {
-            //gameObjects.set(INDEX_ANIMATIONS, sAnimations);
         }
     }
 }

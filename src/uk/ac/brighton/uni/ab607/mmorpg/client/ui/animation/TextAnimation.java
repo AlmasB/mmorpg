@@ -31,7 +31,7 @@ public class TextAnimation extends Animation {
         }
     }*/
 
-    private String text;
+    public String text;
     private Color color;
 
     public TextAnimation(int x, int y, String text, Color color, float duration) {

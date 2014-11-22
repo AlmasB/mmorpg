@@ -41,6 +41,10 @@ public abstract class Animation implements java.io.Serializable, Drawable {
 
     protected abstract void updateImpl(float completed);
 
+    public void setFinished() {
+        currentDuration = maxDuration;
+    }
+
     public boolean hasFinished() {
         return currentDuration >= maxDuration;
     }

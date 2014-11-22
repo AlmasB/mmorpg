@@ -729,6 +729,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         spriteID = ByteStream.byteArrayToInt(data, 11);
         direction = Dir.values()[data[15]];
 
+        //runtimeID = ByteStream.byteArrayToInt(data, 32);
+
         Platform.runLater(() -> {
             sprite.setTranslateX(x);
             sprite.setTranslateY(y);
@@ -741,12 +743,11 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
             sprite.imageView.setViewport(rect);
             //sprite.name.setText(name);
         });
-        //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
     }
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[32];
+        byte[] data = new byte[36];
 
         data[0] = -127;
         ByteStream.intToByteArray(data, 1, x);
@@ -761,6 +762,8 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         byte[] bName = name.getBytes();
         for (int i = 0; i < Math.min(bName.length, 16); i++)
             data[16 + i] = bName[i];
+
+        ByteStream.intToByteArray(data, 32, runtimeID);
 
         return data;
     }

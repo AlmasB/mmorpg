@@ -21,6 +21,7 @@ import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
+import com.almasb.common.util.ByteStream;
 import com.almasb.common.util.Out;
 import com.almasb.java.io.ResourceManager;
 import com.almasb.java.io.Resources;
@@ -186,12 +187,41 @@ public class GameMap {
 
                 server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
+                baos = new ByteArrayOutputStream();
+
+                // test
+                if (animationsToSend.length > 0) {
+                    for (int i = 0; i < animationsToSend.length; i++) {
+                        if (animationsToSend[i] instanceof TextAnimation) {
+                            TextAnimation a = (TextAnimation) animationsToSend[i];
+                            a.setFinished();
+
+                            byte[] data = new byte[13];
+
+                            data[0] = -126;
+
+                            ByteStream.intToByteArray(data, 1, a.getX());
+                            ByteStream.intToByteArray(data, 5, a.getY());
+
+                            try {
+                                ByteStream.intToByteArray(data, 9, Integer.parseInt(a.text));
+                                baos.write(data);
+                            }
+                            catch (NumberFormatException e) {
+                                // ignore for now
+                            }
+                        }
+                    }
+                }
+
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
+
 
 
                 if (chestsToSend.length > 0)
                     server.send(new DataPacket(chestsToSend), player.ip, player.port);
-                if (animationsToSend.length > 0)
-                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
+                //                if (animationsToSend.length > 0)
+                //                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
 
                 tick++;
 
