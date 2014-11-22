@@ -22,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -84,6 +85,37 @@ public class UIInventoryWindow extends UIFragmentWindow {
 
                 root.getChildren().add(box);
             }
+
+
+            // EQUIP ITEMS
+
+            //         HELM
+            // RIGHT   BODY   LEFT
+            //         SHOES
+            // in order of int definition HELM BODY SHOES RIGHT LEFT
+            GridPane grid = new GridPane();
+            grid.setVgap(10);
+            grid.setHgap(15);
+            grid.setTranslateX(35);
+            grid.setTranslateY(60);
+
+
+            EquipItemView equip0 = new EquipItemView(Player.HELM);
+            grid.add(equip0, 1, 0);
+
+            EquipItemView equip1 = new EquipItemView(Player.BODY);
+            grid.add(equip1, 1, 1);
+
+            EquipItemView equip2 = new EquipItemView(Player.SHOES);
+            grid.add(equip2, 1, 2);
+
+            EquipItemView equip3 = new EquipItemView(Player.RIGHT_HAND);
+            grid.add(equip3, 0, 1);
+
+            EquipItemView equip4 = new EquipItemView(Player.LEFT_HAND);
+            grid.add(equip4, 2, 1);
+
+            root.getChildren().add(grid);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -176,6 +208,62 @@ public class UIInventoryWindow extends UIFragmentWindow {
                         addActionRequest(new ActionRequest(Action.USE_ITEM, player.name, pos));
                     }
                 });
+            });
+
+
+            //            VBox vbox = new VBox();
+            //            vbox.getChildren().addAll(imageView);
+
+            getChildren().add(imageView);
+        }
+    }
+
+    private class EquipItemView extends Parent {
+        private ImageView imageView = new ImageView(UIConst.Images.SS_ITEMS);
+
+        public EquipItemView(int pos) {
+            imageView.viewportProperty().bind(player.equipItemSpriteProperties.get(pos));
+
+            //            imageView.setFitWidth(45);
+            //            imageView.setFitHeight(45);
+
+            DropShadow drop = new DropShadow(1, Color.GOLD);
+            drop.setInput(new Glow());
+
+            final Popup popup = new Popup();
+
+
+            Rectangle rect = new Rectangle(250, 150);
+            rect.setArcWidth(30);
+            rect.setArcHeight(30);
+            rect.setFill(Color.AQUA);
+
+            VBox box = new VBox();
+            box.setPadding(new Insets(5, 5, 5, 5));
+            box.setAlignment(Pos.CENTER);
+
+            Text fullText = new Text();
+            fullText.setFont(fullText.getFont().font(18));
+            fullText.setWrappingWidth(200);
+            fullText.textProperty().bind(player.equipItemDescProperties[pos]);
+            box.getChildren().add(fullText);
+
+            popup.getContent().addAll(rect, box);
+
+            imageView.setOnMouseEntered(event -> {
+                imageView.setEffect(drop);
+                popup.setX(getX() + 400);
+                popup.setY(getY());
+                popup.show(UIInventoryWindow.this);
+            });
+
+            imageView.setOnMouseExited(event -> {
+                imageView.setEffect(null);
+                popup.hide();
+            });
+
+            imageView.setOnMouseClicked(event -> {
+                // TODO:
             });
 
 

@@ -128,6 +128,9 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleStringProperty[] itemDescProperties = new SimpleStringProperty[Inventory.MAX_SIZE];
     public transient ArrayList<ObjectProperty<Rectangle2D>> itemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
 
+    public transient SimpleStringProperty[] equipItemDescProperties = new SimpleStringProperty[5];
+    public transient ArrayList<ObjectProperty<Rectangle2D>> equipItemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
+
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
 
@@ -150,6 +153,10 @@ public class Player extends GameCharacter implements PseudoHTML {
         for (int i = 0; i < itemDescProperties.length; i++) {
             itemDescProperties[i] = new SimpleStringProperty("");
             itemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
+        }
+        for (int i = 0; i < equipItemDescProperties.length; i++) {
+            equipItemDescProperties[i] = new SimpleStringProperty("");
+            equipItemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
         }
 
 
@@ -191,6 +198,12 @@ public class Player extends GameCharacter implements PseudoHTML {
                     itemDescProperties[i].set("");
                     itemSpriteProperties.get(i).set(new Rectangle2D(0, 0, 34, 34));
                 }
+            }
+
+            for (int i = 0; i < equipItemDescProperties.length; i++) {
+                EquippableItem item = player.equip[i];
+                equipItemDescProperties[i].set(item.description);
+                equipItemSpriteProperties.get(i).set(new Rectangle2D(item.ssX*34, item.ssY*34, 34, 34));
             }
 
             hpProperty.set(player.getHP());
