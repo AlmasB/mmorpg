@@ -128,6 +128,7 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleIntegerProperty[] skillLevelProperties = new SimpleIntegerProperty[9];
     public transient SimpleStringProperty[] skillDescProperties = new SimpleStringProperty[9];
     public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
+    public transient SimpleBooleanProperty[] skillReadyProperties = new SimpleBooleanProperty[9];
 
     public transient SimpleStringProperty[] itemDescProperties = new SimpleStringProperty[Inventory.MAX_SIZE];
     public transient ArrayList<ObjectProperty<Rectangle2D>> itemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
@@ -148,6 +149,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             skillDescProperties[i] = new SimpleStringProperty("");
             ObjectProperty<Image> img = new SimpleObjectProperty<Image>(UIConst.Images.IC_SKILL_DUMMY);
             skillImageProperties.add(img);
+            skillReadyProperties[i] = new SimpleBooleanProperty(true);
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
             statProperties[i] = new SimpleIntegerProperty(1);
@@ -203,6 +205,7 @@ public class Player extends GameCharacter implements PseudoHTML {
                 skillLevelProperties[i].set(skill.getLevel());
                 skillImageProperties.get(i).set(UIConst.Images.getSkillImageByID(skill.id));
                 skillDescProperties[i].set(skill.name + "\n" + "SP: " + skill.getManaCost() + "\n" + skill.description);
+                skillReadyProperties[i].set(skill.getCurrentCooldown() == 0);
             }
 
             for (int i = 0; i < itemDescProperties.length; i++) {

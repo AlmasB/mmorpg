@@ -75,6 +75,9 @@ public class GameWindow extends FXWindow {
         UIAnimations.init(gameRoot, player);
     }
 
+    /**
+     * Game layer
+     */
     @Override
     protected void createContent(Pane root) {
         ImageView background = new ImageView(UIConst.Images.SS_MAP);
@@ -111,6 +114,9 @@ public class GameWindow extends FXWindow {
         root.getChildren().addAll(gameRoot, uiRoot);
     }
 
+    /**
+     * UI layer
+     */
     private void createUI() {
         ImageView hotbarImage = new ImageView(UIConst.Images.UI_HOTBAR);
         hotbarImage.setTranslateX(300);
@@ -290,6 +296,8 @@ public class GameWindow extends FXWindow {
         primaryStage.setTitle("Orion MMORPG");
         primaryStage.setResizable(false);
         primaryStage.setOnCloseRequest(event -> {
+            // TODO: client.send(new DataPacket(new QueryRequest(Query.LOGOFF, name)));
+            // TODO: addActionRequest(new ActionRequest(Action.CHAT, player.name, map.name + "," + chatText));
             System.exit(0);
         });
         primaryStage.show();
@@ -316,6 +324,7 @@ public class GameWindow extends FXWindow {
 
             text.textProperty().bind(new SimpleStringProperty("Lv ").concat(player.skillLevelProperties[pos]));
             imageView.imageProperty().bind(player.skillImageProperties.get(pos));
+            imageView.visibleProperty().bind(player.skillReadyProperties[pos]);
 
             imageView.setFitWidth(45);
             imageView.setFitHeight(45);

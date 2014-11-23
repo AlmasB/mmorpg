@@ -1,10 +1,8 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client;
 
-import com.almasb.java.io.Resources;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.GameWindow;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.GameGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.client.ui.LoginFXGUI;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.server.GameServer;
@@ -23,23 +21,16 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
-        //        if (args.length == 0) {
-        //            new GameWindow("", "").init();
-        //            return;
-        //        }
-
         if (args.length != 1) {
             usage();
             return;
         }
 
-
-
         boolean local = false, server = false;
 
         switch (args[0]) {
             case "-version":
-                Out.println("Version: " + Resources.getText("system/version.txt").get(0));
+                //Out.println("Version: " + Resources.getText("system/version.txt").get(0));
                 return;
             case "-local":
                 local = true;   // fallthru
@@ -54,9 +45,6 @@ public class ClientMain {
                 return;
         }
 
-        // load game resources
-        //Resources.init(R.drawable.class, R.raw.class);
-
         // load game data
         ObjectManager.load();
 
@@ -65,13 +53,12 @@ public class ClientMain {
                 new GameServer();
 
             if (local) {
-                //new GameGUI("127.0.0.1", "Debug");
                 new GameWindow("127.0.0.1", "Debug").init();
             }
             else {
                 LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
                 // will only be called after previous gui finishes
-                new GameGUI(LoginFXGUI.getIP(), LoginFXGUI.getUserName());
+                new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();;
             }
         }
         catch (Exception e) {
