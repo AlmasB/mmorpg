@@ -232,6 +232,11 @@ public class ObjectManager {
                 }
                         ));
             }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
+            }
         });
 
         addSkill(new Skill(ID.Skill.Gladiator.SHATTER_ARMOR, "Shatter Armor", Desc.Skill.Gladiator.SHATTER_ARMOR, true, 30.0f) {

@@ -60,6 +60,8 @@ public class GameWindow extends FXWindow {
     private ArrayList<Player> playersList = new ArrayList<Player>();
 
     private int selX = 1000, selY = 600;
+    private boolean selectingTarget = false;
+    private int skillIndex = 0;
 
     private UIStatsWindow statsWindow;
     private UIInventoryWindow inventoryWindow;
@@ -247,7 +249,7 @@ public class GameWindow extends FXWindow {
                 catch (NumberFormatException e) {
                 }
                 if (digit != 0) {
-                    int skillIndex = digit - 1;
+                    skillIndex = digit - 1;
                     if (skillIndex < player.getSkills().length) {
                         Skill skill = player.getSkills()[skillIndex];
                         if (skill != null && skill.active && skill.getLevel() > 0 && skill.getCurrentCooldown() == 0 &&
@@ -258,6 +260,7 @@ public class GameWindow extends FXWindow {
                             }
                             else {
                                 // choose target
+                                selectingTarget = true;
                             }
                         }
                     }
@@ -266,8 +269,17 @@ public class GameWindow extends FXWindow {
         });
 
         scene.setOnMouseClicked(event -> {
-            selX = (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40;
-            selY = (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40;
+            if (!selectingTarget) {
+                selX = (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40;
+                selY = (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40;
+            }
+            else {
+                addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, "map1.txt,"
+                        + (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40
+                        + "," + (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40, skillIndex, 0));
+                selectingTarget = false;
+                UIConst.Audio.getSkillAudioByID(player.getSkills()[skillIndex].id).play();
+            }
         });
     }
 

@@ -200,12 +200,21 @@ public final class UIConst {
     }
 
     public static final class Audio {
-
+        public static AudioClip SKILL_7010;
         public static AudioClip SKILL_7011;
+
+        public static AudioClip SKILL_7110;
+        public static AudioClip SKILL_7113;
+        public static AudioClip SKILL_7114;
+
 
         static {
             try {
+                SKILL_7010 = ResourceManager.loadAudio("audio_skill_mighty_swing.wav");
                 SKILL_7011 = ResourceManager.loadAudio("audio_skill_roar.wav");
+                SKILL_7110 = ResourceManager.loadAudio("audio_skill_holy_light.wav");
+                SKILL_7113 = ResourceManager.loadAudio("audio_skill_precision_strike.wav");
+                SKILL_7114 = ResourceManager.loadAudio("audio_skill_last_stand.wav");
             }
             catch (Exception e) {
                 Sys.logExceptionAndExit(e);

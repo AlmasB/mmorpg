@@ -128,7 +128,6 @@ public class ServerActionHandler {
 
                     if (target.getHP() <= 0) {
                         // process monster's death
-                        // TODO: test
                         ArrayList<Player> attackers = new ArrayList<Player>();
                         for (int runtimeID : target.getAttackers()) {
                             Player p = server.getPlayerByRuntimeID(runtimeID, req.data);
@@ -163,35 +162,44 @@ public class ServerActionHandler {
             return;
         }
 
+        String[] tokens = req.data.split(",");
 
-        Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2, req.data);
+        Enemy skTarget = server.getMapByName(tokens[0]).getEnemyByXY(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
         if (skTarget != null
                 && server.distanceBetween(player, skTarget) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
             SkillUseResult result = player.useSkill(req.value1, skTarget);
-            if (!result.success)
-                return;
+            //            if (!result.success)
+            //                return;
 
-            if (result.animations.length > 0) {
-                for (Animation a : result.animations)
-                    server.addAnimation(a, req.data);
-            }
-            else if (result.target == Target.ENEMY) {
-                skTarget.addAttackerRuntimeID(player.getRuntimeID());
-                server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
-                //server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
-            }
-            else if (result.target == Target.SELF) {
-                server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
-            }
+            server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(), result.damage+"", Color.BLUE, 2.0f), tokens[0]);
+
+            skTarget.addAttackerRuntimeID(player.getRuntimeID());
+            //
+            //            if (result.animations.length > 0) {
+            //                for (Animation a : result.animations)
+            //                    server.addAnimation(a, req.data);
+            //            }
+            //            else if (result.target == Target.ENEMY) {
+            //                //skTarget.addAttackerRuntimeID(player.getRuntimeID());
+            //                //server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
+            //                //server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
+            //            }
+            //            else if (result.target == Target.SELF) {
+            //                //server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
+            //            }
 
             if (skTarget.getHP() <= 0) {
+
+                //Out.d("hp < 0", "true " + tokens[0]);
+
                 // process monster's death
-                // TODO: test
                 ArrayList<Player> attackers = new ArrayList<Player>();
                 for (int runtimeID : skTarget.getAttackers()) {
-                    GameCharacter ch = server.getGameCharacterByRuntimeID(runtimeID, req.data);
-                    if (ch != null) {
-                        attackers.add((Player) ch);
+                    //Out.d("id", runtimeID + "");
+                    Player p = server.getPlayerByRuntimeID(runtimeID, tokens[0]);
+                    if (p != null) {
+                        //Out.d("attackers", "added");
+                        attackers.add(p);
                     }
                 }
 
