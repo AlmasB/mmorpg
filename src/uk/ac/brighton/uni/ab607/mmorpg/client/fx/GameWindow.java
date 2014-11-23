@@ -262,7 +262,7 @@ public class GameWindow extends FXWindow {
                                 player.getSP() >= skill.getManaCost()) {
                             if (skill.isSelfTarget()) {
                                 addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, "map1.txt", skillIndex, 0));
-                                UIConst.Audio.getSkillAudioByID(skill.id).play();
+                                //UIConst.Audio.getSkillAudioByID(skill.id).play();
                             }
                             else {
                                 // choose target
@@ -284,7 +284,7 @@ public class GameWindow extends FXWindow {
                         + (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40
                         + "," + (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40, skillIndex, 0));
                 selectingTarget = false;
-                UIConst.Audio.getSkillAudioByID(player.getSkills()[skillIndex].id).play();
+                //UIConst.Audio.getSkillAudioByID(player.getSkills()[skillIndex].id).play();
             }
         });
     }

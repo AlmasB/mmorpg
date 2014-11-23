@@ -139,24 +139,26 @@ public final class UIConst {
                 IC_SKILL_7222 = ResourceManager.loadFXImage("ic_skill_mind_blast.png");
                 IC_SKILL_7223 = ResourceManager.loadFXImage("ic_skill_curse_of_witchcraft.png");
                 IC_SKILL_7224 = ResourceManager.loadFXImage("ic_skill_mana_burn.png");
-                //
-                //                // SCOUT
-                //                IC_SKILL_7030;
-                //                IC_SKILL_7031;
-                //                IC_SKILL_7032;
-                //                IC_SKILL_7033;
-                //
-                //                IC_SKILL_7130;
-                //                IC_SKILL_7131;
-                //                IC_SKILL_7132;
-                //                IC_SKILL_7133;
-                //                IC_SKILL_7134;
-                //
-                //                IC_SKILL_7230;
-                //                IC_SKILL_7231;
-                //                IC_SKILL_7232;
-                //                IC_SKILL_7233;
-                //                IC_SKILL_7234;
+
+                // SCOUT
+                IC_SKILL_7030 = ResourceManager.loadFXImage("ic_skill_trick_attack.png");
+                IC_SKILL_7031 = ResourceManager.loadFXImage("ic_skill_poison_attack.png");
+                IC_SKILL_7032 = ResourceManager.loadFXImage("ic_skill_weapon_mastery.png");
+                IC_SKILL_7033 = ResourceManager.loadFXImage("ic_skill_experienced_fighter.png");
+
+                // ROGUE
+                IC_SKILL_7130 = ResourceManager.loadFXImage("ic_skill_shameless.png");
+                IC_SKILL_7131 = ResourceManager.loadFXImage("ic_skill_double_strike.png");
+                IC_SKILL_7132 = ResourceManager.loadFXImage("ic_skill_triple_strike.png");
+                IC_SKILL_7133 = ResourceManager.loadFXImage("ic_skill_five_finger_death_punch.png");
+                IC_SKILL_7134 = ResourceManager.loadFXImage("ic_skill_critical_strike.png");
+
+                // RANGER
+                IC_SKILL_7230 = ResourceManager.loadFXImage("ic_skill_pinpoint_weakness.png");
+                IC_SKILL_7231 = ResourceManager.loadFXImage("ic_skill_bullseye.png");
+                IC_SKILL_7232 = ResourceManager.loadFXImage("ic_skill_fast_reflexes.png");
+                IC_SKILL_7233 = ResourceManager.loadFXImage("ic_skill_enchanted_arrow.png");
+                IC_SKILL_7234 = ResourceManager.loadFXImage("ic_skill_eagle_eye.png");
             }
             catch (IOException e) {
                 Sys.logExceptionAndExit(e);
@@ -174,28 +176,6 @@ public final class UIConst {
 
             return null;
         }
-        //        public class Scout {
-        //            public static final String TRICK_ATTACK = "7030";
-        //            public static final String POISON_ATTACK = "7031";
-        //            public static final String WEAPON_MASTERY = "7032";
-        //            public static final String EXPERIENCED_FIGHTER = "7033";
-        //        }
-        //
-        //        public class Rogue {
-        //            public static final String SHAMELESS = "7130";
-        //            public static final String DOUBLE_STRIKE = "7131";
-        //            public static final String TRIPLE_STRIKE = "7132";
-        //            public static final String FIVE_FINGER_DEATH_PUNCH = "7133";
-        //            public static final String CRITICAL_STRIKE = "7134";
-        //        }
-        //
-        //        public class Ranger {
-        //            public static final String PINPOINT_WEAKNESS = "7230";
-        //            public static final String BULLSEYE = "7231";
-        //            public static final String FAST_REFLEXES = "7232";
-        //            public static final String ENCHANTED_ARROW = "7233";
-        //            public static final String EAGLE_EYE = "7234";
-        //        }
     }
 
     public static final class Audio {
