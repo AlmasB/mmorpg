@@ -99,10 +99,21 @@ public class GameWindow extends FXWindow {
 
         gameRoot.getChildren().addAll(playerSprites);
 
-        ImageView img = new ImageView(UIConst.Images.UI_HOTBAR);
-        img.setTranslateX(300);
-        img.setTranslateY(580);
-        uiRoot.getChildren().add(img);
+        // create peripheral windows
+        menuWindow = new UIMenuWindow();
+        statsWindow = new UIStatsWindow(player);
+        inventoryWindow = new UIInventoryWindow(player);
+
+        createUI();
+
+        root.getChildren().addAll(gameRoot, uiRoot);
+    }
+
+    private void createUI() {
+        ImageView hotbarImage = new ImageView(UIConst.Images.UI_HOTBAR);
+        hotbarImage.setTranslateX(300);
+        hotbarImage.setTranslateY(580);
+        uiRoot.getChildren().add(hotbarImage);
 
         for (int i = 0; i < 9; i++) {
             SkillView skill = new SkillView(i);
@@ -110,30 +121,6 @@ public class GameWindow extends FXWindow {
             skill.setTranslateY(600);
             uiRoot.getChildren().add(skill);
         }
-
-
-
-        menuWindow = new UIMenuWindow();
-        statsWindow = new UIStatsWindow(player);
-        inventoryWindow = new UIInventoryWindow(player);
-
-
-        // UI elements
-
-        Button btnOptions2 = new Button("Menu");
-        btnOptions2.setTranslateX(950);
-        btnOptions2.setTranslateY(640);
-        btnOptions2.setFont(UIConst.FONT);
-        btnOptions2.setOnAction(event -> {
-            if (menuWindow.isShowing())
-                menuWindow.minimize();
-            else
-                menuWindow.restore();
-        });
-
-        uiRoot.getChildren().add(btnOptions2);
-
-
 
         ProgressBar xpBar = new ProgressBar(0);
         xpBar.setPrefWidth(600);
@@ -173,91 +160,52 @@ public class GameWindow extends FXWindow {
 
         uiRoot.getChildren().add(spBar);
 
+        Button btnMenu = new Button("Menu");
+        btnMenu.setTranslateX(950);
+        btnMenu.setTranslateY(640);
+        btnMenu.setFont(UIConst.FONT);
+        btnMenu.setOnAction(event -> {
+            if (menuWindow.isShowing())
+                menuWindow.minimize();
+            else
+                menuWindow.restore();
+        });
+
+        uiRoot.getChildren().add(btnMenu);
 
         Button btnStats = new Button("Stats");
         btnStats.setTranslateX(1070);
         btnStats.setTranslateY(640);
         btnStats.setFont(UIConst.FONT);
         btnStats.setOnAction(event -> {
-            if (statsWindow.isShowing()) {
+            if (statsWindow.isShowing())
                 statsWindow.minimize();
-            }
-            else {
+            else
                 statsWindow.restore();
-            }
         });
 
         uiRoot.getChildren().add(btnStats);
 
 
-        Button inventory = new Button("Inventory");
-        inventory.setTranslateX(1180);
-        inventory.setTranslateY(640);
-        inventory.setFont(UIConst.FONT);
-        inventory.setOnAction(event -> {
-            //            if (test == 0) {
-            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
-            //                test++;
-            //            }
-            //            else if (test == 1) {
-            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "CRUSADER"));
-            //                test++;
-            //            }
-            if (inventoryWindow.isShowing()) {
+        Button btnInventory = new Button("Inventory");
+        btnInventory.setTranslateX(1180);
+        btnInventory.setTranslateY(640);
+        btnInventory.setFont(UIConst.FONT);
+        btnInventory.setOnAction(event -> {
+            if (inventoryWindow.isShowing())
                 inventoryWindow.minimize();
-            }
-            else {
+            else
                 inventoryWindow.restore();
-            }
         });
 
-        uiRoot.getChildren().add(inventory);
-
-
-
-
-        root.getChildren().addAll(gameRoot, uiRoot);
+        uiRoot.getChildren().add(btnInventory);
     }
-
-    int test = 0;
-
-    //    private Random rand = new Random();
-    //
-    //    private void moneyTest() {
-    //        Platform.runLater(() -> {
-    //            final int val = rand.nextInt(1000);
-    //            Text text = new Text(val + "G");
-    //            text.setFont(UIConst.FONT);
-    //            text.setFill(Color.GOLD);
-    //            TranslateTransition tt = new TranslateTransition(Duration.seconds(1.66), text);
-    //            tt.setFromX(player.getX() + rand.nextInt(1280) - 640);
-    //            tt.setFromY(player.getY() + rand.nextInt(720) - 360);
-    //
-    //            tt.setToX(player.getX() + 500);
-    //            tt.setToY(player.getY() + 320);
-    //            tt.setOnFinished(event -> {
-    //                gameRoot.getChildren().remove(text);
-    //                money.set(money.get() + val);
-    //                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), inventory);
-    //                st.setFromY(1);
-    //                st.setToY(1.3);
-    //                st.setAutoReverse(true);
-    //                st.setCycleCount(2);
-    //                st.play();
-    //            });
-    //
-    //            gameRoot.getChildren().add(text);
-    //
-    //            tt.play();
-    //        });
-    //    }
 
     @Override
     protected void initScene(Scene scene) {
         gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
         gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
 
-        // TODO: add key events
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
 
@@ -272,20 +220,16 @@ public class GameWindow extends FXWindow {
 
             }
             if (event.getCode() == KeyCode.I) {
-                if (inventoryWindow.isShowing()) {
+                if (inventoryWindow.isShowing())
                     inventoryWindow.minimize();
-                }
-                else {
+                else
                     inventoryWindow.restore();
-                }
             }
             if (event.getCode() == KeyCode.S) {
-                if (statsWindow.isShowing()) {
+                if (statsWindow.isShowing())
                     statsWindow.minimize();
-                }
-                else {
+                else
                     statsWindow.restore();
-                }
             }
             if (event.getCode() == KeyCode.ESCAPE) {
                 if (menuWindow.isShowing())
@@ -303,10 +247,20 @@ public class GameWindow extends FXWindow {
                 catch (NumberFormatException e) {
                 }
                 if (digit != 0) {
-                    Out.d("event", digit + "");
-                    // TODO: skill use
-                    //addActionRequest(new ActionRequest(Action.SKILL_USE, player.name,
-                    //"map1.txt", digit-1, runtimeID));
+                    int skillIndex = digit - 1;
+                    if (skillIndex < player.getSkills().length) {
+                        Skill skill = player.getSkills()[skillIndex];
+                        if (skill != null && skill.active && skill.getLevel() > 0 && skill.getCurrentCooldown() == 0 &&
+                                player.getSP() >= skill.getManaCost()) {
+                            if (skill.isSelfTarget()) {
+                                addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, "map1.txt", skillIndex, 0));
+                                UIConst.Audio.getSkillAudioByID(skill.id).play();
+                            }
+                            else {
+                                // choose target
+                            }
+                        }
+                    }
                 }
             }
         });

@@ -22,6 +22,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.UsableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
@@ -154,7 +155,15 @@ public class ServerActionHandler {
         }
     }
 
+    // TODO: redesign
     public void serverActionSkillUse(Player player, ActionRequest req) {
+        Skill skill = player.getSkills()[req.value1];
+        if (skill != null && skill.isSelfTarget()) {
+            SkillUseResult result = player.useSkill(req.value1, player);
+            return;
+        }
+
+
         Enemy skTarget = (Enemy) server.getGameCharacterByRuntimeID(req.value2, req.data);
         if (skTarget != null
                 && server.distanceBetween(player, skTarget) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {

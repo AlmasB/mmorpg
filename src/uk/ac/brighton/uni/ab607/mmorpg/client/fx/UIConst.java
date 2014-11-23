@@ -1,5 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
+import java.applet.AudioClip;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -196,6 +197,32 @@ public final class UIConst {
         //            public static final String ENCHANTED_ARROW = "7233";
         //            public static final String EAGLE_EYE = "7234";
         //        }
+    }
+
+    public static final class Audio {
+
+        public static AudioClip SKILL_7011;
+
+        static {
+            try {
+                SKILL_7011 = ResourceManager.loadAudio("audio_skill_roar.wav");
+            }
+            catch (Exception e) {
+                Sys.logExceptionAndExit(e);
+            }
+        }
+
+        public static AudioClip getSkillAudioByID(String id) {
+            try {
+                Field field = Audio.class.getDeclaredField("SKILL_" + id);
+                return (AudioClip)field.get(null);
+            }
+            catch (Exception e) {
+                Sys.logExceptionAndExit(e);
+            }
+
+            return null;
+        }
     }
 
     // TODO: pre-load all resource and exit if not found

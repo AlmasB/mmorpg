@@ -100,6 +100,10 @@ public abstract class Skill implements java.io.Serializable {
         return useResult;
     }
 
+    public boolean isSelfTarget() {
+        return false;
+    }
+
     // add some methods for overriding
     // isPassive()
     // isSelfTarget()

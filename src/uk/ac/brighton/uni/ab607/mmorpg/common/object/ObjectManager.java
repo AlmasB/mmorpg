@@ -205,6 +205,11 @@ public class ObjectManager {
                 new Essence[] {}
                         ));
             }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
+            }
         });
 
         addSkill(new Skill(ID.Skill.Crusader.LAST_STAND, "Last Stand", Desc.Skill.Crusader.LAST_STAND, true, 60.0f) {
