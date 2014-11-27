@@ -747,7 +747,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[35];
+        byte[] data = new byte[23];
 
         ByteStream.intToByteArray(data, 0, x);
         ByteStream.intToByteArray(data, 4, y);
@@ -758,11 +758,13 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         data[14] = (byte)direction.ordinal();
 
         // MAX is 16
-        byte[] bName = name.getBytes();
-        for (int i = 0; i < Math.min(bName.length, 16); i++)
-            data[15 + i] = bName[i];
+        //        byte[] bName = name.getBytes();
+        //        for (int i = 0; i < Math.min(bName.length, 16); i++)
+        //            data[15 + i] = bName[i];
 
-        ByteStream.intToByteArray(data, 31, runtimeID);
+        ByteStream.intToByteArray(data, 15, id != null ? Integer.parseInt(id) : runtimeID);
+
+        ByteStream.intToByteArray(data, 19, runtimeID);
 
         return data;
     }

@@ -33,7 +33,7 @@ public class GameServer {
 
     private int playerRuntimeID = 1000;
 
-    //private ArrayList<Player> players = new ArrayList<Player>();
+    private ArrayList<Player> players = new ArrayList<Player>();
 
     private ServerActionHandler actionHandler;
 
@@ -175,6 +175,7 @@ public class GameServer {
             for (GameMap m : maps) {
                 p = m.getPlayerByName(playerName);
                 if (p != null) {
+                    players.remove(p);
                     m.removePlayer(p);
                     GameAccount.setPlayer(p, p.name);
                     GameAccount.setMapName(m.name, p.name);
@@ -184,30 +185,6 @@ public class GameServer {
             }
         }
     }
-
-    /*private class ServerLoop implements Runnable {
-        @Override
-        public void run() {
-            long start;
-
-            while (true) {
-                start = System.currentTimeMillis();
-
-                for (GameMap map : maps)
-                    map.update(server);
-
-                long delay = System.currentTimeMillis() - start;
-                try {
-                    if (delay < 20) {
-                        Thread.sleep(20 - delay);
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
 
     private void serverLoop() {
         for (GameMap map : maps)
@@ -311,6 +288,21 @@ public class GameServer {
         p.setRuntimeID(playerRuntimeID++);
         GameMap m = getMapByName(mapName);
         m.addPlayer(p);
+
+        players.add(p);
+
+        try {
+            String data = "";
+            for (Player player : players) {
+                data += player.getRuntimeID() + "," + player.name + ";";
+            }
+
+            server.send(new DataPacket(data), p.ip, p.port);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
         //addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);

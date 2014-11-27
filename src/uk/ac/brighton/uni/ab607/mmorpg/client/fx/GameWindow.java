@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,6 +30,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
@@ -59,6 +61,7 @@ public class GameWindow extends FXWindow {
     // currently also uses enemy sprites, maybe store in 1 group
     private Group playerSprites = new Group();
     private ArrayList<Player> playersList = new ArrayList<Player>();
+    private HashMap<String, String> idMap = new HashMap<String, String>();
 
     private int selX = 1000, selY = 600;
     private boolean selectingTarget = false;
@@ -415,78 +418,108 @@ public class GameWindow extends FXWindow {
 
         @Override
         public void parseServerPacket(DataPacket packet) {
-            if (clientReady && packet.byteData != null && packet.byteData.length > 0) {
+            if (clientReady && packet.byteData.length > 0) {
 
                 // PLAYER, ENEMY
                 if (packet.byteData[0] == MessageType.UPDATE_GAME_CHAR.ordinal()) {
-                    for (Player p : playersList)
-                        p.sprite.setValid(false);
-
-
-                    // raw data of players containing drawing data
-                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
-                    // remove the first byte
-                    in.read();
-
-                    // number of players
-                    int size = packet.byteData.length / 35;
-                    for (int i = 0; i < size; i++) {
-                        byte[] data = new byte[15];
-                        byte[] name = new byte[16];
-                        byte[] id = new byte[4];
-
-
-                        try {
-                            in.read(data);
-                            in.read(name);
-                            in.read(id);
-
-                            int runtimeID = ByteStream.byteArrayToInt(id, 0);
-
-                            String playerName = new String(name).replace(new String(new byte[] {0}), "");
-
-                            //Out.d("runtimeID", runtimeID + " " + playerName);
-
-                            // search list of players for name
-                            // if found update their data
-                            // else create new player with data
-
-                            boolean newPlayer = true;
-
-                            for (Player p : playersList) {
-                                if (p.name.equals(playerName) && p.getRuntimeID() == runtimeID) {
-                                    newPlayer = false;
-                                    p.loadFromByteArray(data);
-                                    p.sprite.setValid(true);
-                                    //Out.d(playerName, "true");
-                                    break;
-                                }
-                            }
-
-                            if (newPlayer) {
-                                Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
-                                p.loadFromByteArray(data);
-                                p.setRuntimeID(runtimeID);
-                                playersList.add(p);
-                                Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
-                            }
-                        }
-                        catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // END FOR
-
 
                     Platform.runLater(() -> {
+
+                        for (Player p : playersList)
+                            p.sprite.setValid(false);
+
+
+                        // raw data of players containing drawing data
+                        ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                        // remove the first byte
+                        in.read();
+
+                        // number of players
+                        int size = packet.byteData.length / 23;
+                        for (int i = 0; i < size; i++) {
+                            byte[] data = new byte[15];
+                            byte[] name = new byte[4];
+                            byte[] id = new byte[4];
+
+
+                            try {
+                                in.read(data);
+                                in.read(name);
+                                in.read(id);
+
+                                int runtimeID = ByteStream.byteArrayToInt(id, 0);
+                                int idValue = ByteStream.byteArrayToInt(name, 0);
+
+                                String playerName = "";
+                                if (ObjectManager.getEnemyByID(idValue + "") != null) {
+                                    playerName = ObjectManager.getEnemyByID(idValue + "").name;
+                                }
+                                else {
+                                    playerName = idMap.get(idValue + "");
+                                }
+
+                                if (playerName == null) {
+                                    playerName = "UNDEFINED";
+                                }
+
+                                //String playerName = new String(name).replace(new String(new byte[] {0}), "");
+
+                                //Out.d("runtimeID", runtimeID + " " + playerName);
+
+                                // search list of players for name
+                                // if found update their data
+                                // else create new player with data
+
+                                boolean newPlayer = true;
+
+                                for (Player p : playersList) {
+                                    if (p.name.equals(playerName) && p.getRuntimeID() == runtimeID) {
+                                        newPlayer = false;
+                                        p.loadFromByteArray(data);
+                                        p.sprite.setValid(true);
+                                        //Out.d(playerName + " " + runtimeID, "true");
+                                        break;
+                                    }
+                                }
+
+                                if (newPlayer) {
+                                    Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
+                                    p.loadFromByteArray(data);
+                                    p.setRuntimeID(runtimeID);
+                                    playersList.add(p);
+                                    //Out.d("runtimeID", runtimeID + " " + playerName);
+                                    playerSprites.getChildren().add(p.sprite);
+                                    //Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
+                                }
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        // END FOR
+
                         playerSprites.getChildren().removeIf(node -> {
+
+                            //Out.d("fx", "update");
+
                             Sprite s = (Sprite)node;
                             return !s.isValid();
                         });
-                    });
 
-                    playersList.removeIf(player -> !player.sprite.isValid());
+
+                        /*                    Platform.runLater(() -> {
+                        playerSprites.getChildren().removeIf(node -> {
+
+                            //Out.d("fx", "update");
+
+                            Sprite s = (Sprite)node;
+                            return !s.isValid();
+                        });
+                    });*/
+
+                        playersList.removeIf(player -> !player.sprite.isValid());
+                    });
 
                     updateGameClient();
                 }
@@ -532,6 +565,19 @@ public class GameWindow extends FXWindow {
                 player.update(p);
 
                 clientReady = true;
+            }
+
+            if (!packet.stringData.isEmpty()) {
+
+                String[] tokens = packet.stringData.split(";");
+
+                for (String token : tokens) {
+                    String[] pair = token.split(",");
+
+                    idMap.put(pair[0], pair[1]);
+                }
+
+                Out.d("stringData", packet.stringData);
             }
         }
 
