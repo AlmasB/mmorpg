@@ -721,13 +721,13 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public void loadFromByteArray(byte[] data) {
-        x = ByteStream.byteArrayToInt(data, 1);
-        y = ByteStream.byteArrayToInt(data, 5);
-        frame = data[9];
-        place = data[10];
+        x = ByteStream.byteArrayToInt(data, 0);
+        y = ByteStream.byteArrayToInt(data, 4);
+        frame = data[8];
+        place = data[9];
 
-        spriteID = ByteStream.byteArrayToInt(data, 11);
-        direction = Dir.values()[data[15]];
+        spriteID = ByteStream.byteArrayToInt(data, 10);
+        direction = Dir.values()[data[14]];
 
         //runtimeID = ByteStream.byteArrayToInt(data, 32);
 
@@ -741,29 +741,28 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
             Rectangle2D rect = new Rectangle2D(place*40, getRow()*40, 40, 40);
 
             sprite.imageView.setViewport(rect);
-            //sprite.name.setText(name);
+            sprite.name.setText(name);
         });
     }
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[36];
+        byte[] data = new byte[35];
 
-        data[0] = -127;
-        ByteStream.intToByteArray(data, 1, x);
-        ByteStream.intToByteArray(data, 5, y);
-        data[9] = frame;
-        data[10] = place;
-        ByteStream.intToByteArray(data, 11, spriteID);
+        ByteStream.intToByteArray(data, 0, x);
+        ByteStream.intToByteArray(data, 4, y);
+        data[8] = frame;
+        data[9] = place;
+        ByteStream.intToByteArray(data, 10, spriteID);
 
-        data[15] = (byte)direction.ordinal();
+        data[14] = (byte)direction.ordinal();
 
         // MAX is 16
         byte[] bName = name.getBytes();
         for (int i = 0; i < Math.min(bName.length, 16); i++)
-            data[16 + i] = bName[i];
+            data[15 + i] = bName[i];
 
-        ByteStream.intToByteArray(data, 32, runtimeID);
+        ByteStream.intToByteArray(data, 31, runtimeID);
 
         return data;
     }

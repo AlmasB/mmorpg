@@ -11,13 +11,13 @@ import javafx.scene.text.Text;
 public class Sprite extends Parent {
 
     public ImageView imageView;
-    //public Text name = new Text("");
+    public Text name = new Text("");
     private boolean valid = true;
 
     public Sprite(String fileName) {
         try {
             imageView = new ImageView(ResourceManager.loadFXImage(fileName));
-            getChildren().addAll(imageView);
+            getChildren().addAll(imageView, name);
         }
         catch (IOException e) {
             e.printStackTrace();

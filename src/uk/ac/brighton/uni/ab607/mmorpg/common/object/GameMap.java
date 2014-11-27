@@ -13,6 +13,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
 
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
@@ -151,12 +152,11 @@ public class GameMap {
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                if (playersToSend.length > 0) {
+                if (playersToSend.length > 0 || enemiesToSend.length > 0) {
+                    baos.write((byte)MessageType.UPDATE_GAME_CHAR.ordinal());
                     for (int i = 0; i < playersToSend.length; i++) {
                         baos.write(playersToSend[i].toByteArray());
                     }
-                }
-                if (enemiesToSend.length > 0) {
                     for (int i = 0; i < enemiesToSend.length; i++) {
                         baos.write(enemiesToSend[i].toByteArray());
                     }
@@ -168,20 +168,20 @@ public class GameMap {
 
                 // test
                 if (animationsToSend.length > 0) {
+                    baos.write((byte)MessageType.ANIMATION.ordinal());
+
                     for (int i = 0; i < animationsToSend.length; i++) {
                         if (animationsToSend[i] instanceof TextAnimation) {
                             TextAnimation a = (TextAnimation) animationsToSend[i];
                             a.setFinished();
 
-                            byte[] data = new byte[13];
+                            byte[] data = new byte[12];
 
-                            data[0] = -126;
-
-                            ByteStream.intToByteArray(data, 1, a.getX());
-                            ByteStream.intToByteArray(data, 5, a.getY());
+                            ByteStream.intToByteArray(data, 0, a.getX());
+                            ByteStream.intToByteArray(data, 4, a.getY());
 
                             try {
-                                ByteStream.intToByteArray(data, 9, Integer.parseInt(a.text));
+                                ByteStream.intToByteArray(data, 8, Integer.parseInt(a.text));
                                 baos.write(data);
                             }
                             catch (NumberFormatException e) {

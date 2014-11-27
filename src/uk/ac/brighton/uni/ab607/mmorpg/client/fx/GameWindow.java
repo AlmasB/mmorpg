@@ -32,6 +32,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
@@ -417,18 +418,20 @@ public class GameWindow extends FXWindow {
             if (clientReady && packet.byteData != null && packet.byteData.length > 0) {
 
                 // PLAYER, ENEMY
-                if (packet.byteData[0] == -127) {
+                if (packet.byteData[0] == MessageType.UPDATE_GAME_CHAR.ordinal()) {
                     for (Player p : playersList)
                         p.sprite.setValid(false);
 
 
                     // raw data of players containing drawing data
                     ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    // remove the first byte
+                    in.read();
 
                     // number of players
-                    int size = packet.byteData.length / 36;
+                    int size = packet.byteData.length / 35;
                     for (int i = 0; i < size; i++) {
-                        byte[] data = new byte[16];
+                        byte[] data = new byte[15];
                         byte[] name = new byte[16];
                         byte[] id = new byte[4];
 
@@ -489,19 +492,17 @@ public class GameWindow extends FXWindow {
                 }
 
                 // ANIMATION
-                if (packet.byteData[0] == -126) {
+                if (packet.byteData[0] == MessageType.ANIMATION.ordinal()) {
 
                     ByteBuffer buf = ByteBuffer.wrap(packet.byteData);
+                    // skip first byte
+                    buf.get();
 
-                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    //ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
 
                     // number of players
-                    int size = packet.byteData.length / 13;
+                    int size = packet.byteData.length / 12;
                     for (int i = 0; i < size; i++) {
-
-                        // skip first byte
-                        buf.get();
-
                         int x = buf.getInt();
                         int y = buf.getInt();
                         int dmg = buf.getInt();
