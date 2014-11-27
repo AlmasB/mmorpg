@@ -363,6 +363,11 @@ public class ObjectManager {
                 }
                         ));
             }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
+            }
         });
 
         addSkill(new Skill(ID.Skill.Enchanter.ASTRAL_PROTECTION, "Astral Protection", Desc.Skill.Enchanter.ASTRAL_PROTECTION, false, 0.0f) {
@@ -482,6 +487,11 @@ public class ObjectManager {
                         new Essence(Stat.ARM, 5*level)
                 }
                         ));
+            }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
             }
         });
 
@@ -808,6 +818,11 @@ public class ObjectManager {
                         new Essence(Stat.HP_REGEN, 2*level)
                 }));
             }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
+            }
         });
 
         addSkill(new Skill(ID.Skill.Wizard.THUNDERBOLT_FIRESTORM, "Thunderbolt Firestorm", Desc.Skill.Wizard.THUNDERBOLT_FIRESTORM, true, 40.0f) {
@@ -993,6 +1008,11 @@ public class ObjectManager {
                         new Essence[] {
                         new Essence(Stat.ASPD, level*2)
                 }));
+            }
+
+            @Override
+            public boolean isSelfTarget() {
+                return true;
             }
         });
 
