@@ -36,7 +36,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 public abstract class GameCharacter implements java.io.Serializable, Drawable, ByteStream {
     private static final long serialVersionUID = -4840633591092062960L;
 
-    public static final int BYTE_STREAM_SIZE = 17;
+    public static final int BYTE_STREAM_SIZE = 13;
 
     public static class Experience implements java.io.Serializable {
         private static final long serialVersionUID = 2762180993708324531L;
@@ -749,7 +749,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[17];
+        byte[] data = new byte[BYTE_STREAM_SIZE];
 
         int xy = x << 16 | y;
 
@@ -758,8 +758,11 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
         data[8] = (byte)((place << 2 | direction.ordinal()) & 0xFF);
 
-        ByteStream.intToByteArray(data, 9, id != null ? Integer.parseInt(id) : runtimeID);
-        ByteStream.intToByteArray(data, 13, runtimeID);
+        int idValue = id != null ? Integer.parseInt(id) : runtimeID;
+
+        int ids = idValue << 16 | runtimeID;
+
+        ByteStream.intToByteArray(data, 9, ids);
 
         return data;
     }
