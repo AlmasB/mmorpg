@@ -31,4 +31,24 @@ public class GameMath {
     public static boolean checkChance(float chance) {
         return Math.random() * 100 + 1 <= chance;
     }
+
+    /**
+     *
+     * @param dmg
+     * @return
+     *          true if dmg dealt was critical
+     */
+    public static boolean isCritical(int dmg) {
+        return ((dmg >> 31) & 0b01) == 1;
+    }
+
+    /**
+     * Normalizes damage, in other words removes the MSB
+     *
+     * @param dmg
+     * @return
+     */
+    public static int normalizeDamage(int dmg) {
+        return dmg & 0x7FFFFFFF;
+    }
 }

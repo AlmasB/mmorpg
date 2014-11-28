@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -69,8 +70,8 @@ public class UIAnimations {
         public SkillDamageAnimation(String dmgText, int x, int y) {
             Platform.runLater(() -> {
                 Text text = new Text(dmgText);
-                text.setFill(Color.BLUE);
-                text.setFont(text.getFont().font(14));
+                text.setFill(Color.AQUAMARINE);
+                text.setFont(text.getFont().font(16));
                 root.getChildren().add(text);
                 TranslateTransition tt = new TranslateTransition(Duration.seconds(1.5), text);
 
@@ -83,6 +84,11 @@ public class UIAnimations {
                     root.getChildren().remove(text);
                 });
 
+                ScaleTransition st = new ScaleTransition(Duration.seconds(0.75), text);
+                st.setFromX(1);
+                st.setToX(1.5);
+
+                st.play();
                 tt.play();
             });
         }
