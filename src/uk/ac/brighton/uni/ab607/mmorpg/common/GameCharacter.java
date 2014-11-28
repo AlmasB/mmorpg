@@ -476,8 +476,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
      * @return
      */
     public int dealPhysicalDamage(GameCharacter target, float baseDamage, Element element) {
+        boolean crit = false;
         if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
             baseDamage *= getTotalStat(CRIT_DMG);
+            crit = true;
         }
 
         float elementalDamageModifier = element.getDamageModifierAgainst(target.getArmorElement());
@@ -486,6 +488,9 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         int totalDamage = Math.max(Math.round(elementalDamageModifier * damageAfterReduction), 0);
         target.hp -= totalDamage;
 
+        // set the negative bit on to indicate crit
+        if (crit)
+            totalDamage = totalDamage | (1 << 31);
         return totalDamage;
     }
 

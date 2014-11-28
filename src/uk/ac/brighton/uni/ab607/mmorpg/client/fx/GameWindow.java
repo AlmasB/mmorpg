@@ -540,6 +540,10 @@ public class GameWindow extends FXWindow {
                                     // TODO:
                                     Out.d("text", msg.getText());
                                     break;
+                                case BUFF:
+                                    // TODO:
+                                    Out.d("buff", msg.getText());
+                                    break;
                                 default:
                                     Out.d("unknown type of text animation", msg.getText());
                                     break;

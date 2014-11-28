@@ -6,34 +6,26 @@ public class SkillUseResult implements java.io.Serializable {
      */
     private static final long serialVersionUID = 606462172238372852L;
 
-    public enum Target {
-        SELF, ENEMY, AREA
-    }
+    public static SkillUseResult DEFAULT_FALSE = new SkillUseResult(false, "");
+    public static SkillUseResult DEFAULT_TRUE = new SkillUseResult(true, "");
 
-    public static SkillUseResult DEFAULT_FALSE = new SkillUseResult(Target.SELF, 0, false);
-    public static SkillUseResult DEFAULT_TRUE = new SkillUseResult(Target.SELF, 0, true);
-
-    public final Target target;
-    public final int damage;
+    public final String data;
     public final boolean success;
-
-    //public final boolean buffSkill ? if yes maybe get value of buff i.e. armor + 20%
-    //public final int selfDamage/targetDamage ?
 
     /**
      * Hidden ctor
      *
-     * @param target
-     * @param damage
-     * @param success
      */
-    private SkillUseResult(Target target, int damage, boolean success) {
-        this.target = target;
-        this.damage = damage;
+    private SkillUseResult(boolean success, String data) {
         this.success = success;
+        this.data = data;
     }
 
-    public SkillUseResult(Target target, int damage) {
-        this(target, damage, true);
+    public SkillUseResult(String data) {
+        this(true, data);
+    }
+
+    public SkillUseResult(int dmg) {
+        this(true, dmg + "");
     }
 }

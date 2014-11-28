@@ -23,7 +23,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
 
@@ -159,7 +158,7 @@ public class ObjectManager {
                 float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
                 float dmg = (Math.max(diff, 0) + 10*level) * 5;
                 int d = caster.dealPhysicalDamage(target, dmg);
-                useResult = new SkillUseResult(Target.ENEMY, d);
+                useResult = new SkillUseResult(d);
             }
         });
 
@@ -202,6 +201,8 @@ public class ObjectManager {
                 },
                 new Essence[] {}
                         ));
+
+                useResult = new SkillUseResult("STR +" + level*2 + " VIT +" + level*2);
             }
 
             @Override
@@ -229,6 +230,8 @@ public class ObjectManager {
                         new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
                 }
                         ));
+
+                useResult = new SkillUseResult("ATK UP!");
             }
 
             @Override
@@ -722,8 +725,6 @@ public class ObjectManager {
             }
         });
 
-        // NEWLY ADDED SKILLS
-
         addSkill(new Skill(ID.Skill.Crusader.HOLY_LIGHT, "Holy Light", Desc.Skill.Crusader.HOLY_LIGHT, true, 20.0f) {
             /**
              *
@@ -742,6 +743,8 @@ public class ObjectManager {
                         new Rune(Attribute.VITALITY, level*2)
                 },
                 new Essence[] {}));
+
+                useResult = new SkillUseResult("VIT +" + level*2);
             }
         });
 
@@ -760,6 +763,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.ATK) + (caster.getTotalAttribute(Attribute.STRENGTH) / 10) * level;
                 caster.dealPureDamage(target, dmg);
+
+                useResult = new SkillUseResult((int)dmg);
             }
         });
 
