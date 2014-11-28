@@ -8,10 +8,6 @@ import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.util.Out;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.BasicAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.ImageAnimation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
@@ -28,6 +24,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage.AnimationMessageType;
 
 /**
  * Processes all client action requests
@@ -124,7 +122,7 @@ public class ServerActionHandler {
                     int dmg = player.attack(target);
                     target.addAttackerRuntimeID(player.getRuntimeID());
 
-                    server.addAnimation(new TextAnimation(target.getX(), target.getY(), dmg+"", Color.BLUE, 2.0f), req.data);
+                    server.addTextAnimation(new TextAnimationMessage(target.getX(), target.getY(), AnimationMessageType.BASIC_DAMAGE_TO_ENEMY, dmg+""), req.data);
 
                     if (target.getHP() <= 0) {
                         // process monster's death
@@ -142,7 +140,7 @@ public class ServerActionHandler {
 
                 if (target.canAttack() && !target.hasStatusEffect(Status.STUNNED)) {
                     int dmg = target.attack(player);
-                    server.addAnimation(new TextAnimation(player.getX(), player.getY() + 80, dmg+"", Color.WHITE, 2.0f), req.data);
+                    server.addTextAnimation(new TextAnimationMessage(player.getX(), player.getY() + 80, AnimationMessageType.DAMAGE_TO_PLAYER, dmg+""), req.data);
                     if (player.getHP() <= 0) {
                         player.onDeath();
                         Point2D p = server.getMapByName(req.data).getRandomFreePos();
@@ -171,7 +169,7 @@ public class ServerActionHandler {
             //            if (!result.success)
             //                return;
 
-            server.addAnimation(new TextAnimation(skTarget.getX(), skTarget.getY(), result.damage+"", Color.BLUE, 2.0f), tokens[0]);
+            server.addTextAnimation(new TextAnimationMessage(skTarget.getX(), skTarget.getY(), AnimationMessageType.SKILL_DAMAGE_TO_ENEMY, result.damage+""), tokens[0]);
 
             skTarget.addAttackerRuntimeID(player.getRuntimeID());
             //
@@ -209,7 +207,7 @@ public class ServerActionHandler {
     }
 
     public void serverActionChat(Player player, ActionRequest req) {
-        server.addAnimation(new TextAnimation(player.getX(), player.getY(), req.data.split(",")[1], Color.WHITE, 3.0f), req.data.split(",")[0]);
+        server.addTextAnimation(new TextAnimationMessage(player.getX(), player.getY(), AnimationMessageType.TEXT, req.data.split(",")[1]), req.data.split(",")[0]);
     }
 
     public void serverActionMove(Player p, ActionRequest req) throws BadActionRequestException {

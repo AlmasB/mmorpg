@@ -43,9 +43,9 @@ public class UIAnimations {
     }
 
     public static class BasicDamageAnimation {
-        public BasicDamageAnimation(int dmg, int x, int y) {
+        public BasicDamageAnimation(String dmgText, int x, int y) {
             Platform.runLater(() -> {
-                Text text = new Text(dmg + "");
+                Text text = new Text(dmgText);
                 text.setFill(Color.CORNSILK);
                 text.setFont(text.getFont().font(14));
                 root.getChildren().add(text);
@@ -66,9 +66,9 @@ public class UIAnimations {
     }
 
     public static class SkillDamageAnimation {
-        public SkillDamageAnimation(int dmg, int x, int y) {
+        public SkillDamageAnimation(String dmgText, int x, int y) {
             Platform.runLater(() -> {
-                Text text = new Text(dmg + "");
+                Text text = new Text(dmgText);
                 text.setFill(Color.BLUE);
                 text.setFont(text.getFont().font(14));
                 root.getChildren().add(text);

@@ -36,6 +36,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 public abstract class GameCharacter implements java.io.Serializable, Drawable, ByteStream {
     private static final long serialVersionUID = -4840633591092062960L;
 
+    public static final int BYTE_STREAM_SIZE = 17;
+
     public static class Experience implements java.io.Serializable {
         private static final long serialVersionUID = 2762180993708324531L;
         public int base, stat, job;

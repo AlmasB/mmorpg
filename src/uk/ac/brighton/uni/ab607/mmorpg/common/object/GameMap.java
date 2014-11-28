@@ -6,25 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.AnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
-import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
-import com.almasb.common.util.ByteStream;
 import com.almasb.common.util.Out;
 import com.almasb.java.io.ResourceManager;
-import com.almasb.java.io.Resources;
 
 public class GameMap {
 
@@ -40,7 +37,8 @@ public class GameMap {
 
     private ArrayList<Player> players = new ArrayList<Player>();
 
-    public ArrayList<Animation> animations = new ArrayList<Animation>();
+    public ArrayList<TextAnimationMessage> animationsText = new ArrayList<TextAnimationMessage>();
+    public ArrayList<ImageAnimationMessage> animationsImage = new ArrayList<ImageAnimationMessage>();
 
     private int tick = 0;
 
@@ -88,11 +86,13 @@ public class GameMap {
     public void update(UDPServer server) {
         List<Player> tmpPlayers = new ArrayList<Player>(players);
 
-        // process animations
-        for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
-            Animation a = it.next();
-            a.update(0.02f);    // that's how much we sleep
-            if (a.hasFinished())
+        // clean animations
+        for (Iterator<TextAnimationMessage> it = animationsText.iterator(); it.hasNext(); ) {
+            if (it.next().isSent())
+                it.remove();
+        }
+        for (Iterator<ImageAnimationMessage> it = animationsImage.iterator(); it.hasNext(); ) {
+            if (it.next().isSent())
                 it.remove();
         }
 
@@ -136,20 +136,24 @@ public class GameMap {
 
 
         Stream<Player> playerStream = tmpPlayers.stream();
-        Stream<Animation> animationStream = animations.stream();
+        Stream<TextAnimationMessage> animationStream = animationsText.stream();
+        Stream<ImageAnimationMessage> animationStream2 = animationsImage.stream();
         Stream<Enemy> enemyStream = tmpList.stream();
 
         tmpPlayers.forEach(player -> {
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
             Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
-            Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
+            TextAnimationMessage[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(TextAnimationMessage[]::new);
+            ImageAnimationMessage[] animationsToSend2 = animationStream2.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(ImageAnimationMessage[]::new);
             Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
 
             try {
+                // send THE player
                 if (tick == 0)
                     server.send(new DataPacket(player), player.ip, player.port);
 
+                // send players / enemies
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
                 if (playersToSend.length > 0 || enemiesToSend.length > 0) {
@@ -164,30 +168,26 @@ public class GameMap {
 
                 server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
+                // send animations
                 baos = new ByteArrayOutputStream();
-
-                // test
                 if (animationsToSend.length > 0) {
-                    baos.write((byte)MessageType.ANIMATION.ordinal());
+                    baos.write((byte)MessageType.ANIMATION_TEXT.ordinal());
 
                     for (int i = 0; i < animationsToSend.length; i++) {
-                        if (animationsToSend[i] instanceof TextAnimation) {
-                            TextAnimation a = (TextAnimation) animationsToSend[i];
-                            a.setFinished();
+                        baos.write(animationsToSend[i].toByteArray());
+                        animationsToSend[i].setSent();
+                    }
+                }
 
-                            byte[] data = new byte[12];
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
-                            ByteStream.intToByteArray(data, 0, a.getX());
-                            ByteStream.intToByteArray(data, 4, a.getY());
+                baos = new ByteArrayOutputStream();
+                if (animationsToSend2.length > 0) {
+                    baos.write((byte)MessageType.ANIMATION_IMAGE.ordinal());
 
-                            try {
-                                ByteStream.intToByteArray(data, 8, Integer.parseInt(a.text));
-                                baos.write(data);
-                            }
-                            catch (NumberFormatException e) {
-                                // ignore for now
-                            }
-                        }
+                    for (int i = 0; i < animationsToSend2.length; i++) {
+                        baos.write(animationsToSend2[i].toByteArray());
+                        animationsToSend2[i].setSent();
                     }
                 }
 

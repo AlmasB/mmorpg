@@ -17,16 +17,17 @@ import com.almasb.common.search.AStarLogic;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.AnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
 public class GameServer {
     private UDPServer server = null;
@@ -309,8 +310,12 @@ public class GameServer {
         //addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
     }
 
-    /*package-private*/ void addAnimation(Animation a, String mapName) {
-        getMapByName(mapName).animations.add(a);
+    /*package-private*/ void addTextAnimation(TextAnimationMessage a, String mapName) {
+        getMapByName(mapName).animationsText.add(a);
+    }
+
+    /*package-private*/ void addTextAnimation(ImageAnimationMessage a, String mapName) {
+        getMapByName(mapName).animationsImage.add(a);
     }
 
     private void initGameMaps() {

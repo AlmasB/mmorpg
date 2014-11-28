@@ -27,6 +27,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
@@ -34,10 +35,13 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage.AnimationMessageType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
@@ -435,7 +439,7 @@ public class GameWindow extends FXWindow {
                         in.read();
 
                         // number of players
-                        int size = packet.byteData.length / 17;
+                        int size = packet.byteData.length / GameCharacter.BYTE_STREAM_SIZE;
                         for (int i = 0; i < size; i++) {
                             byte[] data = new byte[9];
                             byte[] name = new byte[4];
@@ -526,26 +530,64 @@ public class GameWindow extends FXWindow {
                 }
 
                 // ANIMATION
-                if (packet.byteData[0] == MessageType.ANIMATION.ordinal()) {
-
-                    ByteBuffer buf = ByteBuffer.wrap(packet.byteData);
+                if (packet.byteData[0] == MessageType.ANIMATION_TEXT.ordinal()) {
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
                     // skip first byte
-                    buf.get();
+                    in.read();
 
-                    //ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
-
-                    // number of players
-                    int size = packet.byteData.length / 12;
+                    // number of messages
+                    int size = packet.byteData.length / TextAnimationMessage.BYTE_STREAM_SIZE;
                     for (int i = 0; i < size; i++) {
-                        int x = buf.getInt();
-                        int y = buf.getInt();
-                        int dmg = buf.getInt();
-                        //                        int x = ByteStream.byteArrayToInt(packet.byteData, 1);
-                        //                        int y = ByteStream.byteArrayToInt(packet.byteData, 5);
-                        //
-                        //                        int dmg = ByteStream.byteArrayToInt(packet.byteData, 9);
+                        byte[] data = new byte[TextAnimationMessage.BYTE_STREAM_SIZE];
+                        try {
+                            in.read(data);
+                            TextAnimationMessage msg = new TextAnimationMessage(0, 0, AnimationMessageType.TEXT, "");
+                            msg.loadFromByteArray(data);
 
-                        new BasicDamageAnimation(dmg, x, y);
+                            switch (msg.getType()) {
+                                case BASIC_DAMAGE_TO_ENEMY:
+                                    new BasicDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case DAMAGE_TO_PLAYER:
+                                    new BasicDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case SKILL_DAMAGE_TO_ENEMY:
+                                    new SkillDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case TEXT:
+                                    // TODO:
+                                    Out.d("text", msg.getText());
+                                    break;
+                                default:
+                                    Out.d("unknown type of text animation", msg.getText());
+                                    break;
+                            }
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (packet.byteData[0] == MessageType.ANIMATION_IMAGE.ordinal()) {
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    // skip first byte
+                    in.read();
+
+                    // number of messages
+                    int size = packet.byteData.length / ImageAnimationMessage.BYTE_STREAM_SIZE;
+                    for (int i = 0; i < size; i++) {
+                        byte[] data = new byte[ImageAnimationMessage.BYTE_STREAM_SIZE];
+                        try {
+                            in.read(data);
+                            ImageAnimationMessage msg = new ImageAnimationMessage(0, 0, 0, 0, 0);
+                            msg.loadFromByteArray(data);
+
+                            // TODO: some image animation here
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
