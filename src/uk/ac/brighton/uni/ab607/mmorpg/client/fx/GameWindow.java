@@ -2,15 +2,11 @@ package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
 
-import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,23 +26,28 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIAnimations.*;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
+import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage.AnimationMessageType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
+import com.almasb.common.util.ByteStream;
 import com.almasb.common.util.Out;
-import com.almasb.java.io.ResourceManager;
 import com.almasb.java.ui.FXWindow;
 
 public class GameWindow extends FXWindow {
@@ -54,82 +55,88 @@ public class GameWindow extends FXWindow {
     private String name, ip;
     private UDPClient client = null;
 
-    //private Scene scene;
-
+    /**
+     * gameRoot - contains game related nodes
+     * uiRoot - the static node group which overlays the game
+     */
     private Group gameRoot = new Group(), uiRoot = new Group();
 
     private Player player;
     // currently also uses enemy sprites, maybe store in 1 group
     private Group playerSprites = new Group();
     private ArrayList<Player> playersList = new ArrayList<Player>();
+    private HashMap<String, String> idMap = new HashMap<String, String>();
 
     private int selX = 1000, selY = 600;
+    private boolean selectingTarget = false;
+    private int skillIndex = 0;
 
-    private SimpleIntegerProperty money = new SimpleIntegerProperty();
-    private Button inventory = new Button("Inventory");
-
-    private ArrayList<ImageView> skillImages = new ArrayList<ImageView>();
-
-    //private Group enemySprites = new Group();
-    //private ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
+    private UIStatsWindow statsWindow;
+    private UIInventoryWindow inventoryWindow;
+    private UIMenuWindow menuWindow;
 
     public GameWindow(String ip, String playerName) {
         this.ip = ip;
         player = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
         name = playerName;
+
+        UIAnimations.init(gameRoot, player);
     }
 
+    /**
+     * Game layer
+     */
     @Override
     protected void createContent(Pane root) {
-        try {
-            ImageView background = new ImageView(ResourceManager.loadFXImage("map1.png"));
-            gameRoot.getChildren().add(background);
-        }
-        catch (Exception e) {
-            Out.e(e);
-        }
+        ImageView background = new ImageView(UIConst.Images.SS_MAP);
+        gameRoot.getChildren().add(background);
 
+        // add animation listeners
+        player.baseLevelProperty.addListener((obs, old, newValue) -> {
+            if (newValue.intValue() > old.intValue() && old.intValue() != 0)
+                new LevelUpAnimation(gameRoot, player);
+        });
+
+        player.moneyProperty.addListener((obs, old, newValue) -> {
+            if (old.intValue() != -1 && newValue.intValue() - old.intValue() > 0)
+                new MoneyGainAnimation(newValue.intValue() - old.intValue());
+        });
+
+        player.baseXPProperty.addListener((obs, old, newValue) -> {
+            if (newValue.doubleValue() != 0)
+                new XPGainAnimation(newValue.doubleValue() - old.doubleValue());
+        });
 
         playersList.add(player);
         playerSprites.getChildren().add(player.sprite);
 
         gameRoot.getChildren().addAll(playerSprites);
 
-        ImageView img = new ImageView(UIConst.Images.UI_HOTBAR);
-        img.setTranslateX(300);
-        img.setTranslateY(580);
-        uiRoot.getChildren().add(img);
+        // create peripheral windows
+        menuWindow = new UIMenuWindow();
+        statsWindow = new UIStatsWindow(player);
+        inventoryWindow = new UIInventoryWindow(player);
+
+        createUI();
+
+        root.getChildren().addAll(gameRoot, uiRoot);
+    }
+
+    /**
+     * UI layer
+     */
+    private void createUI() {
+        ImageView hotbarImage = new ImageView(UIConst.Images.UI_HOTBAR);
+        hotbarImage.setTranslateX(300);
+        hotbarImage.setTranslateY(580);
+        uiRoot.getChildren().add(hotbarImage);
 
         for (int i = 0; i < 9; i++) {
             SkillView skill = new SkillView(i);
             skill.setTranslateX(338 + i * 60);
-            skill.setTranslateY(625);
+            skill.setTranslateY(600);
             uiRoot.getChildren().add(skill);
         }
-
-
-
-        UIMenuWindow menuWindow = new UIMenuWindow();
-        UIStatsWindow statsWindow = new UIStatsWindow(player);
-        UIInventoryWindow inventoryWindow = new UIInventoryWindow(player);
-
-
-        // UI elements
-
-        Button btnOptions2 = new Button("Menu");
-        btnOptions2.setTranslateX(950);
-        btnOptions2.setTranslateY(640);
-        btnOptions2.setFont(UIConst.FONT);
-        btnOptions2.setOnAction(event -> {
-            if (menuWindow.isShowing())
-                menuWindow.minimize();
-            else
-                menuWindow.restore();
-        });
-
-        uiRoot.getChildren().add(btnOptions2);
-
-
 
         ProgressBar xpBar = new ProgressBar(0);
         xpBar.setPrefWidth(600);
@@ -169,92 +176,51 @@ public class GameWindow extends FXWindow {
 
         uiRoot.getChildren().add(spBar);
 
+        Button btnMenu = new Button("Menu");
+        btnMenu.setTranslateX(950);
+        btnMenu.setTranslateY(640);
+        btnMenu.setFont(UIConst.FONT);
+        btnMenu.setOnAction(event -> {
+            if (menuWindow.isShowing())
+                menuWindow.minimize();
+            else
+                menuWindow.restore();
+        });
+
+        uiRoot.getChildren().add(btnMenu);
 
         Button btnStats = new Button("Stats");
         btnStats.setTranslateX(1070);
         btnStats.setTranslateY(640);
         btnStats.setFont(UIConst.FONT);
         btnStats.setOnAction(event -> {
-            if (statsWindow.isShowing()) {
+            if (statsWindow.isShowing())
                 statsWindow.minimize();
-            }
-            else {
+            else
                 statsWindow.restore();
-            }
         });
 
         uiRoot.getChildren().add(btnStats);
 
 
-        inventory.textProperty().bind(money.asString().concat("G"));
-        inventory.setTranslateX(1180);
-        inventory.setTranslateY(640);
-        inventory.setFont(UIConst.FONT);
-        inventory.setOnAction(event -> {
-            //            if (test == 0) {
-            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "WARRIOR"));
-            //                test++;
-            //            }
-            //            else if (test == 1) {
-            //                addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, "CRUSADER"));
-            //                test++;
-            //            }
-            if (inventoryWindow.isShowing()) {
+        Button btnInventory = new Button("Inventory");
+        btnInventory.setTranslateX(1180);
+        btnInventory.setTranslateY(640);
+        btnInventory.setFont(UIConst.FONT);
+        btnInventory.setOnAction(event -> {
+            if (inventoryWindow.isShowing())
                 inventoryWindow.minimize();
-            }
-            else {
+            else
                 inventoryWindow.restore();
-            }
         });
 
-        uiRoot.getChildren().add(inventory);
-
-
-
-
-        root.getChildren().addAll(gameRoot, uiRoot);
+        uiRoot.getChildren().add(btnInventory);
     }
-
-    int test = 0;
-
-    //    private Random rand = new Random();
-    //
-    //    private void moneyTest() {
-    //        Platform.runLater(() -> {
-    //            final int val = rand.nextInt(1000);
-    //            Text text = new Text(val + "G");
-    //            text.setFont(UIConst.FONT);
-    //            text.setFill(Color.GOLD);
-    //            TranslateTransition tt = new TranslateTransition(Duration.seconds(1.66), text);
-    //            tt.setFromX(player.getX() + rand.nextInt(1280) - 640);
-    //            tt.setFromY(player.getY() + rand.nextInt(720) - 360);
-    //
-    //            tt.setToX(player.getX() + 500);
-    //            tt.setToY(player.getY() + 320);
-    //            tt.setOnFinished(event -> {
-    //                gameRoot.getChildren().remove(text);
-    //                money.set(money.get() + val);
-    //                ScaleTransition st = new ScaleTransition(Duration.seconds(0.66), inventory);
-    //                st.setFromY(1);
-    //                st.setToY(1.3);
-    //                st.setAutoReverse(true);
-    //                st.setCycleCount(2);
-    //                st.play();
-    //            });
-    //
-    //            gameRoot.getChildren().add(text);
-    //
-    //            tt.play();
-    //        });
-    //    }
 
     @Override
     protected void initScene(Scene scene) {
-        //this.scene = scene;
-
         gameRoot.layoutXProperty().bind(player.xProperty.subtract(640).negate());
         gameRoot.layoutYProperty().bind(player.yProperty.subtract(360).negate());
-
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
@@ -269,11 +235,65 @@ public class GameWindow extends FXWindow {
             if (event.getCode() == KeyCode.DOWN) {
 
             }
+            if (event.getCode() == KeyCode.I) {
+                if (inventoryWindow.isShowing())
+                    inventoryWindow.minimize();
+                else
+                    inventoryWindow.restore();
+            }
+            if (event.getCode() == KeyCode.S) {
+                if (statsWindow.isShowing())
+                    statsWindow.minimize();
+                else
+                    statsWindow.restore();
+            }
+            if (event.getCode() == KeyCode.ESCAPE) {
+                if (menuWindow.isShowing())
+                    menuWindow.minimize();
+                else
+                    menuWindow.restore();
+            }
+
+            if (event.getCode().isDigitKey()) {
+                int digit = 0;
+                try {
+                    digit = Integer.parseInt(
+                            event.getCode().toString().charAt(event.getCode().toString().length()-1) + "");
+                }
+                catch (NumberFormatException e) {
+                }
+                if (digit != 0) {
+                    skillIndex = digit - 1;
+                    if (skillIndex < player.getSkills().length) {
+                        Skill skill = player.getSkills()[skillIndex];
+                        if (skill != null && skill.active && skill.getLevel() > 0 && skill.getCurrentCooldown() == 0 &&
+                                player.getSP() >= skill.getManaCost()) {
+                            if (skill.isSelfTarget()) {
+                                addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, "map1.txt", skillIndex, 0));
+                                //UIConst.Audio.getSkillAudioByID(skill.id).play();
+                            }
+                            else {
+                                // choose target
+                                selectingTarget = true;
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         scene.setOnMouseClicked(event -> {
-            selX = (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40;
-            selY = (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40;
+            if (!selectingTarget) {
+                selX = (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40;
+                selY = (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40;
+            }
+            else {
+                addActionRequest(new ActionRequest(Action.SKILL_USE, player.name, "map1.txt,"
+                        + (int)(event.getX() - gameRoot.getLayoutX()) / 40 * 40
+                        + "," + (int)(event.getY() - gameRoot.getLayoutY()) / 40 * 40, skillIndex, 0));
+                selectingTarget = false;
+                //UIConst.Audio.getSkillAudioByID(player.getSkills()[skillIndex].id).play();
+            }
         });
     }
 
@@ -283,11 +303,11 @@ public class GameWindow extends FXWindow {
         primaryStage.setHeight(720);
         primaryStage.setTitle("Orion MMORPG");
         primaryStage.setResizable(false);
-        //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setOnCloseRequest(event -> {
+            // TODO: client.send(new DataPacket(new QueryRequest(Query.LOGOFF, name)));
+            // TODO: addActionRequest(new ActionRequest(Action.CHAT, player.name, map.name + "," + chatText));
             System.exit(0);
         });
-
         primaryStage.show();
 
         try {
@@ -297,11 +317,8 @@ public class GameWindow extends FXWindow {
             //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::showTraffic, 0, 10, TimeUnit.SECONDS);
         }
         catch (IOException e) {
-            Out.e(e);
+            Sys.logExceptionAndExit(e);
         }
-
-
-        //Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::moneyTest, 0, 2, TimeUnit.SECONDS);
     }
 
     private class SkillView extends Parent {
@@ -315,6 +332,7 @@ public class GameWindow extends FXWindow {
 
             text.textProperty().bind(new SimpleStringProperty("Lv ").concat(player.skillLevelProperties[pos]));
             imageView.imageProperty().bind(player.skillImageProperties.get(pos));
+            imageView.visibleProperty().bind(player.skillReadyProperties[pos]);
 
             imageView.setFitWidth(45);
             imageView.setFitHeight(45);
@@ -354,9 +372,15 @@ public class GameWindow extends FXWindow {
                 popup.hide();
             });
 
+            Button btn = new Button("+");
+            btn.visibleProperty().bind(player.skillPointsProperty.greaterThan(0)
+                    .and(player.skillLevelProperties[pos].lessThan(Skill.MAX_LEVEL)));
+            btn.setOnAction(event -> {
+                addActionRequest(new ActionRequest(Action.SKILL_UP, player.name, pos));
+            });
 
             VBox vbox = new VBox();
-            vbox.getChildren().addAll(imageView, text);
+            vbox.getChildren().addAll(btn, imageView, text);
 
             getChildren().add(vbox);
         }
@@ -393,72 +417,179 @@ public class GameWindow extends FXWindow {
      * @version 1.0
      *
      */
-    class ServerResponseParser extends ServerPacketParser {
+    private class ServerResponseParser extends ServerPacketParser {
+        private boolean clientReady = false;
+
         @Override
         public void parseServerPacket(DataPacket packet) {
-            if (packet.byteData != null && packet.byteData.length > 0 && packet.byteData[0] == -127) {
+            if (clientReady && packet.byteData.length > 0) {
 
-                for (Player p : playersList)
-                    p.sprite.setValid(false);
+                // PLAYER, ENEMY
+                if (packet.byteData[0] == MessageType.UPDATE_GAME_CHAR.ordinal()) {
+
+                    Platform.runLater(() -> {
+
+                        for (Player p : playersList)
+                            p.sprite.setValid(false);
 
 
-                // raw data of players containing drawing data
-                ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                        // raw data of players containing drawing data
+                        ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                        // remove the first byte
+                        in.read();
 
-                // number of players
-                int size = packet.byteData.length / 32;
-                for (int i = 0; i < size; i++) {
-                    byte[] data = new byte[16];
-                    byte[] name = new byte[16];
+                        // number of players
+                        int size = packet.byteData.length / GameCharacter.BYTE_STREAM_SIZE;
+                        for (int i = 0; i < size; i++) {
+                            byte[] data = new byte[9];
+                            byte[] name = new byte[4];
+                            byte[] id = new byte[4];
 
-                    try {
-                        in.read(data);
-                        in.read(name);
 
-                        String playerName = new String(name).replace(new String(new byte[] {0}), "");
+                            try {
+                                in.read(data);
+                                in.read(name);
+                                in.read(id);
 
-                        // search list of players for name
-                        // if found update their data
-                        // else create new player with data
+                                int runtimeID = ByteStream.byteArrayToInt(id, 0);
+                                int idValue = ByteStream.byteArrayToInt(name, 0);
 
-                        boolean newPlayer = true;
+                                String playerName = "";
+                                if (ObjectManager.getEnemyByID(idValue + "") != null) {
+                                    playerName = ObjectManager.getEnemyByID(idValue + "").name;
+                                }
+                                else {
+                                    playerName = idMap.get(idValue + "");
+                                }
 
-                        for (Player p : playersList) {
-                            if (p.name.equals(playerName)) {
-                                newPlayer = false;
-                                p.loadFromByteArray(data);
-                                p.sprite.setValid(true);
-                                break;
+                                if (playerName == null) {
+                                    //playerName = "UNDEFINED";
+                                    continue;
+                                }
+
+                                //String playerName = new String(name).replace(new String(new byte[] {0}), "");
+
+                                //Out.d("runtimeID", runtimeID + " " + playerName);
+
+                                // search list of players for name
+                                // if found update their data
+                                // else create new player with data
+
+                                boolean newPlayer = true;
+
+                                for (Player p : playersList) {
+                                    if (p.name.equals(playerName) && p.getRuntimeID() == runtimeID) {
+                                        newPlayer = false;
+                                        p.loadFromByteArray(data);
+                                        p.sprite.setValid(true);
+                                        //Out.d(playerName + " " + runtimeID, "true");
+                                        break;
+                                    }
+                                }
+
+                                if (newPlayer) {
+                                    Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
+                                    p.loadFromByteArray(data);
+                                    p.setRuntimeID(runtimeID);
+                                    playersList.add(p);
+                                    //Out.d("runtimeID", runtimeID + " " + playerName);
+                                    playerSprites.getChildren().add(p.sprite);
+                                    //Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
+                                }
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
 
-                        if (newPlayer) {
-                            //Out.d("player", "new");
+                        // END FOR
 
-                            Player p = new Player(playerName, GameCharacterClass.NOVICE, 0, 0, "", 0);
-                            p.loadFromByteArray(data);
-                            playersList.add(p);
-                            Platform.runLater(() -> playerSprites.getChildren().add(p.sprite));
+                        playerSprites.getChildren().removeIf(node -> {
+
+                            //Out.d("fx", "update");
+
+                            Sprite s = (Sprite)node;
+                            return !s.isValid();
+                        });
+
+
+                        /*                    Platform.runLater(() -> {
+                        playerSprites.getChildren().removeIf(node -> {
+
+                            //Out.d("fx", "update");
+
+                            Sprite s = (Sprite)node;
+                            return !s.isValid();
+                        });
+                    });*/
+
+                        playersList.removeIf(player -> !player.sprite.isValid());
+                    });
+
+                    updateGameClient();
+                }
+
+                // ANIMATION
+                if (packet.byteData[0] == MessageType.ANIMATION_TEXT.ordinal()) {
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    // skip first byte
+                    in.read();
+
+                    // number of messages
+                    int size = packet.byteData.length / TextAnimationMessage.BYTE_STREAM_SIZE;
+                    for (int i = 0; i < size; i++) {
+                        byte[] data = new byte[TextAnimationMessage.BYTE_STREAM_SIZE];
+                        try {
+                            in.read(data);
+                            TextAnimationMessage msg = new TextAnimationMessage(0, 0, AnimationMessageType.TEXT, "");
+                            msg.loadFromByteArray(data);
+
+                            switch (msg.getType()) {
+                                case BASIC_DAMAGE_TO_ENEMY:
+                                    new BasicDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case DAMAGE_TO_PLAYER:
+                                    new BasicDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case SKILL_DAMAGE_TO_ENEMY:
+                                    new SkillDamageAnimation(msg.getText(), msg.getX(), msg.getY());
+                                    break;
+                                case TEXT:
+                                    // TODO:
+                                    Out.d("text", msg.getText());
+                                    break;
+                                default:
+                                    Out.d("unknown type of text animation", msg.getText());
+                                    break;
+                            }
                         }
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
-                // END FOR
+                if (packet.byteData[0] == MessageType.ANIMATION_IMAGE.ordinal()) {
+                    ByteArrayInputStream in = new ByteArrayInputStream(packet.byteData);
+                    // skip first byte
+                    in.read();
 
+                    // number of messages
+                    int size = packet.byteData.length / ImageAnimationMessage.BYTE_STREAM_SIZE;
+                    for (int i = 0; i < size; i++) {
+                        byte[] data = new byte[ImageAnimationMessage.BYTE_STREAM_SIZE];
+                        try {
+                            in.read(data);
+                            ImageAnimationMessage msg = new ImageAnimationMessage(0, 0, 0, 0, 0);
+                            msg.loadFromByteArray(data);
 
-                Platform.runLater(() -> {
-                    playerSprites.getChildren().removeIf(node -> {
-                        Sprite s = (Sprite)node;
-                        return !s.isValid();
-                    });
-                });
-
-                playersList.removeIf(player -> !player.sprite.isValid());
-
-                updateGameClient();
+                            // TODO: some image animation here
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
 
             if (packet.objectData instanceof ServerResponse) {
@@ -475,22 +606,21 @@ public class GameWindow extends FXWindow {
 
                 // update client's player
                 player.update(p);
+
+                clientReady = true;
             }
 
-            if (packet.multipleObjectData instanceof Player[]) {
-                update((Player[]) packet.multipleObjectData);
-            }
+            if (!packet.stringData.isEmpty()) {
 
-            if (packet.multipleObjectData instanceof Chest[]) {
-                update((Chest[]) packet.multipleObjectData);
-            }
+                String[] tokens = packet.stringData.split(";");
 
-            if (packet.multipleObjectData instanceof Enemy[]) {
-                update((Enemy[]) packet.multipleObjectData);
-            }
+                for (String token : tokens) {
+                    String[] pair = token.split(",");
 
-            if (packet.multipleObjectData instanceof Animation[]) {
-                update((Animation[]) packet.multipleObjectData);
+                    idMap.put(pair[0], pair[1]);
+                }
+
+                Out.d("stringData", packet.stringData);
             }
         }
 
@@ -500,54 +630,19 @@ public class GameWindow extends FXWindow {
 
             try {
                 ActionRequest[] thisGUI = clearPendingActionRequests();
+                ActionRequest[] statsGUI = statsWindow.clearPendingActionRequests();
+                ActionRequest[] invGUI = inventoryWindow.clearPendingActionRequests();
 
                 if (thisGUI.length > 0)
                     client.send(new DataPacket(thisGUI));
+                if (statsGUI.length > 0)
+                    client.send(new DataPacket(statsGUI));
+                if (invGUI.length > 0)
+                    client.send(new DataPacket(invGUI));
             }
             catch (IOException e) {
                 Out.e("updateGameClient", "Failed to send a packet", this, e);
             }
-        }
-
-        /**
-         * Update info about players
-         *
-         * @param sPlayers
-         *                 players from server
-         */
-        private void update(Player[] sPlayers) {
-            Player player = sPlayers[0];
-        }
-
-        /**
-         * Updates info about chests
-         *
-         * @param sChests
-         *                  chests from server
-         */
-        private void update(Chest[] sChests) {
-            //gameObjects.set(INDEX_CHESTS, sChests);
-        }
-
-        /**
-         * Updates info about enemies
-         *
-         * @param sChests
-         *                  enemies from server
-         */
-        private void update(Enemy[] sEnemies) {
-            //                    enemies.clear();
-            //                    for (Enemy e : sEnemies) {
-            //                        enemies.add(e);
-            //                    }
-            //
-            //                    gameObjects.set(INDEX_ENEMIES, sEnemies);
-            //
-            //                    tmpEnemies = new ArrayList<Enemy>(enemies);
-        }
-
-        private void update(Animation[] sAnimations) {
-            //gameObjects.set(INDEX_ANIMATIONS, sAnimations);
         }
     }
 }

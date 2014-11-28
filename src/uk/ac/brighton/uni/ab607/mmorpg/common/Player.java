@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,7 +18,6 @@ import com.almasb.common.graphics.GraphicsContext;
 import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
-import uk.ac.brighton.uni.ab607.mmorpg.R;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
@@ -118,6 +118,9 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleDoubleProperty statXPProperty = new SimpleDoubleProperty();
 
     public transient SimpleStringProperty classProperty = new SimpleStringProperty("NOVICE");
+    public transient SimpleBooleanProperty classChangeProperty = new SimpleBooleanProperty(false);
+
+    public transient SimpleIntegerProperty moneyProperty = new SimpleIntegerProperty(-1);
 
     /**
      * Properties for displaying skills
@@ -125,9 +128,13 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleIntegerProperty[] skillLevelProperties = new SimpleIntegerProperty[9];
     public transient SimpleStringProperty[] skillDescProperties = new SimpleStringProperty[9];
     public transient ArrayList<ObjectProperty<Image>> skillImageProperties = new ArrayList<ObjectProperty<Image>>();
+    public transient SimpleBooleanProperty[] skillReadyProperties = new SimpleBooleanProperty[9];
 
     public transient SimpleStringProperty[] itemDescProperties = new SimpleStringProperty[Inventory.MAX_SIZE];
     public transient ArrayList<ObjectProperty<Rectangle2D>> itemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
+
+    public transient SimpleStringProperty[] equipItemDescProperties = new SimpleStringProperty[5];
+    public transient ArrayList<ObjectProperty<Rectangle2D>> equipItemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
 
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
@@ -142,6 +149,7 @@ public class Player extends GameCharacter implements PseudoHTML {
             skillDescProperties[i] = new SimpleStringProperty("");
             ObjectProperty<Image> img = new SimpleObjectProperty<Image>(UIConst.Images.IC_SKILL_DUMMY);
             skillImageProperties.add(img);
+            skillReadyProperties[i] = new SimpleBooleanProperty(true);
         }
         for (int i = MAX_HP; i <= SP_REGEN; i++) {
             statProperties[i] = new SimpleIntegerProperty(1);
@@ -152,19 +160,36 @@ public class Player extends GameCharacter implements PseudoHTML {
             itemDescProperties[i] = new SimpleStringProperty("");
             itemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
         }
+        for (int i = 0; i < equipItemDescProperties.length; i++) {
+            equipItemDescProperties[i] = new SimpleStringProperty("");
+            equipItemSpriteProperties.add(new SimpleObjectProperty<Rectangle2D>(new Rectangle2D(0, 0, 34, 34)));
+        }
 
 
         this.x = x;
         this.y = y;
         this.ip = ip;
         this.port = port;
-        this.spriteID = R.drawable.player1;
+        //this.spriteID = R.drawable.player1;
         for (int i = HELM; i <= LEFT_HAND; i++) {   // helm 0, body 1, shoes 2 so we get 5000, 5001, 5002
             equip[i] = i >= RIGHT_HAND ? ObjectManager.getWeaponByID(ID.Weapon.HANDS) : ObjectManager.getArmorByID("500" + i);
         }
     }
 
     public void update(Player player) {
+        this.baseLevel = player.baseLevel;
+        this.jobLevel = player.jobLevel;
+        this.statLevel = player.statLevel;
+        this.charClass = player.charClass;
+        this.inventory = player.inventory;
+        this.equip = player.equip;
+        this.skills = player.skills;
+
+        this.hp = player.hp;
+        this.sp = player.sp;
+
+        this.setRuntimeID(player.getRuntimeID());
+
         Platform.runLater(() -> {
             for (int i = STR; i <= LUC; i++) {
                 attributeProperties[i].set(player.getBaseAttribute(i));
@@ -180,6 +205,7 @@ public class Player extends GameCharacter implements PseudoHTML {
                 skillLevelProperties[i].set(skill.getLevel());
                 skillImageProperties.get(i).set(UIConst.Images.getSkillImageByID(skill.id));
                 skillDescProperties[i].set(skill.name + "\n" + "SP: " + skill.getManaCost() + "\n" + skill.description);
+                skillReadyProperties[i].set(skill.getCurrentCooldown() == 0);
             }
 
             for (int i = 0; i < itemDescProperties.length; i++) {
@@ -194,6 +220,12 @@ public class Player extends GameCharacter implements PseudoHTML {
                 }
             }
 
+            for (int i = 0; i < equipItemDescProperties.length; i++) {
+                EquippableItem item = player.equip[i];
+                equipItemDescProperties[i].set(item.description);
+                equipItemSpriteProperties.get(i).set(new Rectangle2D(item.ssX*34, item.ssY*34, 34, 34));
+            }
+
             hpProperty.set(player.getHP());
             spProperty.set(player.getSP());
 
@@ -204,14 +236,14 @@ public class Player extends GameCharacter implements PseudoHTML {
             statLevelProperty.set(player.statLevel);
             jobLevelProperty.set(player.jobLevel);
 
-            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[baseLevel-1]);
-            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[jobLevel-1]);
-            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[statLevel-1]);
+            baseXPProperty.set(player.xp.base*1.0f / EXP_NEEDED_BASE[player.baseLevel-1]);
+            jobXPProperty.set(player.xp.job*1.0f / EXP_NEEDED_JOB[player.jobLevel-1]);
+            statXPProperty.set(player.xp.stat*1.0f / EXP_NEEDED_STAT[player.statLevel-1]);
 
 
+            moneyProperty.set(player.money);
+            classChangeProperty.set(GameCharacterClassChanger.canChangeClass(player));
             classProperty.set(GameCharacterClass.values()[player.charClass.ordinal()].toString());
-
-
         });
     }
 

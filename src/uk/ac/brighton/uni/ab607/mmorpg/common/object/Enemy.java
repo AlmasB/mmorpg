@@ -1,11 +1,14 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
+import java.util.ArrayList;
+
+import com.almasb.common.util.Out;
+
 import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 
@@ -24,6 +27,11 @@ public class Enemy extends GameCharacter {
     private transient Element element;
 
     private transient DroppableItem[] drops;
+
+    /**
+     * Runtime ID of players who attacked this monster
+     */
+    private transient ArrayList<Integer> attackers = new ArrayList<Integer>();
 
     /*package-private*/ Enemy(String id, String name, String description, EnemyType type, Element element, int level, AttributeInfo attrs, Experience xp, int spriteID, DroppableItem... drops) {
         super(name, description, GameCharacterClass.MONSTER);
@@ -61,34 +69,50 @@ public class Enemy extends GameCharacter {
                 .luc(copy.getBaseAttribute(LUC)), copy.xp, copy.spriteID, copy.drops);
     }
 
-    public Chest onDeath() {
-        alive = false;
-        Chest drop = new Chest(x, y, GameMath.random(this.baseLevel * 100));
-        for (DroppableItem item : drops) {
-            if (GameMath.checkChance(item.dropChance)) {
-                drop.addItem(ObjectManager.getItemByID(item.itemID));
-            }
+    public void addAttackerRuntimeID(int runtimeID) {
+        if (!attackers.contains(runtimeID)) {
+            attackers.add(runtimeID);
+            //Out.d("added", runtimeID + "");
         }
-        return drop;
+    }
+
+    /**
+     *
+     * @return
+     *          runtime IDs of attackers
+     */
+    public ArrayList<Integer> getAttackers() {
+        return attackers;
     }
 
     /**
      *
      * @param p
      *           The player who landed the killing blow
+     * @param players
+     *          players who attacked the monster, including the killing person
      * @return
      */
-    public Chest onDeath(Player p) {
+    public void onDeath(Player p, ArrayList<Player> players) {
         alive = false;
-        Chest drop = new Chest(x, y, GameMath.random(this.baseLevel * 100));
-        for (DroppableItem item : drops) {
-            if (GameMath.checkChance(item.dropChance)) {
-                drop.addItem(ObjectManager.getItemByID(item.itemID));
 
-                p.getInventory().addItem(ObjectManager.getItemByID(item.itemID));
+        //Out.d("onDeath", players.size() + "");
+
+        for (Player attacker : players) {
+            // if the killer
+            if (p == attacker) {
+
             }
+
+            for (DroppableItem item : drops) {
+                if (GameMath.checkChance(item.dropChance)) {
+                    attacker.getInventory().addItem(ObjectManager.getItemByID(item.itemID));
+                }
+            }
+
+            attacker.incMoney(GameMath.random(this.baseLevel * 100));
+            attacker.gainXP(getXP());
         }
-        return drop;
     }
 
     /**

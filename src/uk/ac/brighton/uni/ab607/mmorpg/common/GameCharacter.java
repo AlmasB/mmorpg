@@ -36,6 +36,8 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 public abstract class GameCharacter implements java.io.Serializable, Drawable, ByteStream {
     private static final long serialVersionUID = -4840633591092062960L;
 
+    public static final int BYTE_STREAM_SIZE = 17;
+
     public static class Experience implements java.io.Serializable {
         private static final long serialVersionUID = 2762180993708324531L;
         public int base, stat, job;
@@ -721,13 +723,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public void loadFromByteArray(byte[] data) {
-        x = ByteStream.byteArrayToInt(data, 1);
-        y = ByteStream.byteArrayToInt(data, 5);
-        frame = data[9];
-        place = data[10];
+        int xy = ByteStream.byteArrayToInt(data, 0);
 
-        spriteID = ByteStream.byteArrayToInt(data, 11);
-        direction = Dir.values()[data[15]];
+        x = xy >> 16 & 0xFFFF;
+        y = xy & 0xFFFF;
+
+        spriteID = ByteStream.byteArrayToInt(data, 4);
+
+        place = (byte)(data[8] >> 2 & 0b11);
+        direction = Dir.values()[(byte)(data[8] & 0b11)];
 
         Platform.runLater(() -> {
             sprite.setTranslateX(x);
@@ -739,28 +743,23 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
             Rectangle2D rect = new Rectangle2D(place*40, getRow()*40, 40, 40);
 
             sprite.imageView.setViewport(rect);
-            //sprite.name.setText(name);
+            sprite.name.setText(name);
         });
-        //name = new String(Arrays.copyOfRange(data, 16, 32)).replace(new String(new byte[] {0}), "");
     }
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[32];
+        byte[] data = new byte[17];
 
-        data[0] = -127;
-        ByteStream.intToByteArray(data, 1, x);
-        ByteStream.intToByteArray(data, 5, y);
-        data[9] = frame;
-        data[10] = place;
-        ByteStream.intToByteArray(data, 11, spriteID);
+        int xy = x << 16 | y;
 
-        data[15] = (byte)direction.ordinal();
+        ByteStream.intToByteArray(data, 0, xy);
+        ByteStream.intToByteArray(data, 4, spriteID);
 
-        // MAX is 16
-        byte[] bName = name.getBytes();
-        for (int i = 0; i < Math.min(bName.length, 16); i++)
-            data[16 + i] = bName[i];
+        data[8] = (byte)((place << 2 | direction.ordinal()) & 0xFF);
+
+        ByteStream.intToByteArray(data, 9, id != null ? Integer.parseInt(id) : runtimeID);
+        ByteStream.intToByteArray(data, 13, runtimeID);
 
         return data;
     }

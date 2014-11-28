@@ -6,22 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Inventory;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
 import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.AnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
-import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.graphics.Rect2D;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.UDPServer;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
-import com.almasb.java.io.Resources;
+import com.almasb.java.io.ResourceManager;
 
 public class GameMap {
 
@@ -36,9 +36,9 @@ public class GameMap {
     private int enemyRuntimeID = 1; // it will keep going up
 
     private ArrayList<Player> players = new ArrayList<Player>();
-    public ArrayList<Chest> chests = new ArrayList<Chest>();
 
-    public ArrayList<Animation> animations = new ArrayList<Animation>();
+    public ArrayList<TextAnimationMessage> animationsText = new ArrayList<TextAnimationMessage>();
+    public ArrayList<ImageAnimationMessage> animationsImage = new ArrayList<ImageAnimationMessage>();
 
     private int tick = 0;
 
@@ -46,7 +46,10 @@ public class GameMap {
         this.name = name;
         this.spriteID = spriteID;
 
-        data = Resources.getText(name);
+        data = ResourceManager.loadText(name);
+
+        if (data == null)
+            Sys.logExceptionAndExit(new Exception("no map data"));
 
         height = data.size();
         width = data.get(0).length();
@@ -83,11 +86,13 @@ public class GameMap {
     public void update(UDPServer server) {
         List<Player> tmpPlayers = new ArrayList<Player>(players);
 
-        // process animations
-        for (Iterator<Animation> it = animations.iterator(); it.hasNext(); ) {
-            Animation a = it.next();
-            a.update(0.02f);    // that's how much we sleep
-            if (a.hasFinished())
+        // clean animations
+        for (Iterator<TextAnimationMessage> it = animationsText.iterator(); it.hasNext(); ) {
+            if (it.next().isSent())
+                it.remove();
+        }
+        for (Iterator<ImageAnimationMessage> it = animationsImage.iterator(); it.hasNext(); ) {
+            if (it.next().isSent())
                 it.remove();
         }
 
@@ -123,25 +128,6 @@ public class GameMap {
         // process players
         for (Player p : tmpPlayers) {
             p.update();
-
-            // player - chest interaction
-            for (Iterator<Chest> it = chests.iterator(); it.hasNext(); ) {
-                Chest c = it.next();
-                if (c.isOpened()) {
-                    it.remove();
-                }
-                else {
-                    if (distanceBetween(p, c) < 1) {
-                        if (p.getInventory().getSize() + c.getItems().size()
-                                <= Inventory.MAX_SIZE) {
-                            c.open();
-                            c.getItems().forEach(p.getInventory()::addItem);
-                            p.incMoney(c.money);
-                            animations.add(new TextAnimation(c.getX(), c.getY(), c.money + " G", Color.GOLD, 1.0f));
-                        }
-                    }
-                }
-            }
         }
 
         // all objects to send
@@ -150,37 +136,31 @@ public class GameMap {
 
 
         Stream<Player> playerStream = tmpPlayers.stream();
-        Stream<Chest> chestStream = chests.stream();
-        Stream<Animation> animationStream = animations.stream();
+        Stream<TextAnimationMessage> animationStream = animationsText.stream();
+        Stream<ImageAnimationMessage> animationStream2 = animationsImage.stream();
         Stream<Enemy> enemyStream = tmpList.stream();
 
         tmpPlayers.forEach(player -> {
-
-
-
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
             Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
-            Chest[] chestsToSend = chestStream.filter(chest -> playerVision.contains(new Point2D(chest.getX(), chest.getY()))).toArray(Chest[]::new);
-            Animation[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(Animation[]::new);
+            TextAnimationMessage[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(TextAnimationMessage[]::new);
+            ImageAnimationMessage[] animationsToSend2 = animationStream2.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(ImageAnimationMessage[]::new);
             Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
 
-
-            //Out.d("map update", playersToSend.length + "");
-
-
             try {
+                // send THE player
                 if (tick == 0)
                     server.send(new DataPacket(player), player.ip, player.port);
 
+                // send players / enemies
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                if (playersToSend.length > 0) {
+                if (playersToSend.length > 0 || enemiesToSend.length > 0) {
+                    baos.write((byte)MessageType.UPDATE_GAME_CHAR.ordinal());
                     for (int i = 0; i < playersToSend.length; i++) {
                         baos.write(playersToSend[i].toByteArray());
                     }
-                }
-                if (enemiesToSend.length > 0) {
                     for (int i = 0; i < enemiesToSend.length; i++) {
                         baos.write(enemiesToSend[i].toByteArray());
                     }
@@ -188,20 +168,35 @@ public class GameMap {
 
                 server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
-                //server.send(new DataPacket(playersToSend), player.ip, player.port);
+                // send animations
+                baos = new ByteArrayOutputStream();
+                if (animationsToSend.length > 0) {
+                    baos.write((byte)MessageType.ANIMATION_TEXT.ordinal());
 
+                    for (int i = 0; i < animationsToSend.length; i++) {
+                        baos.write(animationsToSend[i].toByteArray());
+                        animationsToSend[i].setSent();
+                    }
+                }
 
-                if (chestsToSend.length > 0)
-                    server.send(new DataPacket(chestsToSend), player.ip, player.port);
-                //                if (enemiesToSend.length > 0)
-                //                    server.send(new DataPacket(enemiesToSend), player.ip, player.port);
-                if (animationsToSend.length > 0)
-                    server.send(new DataPacket(animationsToSend), player.ip, player.port);
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
 
-                tick++;
+                baos = new ByteArrayOutputStream();
+                if (animationsToSend2.length > 0) {
+                    baos.write((byte)MessageType.ANIMATION_IMAGE.ordinal());
 
-                if (tick == 50)
-                    tick = 0;
+                    for (int i = 0; i < animationsToSend2.length; i++) {
+                        baos.write(animationsToSend2[i].toByteArray());
+                        animationsToSend2[i].setSent();
+                    }
+                }
+
+                server.sendRawBytes(baos.toByteArray(), player.ip, player.port);
+
+                //                tick++;
+                //
+                //                if (tick == 50)
+                //                    tick = 0;
             }
             catch (Exception e) {
                 Out.e("update", "Failed to send a packet", this, e);
@@ -269,6 +264,14 @@ public class GameMap {
         return null;
     }
 
+    public Player getPlayerByRuntimeID(int runtimeID) {
+        for (Player p : players)
+            if (p.getRuntimeID() == runtimeID)
+                return p;
+
+        return null;
+    }
+
     /**
      *
      * @param ch1
@@ -280,10 +283,6 @@ public class GameMap {
      */
     /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
-    }
-
-    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 
     static class SpawnInfo {

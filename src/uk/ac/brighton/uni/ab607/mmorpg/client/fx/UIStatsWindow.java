@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -14,9 +15,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClassChanger;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
@@ -62,6 +64,31 @@ public class UIStatsWindow extends UIFragmentWindow {
             attrBox.getChildren().add(hLine);
         }
 
+        ChoiceBox<String> cb = new ChoiceBox<String>();
+        cb.visibleProperty().bind(player.classChangeProperty);
+
+        player.classChangeProperty.addListener((obs, old, newValue) -> {
+            if (newValue.booleanValue()) {
+                cb.getItems().clear();
+
+                GameCharacterClass[] classes = GameCharacterClassChanger.getAscensionClasses(player);
+                for (GameCharacterClass cl : classes)
+                    cb.getItems().add(cl.toString());
+
+                cb.getSelectionModel().select(0);
+            }
+        });
+
+        Button btn = new Button("Change Class");
+        btn.setOnAction(event -> {
+            String className = cb.getSelectionModel().getSelectedItem();
+            addActionRequest(new ActionRequest(Action.CHANGE_CLASS, player.name, className));
+        });
+        btn.visibleProperty().bind(player.classChangeProperty);
+
+        HBox box = new HBox(10);
+        box.getChildren().addAll(cb, btn);
+        attrBox.getChildren().add(box);
 
         // STATS
 
@@ -96,20 +123,24 @@ public class UIStatsWindow extends UIFragmentWindow {
                 .concat(" (").concat(player.statProperties[Player.MATK]).concat("+").concat(player.bonusStatProperties[Player.MATK]).concat(")"));
 
         Text statDEF = new Text();
-        statDEF.textProperty().bind(new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF])
-                .concat("+").concat(player.bonusStatProperties[Player.DEF]));
+        statDEF.textProperty().bind(
+                new SimpleStringProperty("DEF: ").concat(player.statProperties[Player.DEF].add(player.bonusStatProperties[Player.DEF]))
+                .concat(" (").concat(player.statProperties[Player.DEF]).concat("+").concat(player.bonusStatProperties[Player.DEF]).concat(")"));
 
         Text statMDEF = new Text();
-        statMDEF.textProperty().bind(new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF])
-                .concat("+").concat(player.bonusStatProperties[Player.MDEF]));
+        statMDEF.textProperty().bind(
+                new SimpleStringProperty("MDEF: ").concat(player.statProperties[Player.MDEF].add(player.bonusStatProperties[Player.MDEF]))
+                .concat(" (").concat(player.statProperties[Player.MDEF]).concat("+").concat(player.bonusStatProperties[Player.MDEF]).concat(")"));
 
         Text statARM = new Text();
-        statARM.textProperty().bind(new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM])
-                .concat("+").concat(player.bonusStatProperties[Player.ARM]));
+        statARM.textProperty().bind(
+                new SimpleStringProperty("ARM: ").concat(player.statProperties[Player.ARM].add(player.bonusStatProperties[Player.ARM]))
+                .concat(" (").concat(player.statProperties[Player.ARM]).concat("+").concat(player.bonusStatProperties[Player.ARM]).concat(")"));
 
         Text statMARM = new Text();
-        statMARM.textProperty().bind(new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM])
-                .concat("+").concat(player.bonusStatProperties[Player.MARM]));
+        statMARM.textProperty().bind(
+                new SimpleStringProperty("MARM: ").concat(player.statProperties[Player.MARM].add(player.bonusStatProperties[Player.MARM]))
+                .concat(" (").concat(player.statProperties[Player.MARM]).concat("+").concat(player.bonusStatProperties[Player.MARM]).concat(")"));
 
         Text statCrit = new Text();
         statCrit.textProperty().bind(new SimpleStringProperty("CRIT: ").concat(player.statProperties[Player.CRIT_CHANCE])

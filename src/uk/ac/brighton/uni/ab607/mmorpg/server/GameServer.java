@@ -17,24 +17,24 @@ import com.almasb.common.search.AStarLogic;
 import com.almasb.common.search.AStarNode;
 import com.almasb.common.util.Out;
 
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.Animation;
-import uk.ac.brighton.uni.ab607.mmorpg.client.ui.animation.TextAnimation;
 import uk.ac.brighton.uni.ab607.mmorpg.common.*;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Chest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ID;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.AnimationMessage;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 
 public class GameServer {
     private UDPServer server = null;
 
     private int playerRuntimeID = 1000;
 
-    //private ArrayList<Player> players = new ArrayList<Player>();
+    private ArrayList<Player> players = new ArrayList<Player>();
 
     private ServerActionHandler actionHandler;
 
@@ -52,11 +52,6 @@ public class GameServer {
         // start main server loop
         //new Thread(new ServerLoop()).start();
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::serverLoop, 0, 20, TimeUnit.MILLISECONDS);
-
-        // test
-        spawnChest(new Chest(1000, 680, 1000,
-                ObjectManager.getWeaponByID(ID.Weapon.IRON_SWORD),
-                ObjectManager.getArmorByID(ID.Armor.CHAINMAL)), "map1.txt");
 
         // call save state to db every 5 mins
         new ScheduledThreadPoolExecutor(1).scheduleAtFixedRate(this::saveState, 5, 5, TimeUnit.MINUTES);
@@ -121,7 +116,7 @@ public class GameServer {
 
                 server.send(new DataPacket(new ServerResponse(Query.LOGIN, true, "Login successful", mapName,
                         p.getX(), p.getY())), packet.getIP(), packet.getPort());
-                server.send(new DataPacket(p)); // send player so client can init
+                server.send(new DataPacket(p), packet.getIP(), packet.getPort()); // send player so client can init
 
                 loginPlayer(mapName, p);
             }
@@ -181,6 +176,7 @@ public class GameServer {
             for (GameMap m : maps) {
                 p = m.getPlayerByName(playerName);
                 if (p != null) {
+                    players.remove(p);
                     m.removePlayer(p);
                     GameAccount.setPlayer(p, p.name);
                     GameAccount.setMapName(m.name, p.name);
@@ -190,30 +186,6 @@ public class GameServer {
             }
         }
     }
-
-    /*private class ServerLoop implements Runnable {
-        @Override
-        public void run() {
-            long start;
-
-            while (true) {
-                start = System.currentTimeMillis();
-
-                for (GameMap map : maps)
-                    map.update(server);
-
-                long delay = System.currentTimeMillis() - start;
-                try {
-                    if (delay < 20) {
-                        Thread.sleep(20 - delay);
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
 
     private void serverLoop() {
         for (GameMap map : maps)
@@ -248,6 +220,10 @@ public class GameServer {
      */
     /*package-private*/ GameCharacter getGameCharacterByRuntimeID(int id, String mapName) {
         return getMapByName(mapName).getEnemyByRuntimeID(id);
+    }
+
+    /*package-private*/ Player getPlayerByRuntimeID(int id, String mapName) {
+        return getMapByName(mapName).getPlayerByRuntimeID(id);
     }
 
     /*package-private*/ GameMap getMapByName(String name) {
@@ -313,19 +289,33 @@ public class GameServer {
         p.setRuntimeID(playerRuntimeID++);
         GameMap m = getMapByName(mapName);
         m.addPlayer(p);
+
+        players.add(p);
+
+        try {
+            String data = "";
+            for (Player player : players) {
+                data += player.getRuntimeID() + "," + player.name + ";";
+            }
+
+            server.send(new DataPacket(data), p.ip, p.port);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Out.println(p.name + " has joined the game. RuntimeID: " + p.getRuntimeID()
                 + " Map: " + m.name);
-        addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);
-        addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
+        //addAnimation(new TextAnimation(800, 800, "Press I to open inventory", Color.GOLD, 5.0f), m.name);
+        //addAnimation(new TextAnimation(800, 830, "Press S to open stats/skills", Color.GOLD, 10.0f), m.name);
     }
 
-    /*package-private*/ Chest spawnChest(Chest chest, String mapName) {
-        getMapByName(mapName).chests.add(chest);
-        return chest;
+    /*package-private*/ void addTextAnimation(TextAnimationMessage a, String mapName) {
+        getMapByName(mapName).animationsText.add(a);
     }
 
-    /*package-private*/ void addAnimation(Animation a, String mapName) {
-        getMapByName(mapName).animations.add(a);
+    /*package-private*/ void addTextAnimation(ImageAnimationMessage a, String mapName) {
+        getMapByName(mapName).animationsImage.add(a);
     }
 
     private void initGameMaps() {
@@ -354,9 +344,5 @@ public class GameServer {
      */
     /*package-private*/ int distanceBetween(GameCharacter ch1, GameCharacter ch2) {
         return (Math.abs(ch1.getX() - ch2.getX()) + Math.abs(ch1.getY() - ch2.getY())) / 40;
-    }
-
-    /*package-private*/ int distanceBetween(GameCharacter ch, Chest c) {
-        return (Math.abs(ch.getX() - c.getX()) + Math.abs(ch.getY() - c.getY())) / 40;
     }
 }

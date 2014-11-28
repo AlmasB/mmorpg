@@ -34,7 +34,7 @@ public abstract class Skill implements java.io.Serializable {
     public static final int MAX_LEVEL = 10;
 
     protected int level = 0;
-    
+
     protected SkillUseResult useResult = SkillUseResult.DEFAULT_TRUE;
 
     public Skill(String id, String name, String description, Boolean active, Float cooldown) {
@@ -70,7 +70,7 @@ public abstract class Skill implements java.io.Serializable {
         }
         return false;
     }
-    
+
     public void setLevel(int level) {
         this.level = level;
     }
@@ -90,16 +90,20 @@ public abstract class Skill implements java.io.Serializable {
     public void putOnCooldown() {
         currentCooldown = skillCooldown;
     }
-    
+
     /**
-     * 
+     *
      * @return
      *          the result of last usage of the skill
      */
     public SkillUseResult getUseResult() {
         return useResult;
     }
-    
+
+    public boolean isSelfTarget() {
+        return false;
+    }
+
     // add some methods for overriding
     // isPassive()
     // isSelfTarget()
