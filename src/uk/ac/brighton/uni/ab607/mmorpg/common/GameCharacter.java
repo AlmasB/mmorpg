@@ -721,15 +721,15 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public void loadFromByteArray(byte[] data) {
-        x = ByteStream.byteArrayToInt(data, 0);
-        y = ByteStream.byteArrayToInt(data, 4);
-        frame = data[8];
-        place = data[9];
+        int xy = ByteStream.byteArrayToInt(data, 0);
 
-        spriteID = ByteStream.byteArrayToInt(data, 10);
-        direction = Dir.values()[data[14]];
+        x = xy >> 16 & 0xFFFF;
+        y = xy & 0xFFFF;
 
-        //runtimeID = ByteStream.byteArrayToInt(data, 32);
+        spriteID = ByteStream.byteArrayToInt(data, 4);
+
+        place = (byte)(data[8] >> 2 & 0b11);
+        direction = Dir.values()[(byte)(data[8] & 0b11)];
 
         Platform.runLater(() -> {
             sprite.setTranslateX(x);
@@ -747,24 +747,17 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[23];
+        byte[] data = new byte[17];
 
-        ByteStream.intToByteArray(data, 0, x);
-        ByteStream.intToByteArray(data, 4, y);
-        data[8] = frame;
-        data[9] = place;
-        ByteStream.intToByteArray(data, 10, spriteID);
+        int xy = x << 16 | y;
 
-        data[14] = (byte)direction.ordinal();
+        ByteStream.intToByteArray(data, 0, xy);
+        ByteStream.intToByteArray(data, 4, spriteID);
 
-        // MAX is 16
-        //        byte[] bName = name.getBytes();
-        //        for (int i = 0; i < Math.min(bName.length, 16); i++)
-        //            data[15 + i] = bName[i];
+        data[8] = (byte)((place << 2 | direction.ordinal()) & 0xFF);
 
-        ByteStream.intToByteArray(data, 15, id != null ? Integer.parseInt(id) : runtimeID);
-
-        ByteStream.intToByteArray(data, 19, runtimeID);
+        ByteStream.intToByteArray(data, 9, id != null ? Integer.parseInt(id) : runtimeID);
+        ByteStream.intToByteArray(data, 13, runtimeID);
 
         return data;
     }

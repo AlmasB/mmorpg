@@ -435,9 +435,9 @@ public class GameWindow extends FXWindow {
                         in.read();
 
                         // number of players
-                        int size = packet.byteData.length / 23;
+                        int size = packet.byteData.length / 17;
                         for (int i = 0; i < size; i++) {
-                            byte[] data = new byte[15];
+                            byte[] data = new byte[9];
                             byte[] name = new byte[4];
                             byte[] id = new byte[4];
 
@@ -459,7 +459,8 @@ public class GameWindow extends FXWindow {
                                 }
 
                                 if (playerName == null) {
-                                    playerName = "UNDEFINED";
+                                    //playerName = "UNDEFINED";
+                                    continue;
                                 }
 
                                 //String playerName = new String(name).replace(new String(new byte[] {0}), "");
