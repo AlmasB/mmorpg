@@ -780,4 +780,23 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
     }
 
     public transient Sprite sprite = new Sprite("player1.png");
+
+    // test methods
+    public void setXY(int xy) {
+        x = xy >> 16 & 0xFFFF;
+        y = xy & 0xFFFF;
+    }
+
+    public void setPlaceDir(byte b) {
+        place = (byte)(b >> 2 & 0b11);
+        direction = Dir.values()[(byte)(b & 0b11)];
+    }
+
+    public void setSpriteID(int id) {
+        spriteID = id;
+    }
+
+    public void setIDs(int ids) {
+        runtimeID = ids & 0xFFFF;
+    }
 }

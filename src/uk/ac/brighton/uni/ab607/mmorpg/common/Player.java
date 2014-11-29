@@ -136,6 +136,10 @@ public class Player extends GameCharacter implements PseudoHTML {
     public transient SimpleStringProperty[] equipItemDescProperties = new SimpleStringProperty[5];
     public transient ArrayList<ObjectProperty<Rectangle2D>> equipItemSpriteProperties = new ArrayList<ObjectProperty<Rectangle2D>>();
 
+    public Player() {
+        this("", GameCharacterClass.NOVICE, 0, 0, "", 0);
+    }
+
     public Player(String name, GameCharacterClass charClass, int x, int y, String ip, int port) {
         super(name, "Player", charClass);
 
@@ -456,22 +460,4 @@ public class Player extends GameCharacter implements PseudoHTML {
         g.setColor(Color.GOLD);
         g.fillRect(tmpX + 1, tmpY + 66, (int)(40 * (xp.base*1.0f/EXP_NEEDED_BASE[baseLevel-1])) - 1, 3);
     }
-
-    // BYTE STREAM IMPL
-
-    //    @Override
-    //    public void loadFromByteArray(byte[] data) {
-    //
-    //    }
-    //
-    //    @Override
-    //    public byte[] toByteArray() {
-    //        byte[] data = new byte[100];
-    //
-    //        data[0] = "P".getBytes()[0];
-    //
-    //
-    //
-    //        return data;
-    //    }
 }
