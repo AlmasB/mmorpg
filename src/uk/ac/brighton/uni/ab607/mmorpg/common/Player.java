@@ -19,7 +19,7 @@ import com.almasb.common.parsing.PseudoHTML;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.UIConst;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;

@@ -205,7 +205,7 @@ public class LoginController extends AnchorPane implements Initializable {
             Thread.sleep(millis);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            Out.e(e);
         }
     }
 

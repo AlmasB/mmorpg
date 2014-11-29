@@ -1,6 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
-import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Stat;
 
 public class Essence implements java.io.Serializable {
 

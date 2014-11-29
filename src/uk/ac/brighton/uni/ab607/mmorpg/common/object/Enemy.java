@@ -2,15 +2,13 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import java.util.ArrayList;
 
-import com.almasb.common.util.Out;
-
-import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacterClass;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 
 public class Enemy extends GameCharacter {
     /**
@@ -72,7 +70,6 @@ public class Enemy extends GameCharacter {
     public void addAttackerRuntimeID(int runtimeID) {
         if (!attackers.contains(runtimeID)) {
             attackers.add(runtimeID);
-            //Out.d("added", runtimeID + "");
         }
     }
 
@@ -95,8 +92,6 @@ public class Enemy extends GameCharacter {
      */
     public void onDeath(Player p, ArrayList<Player> players) {
         alive = false;
-
-        //Out.d("onDeath", players.size() + "");
 
         for (Player attacker : players) {
             // if the killer

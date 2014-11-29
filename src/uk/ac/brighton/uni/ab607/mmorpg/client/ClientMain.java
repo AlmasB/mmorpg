@@ -58,7 +58,7 @@ public class ClientMain {
             else {
                 LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
                 // will only be called after previous gui finishes
-                new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();;
+                new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();
             }
         }
         catch (Exception e) {

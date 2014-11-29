@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common.object;
+package uk.ac.brighton.uni.ab607.mmorpg.common.request;
 
 public class SkillUseResult implements java.io.Serializable {
     /**

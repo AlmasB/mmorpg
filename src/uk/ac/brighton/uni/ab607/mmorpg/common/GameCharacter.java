@@ -20,11 +20,10 @@ import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 
 /**
  * Essentially alive game object
@@ -51,6 +50,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
             this.stat += xp.stat;
             this.job += xp.job;
         }
+    }
+
+    /**
+     * Stats of a game character
+     *
+     */
+    public enum Stat {
+        MAX_HP, MAX_SP, ATK, MATK, DEF, MDEF, ARM, MARM, ASPD, MSPD, CRIT_CHANCE, MCRIT_CHANCE, CRIT_DMG, MCRIT_DMG, HP_REGEN, SP_REGEN
     }
 
     /**

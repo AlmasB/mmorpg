@@ -5,24 +5,25 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
-import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Experience;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Rune;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 
 public class ObjectManager {
 
@@ -1065,15 +1066,15 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.KNIFE, 50), new DroppableItem(ID.Armor.THANATOS_BODY_ARMOR, 10)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.IRON_SWORD, 15), new DroppableItem(ID.Armor.SAPPHIRE_LEGION_PLATE_MAIL, 5)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Armor.CHAINMAL, 25), new DroppableItem(ID.Weapon.SOUL_REAPER, 5)));
 
 
         // ESSENCES
@@ -1083,9 +1084,9 @@ public class ObjectManager {
         // MAPS
 
         addMap(new GameMap("map1.txt", 0,
-                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
-                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
-                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));
+                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 5),
+                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 5),
+                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 5)));
     }
 
     private static void addArmor(Armor armor) {

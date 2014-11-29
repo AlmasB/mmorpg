@@ -1,7 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.fx;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;

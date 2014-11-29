@@ -1,6 +1,5 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common.item;
+package uk.ac.brighton.uni.ab607.mmorpg.common;
 
-import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
 
 public class Rune implements java.io.Serializable {
 
