@@ -10,30 +10,52 @@ import java.util.Random;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.test.GameCharacterProtoBuf.GameCharProtoBuf;
+import uk.ac.brighton.uni.ab607.mmorpg.test.GameMessageProtoBuf.MessageProtoBuf;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.AsnOutputStream;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.Tag;
 
 import com.almasb.common.compression.LZMACompressor;
+import com.almasb.common.compression.LZWCompressor;
 import com.almasb.common.test.Test;
 import com.almasb.common.util.Out;
 import com.almasb.common.util.ZIPCompressor;
 
 public class DataStructureTest {
 
-    private static final int NUM_PACKETS = 10000;
-    private static Data[] randomData = new Data[NUM_PACKETS];
+    enum TestType {
+        PROTOCOL, NUM_PLAYERS
+    }
+
+    // default test to run
+    private static TestType type = TestType.NUM_PLAYERS;
+
+    private static final int NUM_ENEMIES = 100;
+    private static int NUM_PLAYERS = 10000;
+    private static int NUM_PACKETS = NUM_PLAYERS + NUM_ENEMIES;
+
+    private static Data[] randomData;
+    private static DataMessage[] randomData2;
 
     private static ArrayList<Result> results = new ArrayList<Result>();
+
+    private static ArrayList<Result> results1 = new ArrayList<Result>();
+    private static ArrayList<Result> results1000 = new ArrayList<Result>();
+    private static ArrayList<Result> results10000 = new ArrayList<Result>();
 
     private static Random rand = new Random();
 
@@ -44,6 +66,14 @@ public class DataStructureTest {
         public int sprite;
         public byte placeDir;
         public int ids;
+    }
+
+    private static class DataMessage implements Serializable {
+        private static final long serialVersionUID = 2L;
+
+        public int xy;
+        public byte type;
+        public String text;
     }
 
     private static class Result implements Comparable<Result> {
@@ -81,9 +111,30 @@ public class DataStructureTest {
             byte[] compressedZip = new ZIPCompressor().compress(result);
             Out.i("result compressed size", compressedZip.length + " bytes");
 
-            results.add(new Result(getClass().getSimpleName(),
-                    result.length, compressedZip.length, LZMACompressor.compress(result).length,
-                    getTimeTookSeconds()));
+            if (type == TestType.NUM_PLAYERS) {
+                switch (NUM_PLAYERS) {
+                    case 1:
+                        results1.add(new Result(getClass().getSimpleName(),
+                                result.length, compressedZip.length, LZMACompressor.compress(result).length,
+                                getTimeTookSeconds()));
+                        break;
+                    case 1000:
+                        results1000.add(new Result(getClass().getSimpleName(),
+                                result.length, compressedZip.length, LZMACompressor.compress(result).length,
+                                getTimeTookSeconds()));
+                        break;
+                    case 10000:
+                        results10000.add(new Result(getClass().getSimpleName(),
+                                result.length, compressedZip.length, LZMACompressor.compress(result).length,
+                                getTimeTookSeconds()));
+                        break;
+                }
+            }
+            else {
+                results.add(new Result(getClass().getSimpleName(),
+                        result.length, compressedZip.length, LZMACompressor.compress(result).length,
+                        getTimeTookSeconds()));
+            }
         }
     }
 
@@ -100,6 +151,16 @@ public class DataStructureTest {
                 GameCharProtoBuf player = playerBuilder.build();
                 output.write(player.toByteArray());
             }
+
+            for (DataMessage data : randomData2) {
+                MessageProtoBuf.Builder messageBuilder = MessageProtoBuf.newBuilder();
+                messageBuilder.setXy(data.xy);
+                messageBuilder.setType(data.type);
+                messageBuilder.setText(data.text);
+
+                MessageProtoBuf message = messageBuilder.build();
+                output.write(message.toByteArray());
+            }
         }
     }
 
@@ -114,6 +175,12 @@ public class DataStructureTest {
                 out.write(data.placeDir);
                 out.writeInteger(Tag.CLASS_UNIVERSAL, Tag.INTEGER, data.ids);
             }
+
+            for (DataMessage data : randomData2) {
+                out.writeInteger(Tag.CLASS_UNIVERSAL, Tag.INTEGER, data.xy);
+                out.write(data.type);
+                out.writeStringUTF8(data.text);
+            }
             out.close();
 
             output.write(out.toByteArray());
@@ -125,13 +192,22 @@ public class DataStructureTest {
         @Override
         protected void run() throws Exception {
             for (Data data : randomData) {
-                GameCharacter player = new Player();
+                GameCharacterByteStream player = new GameCharacterByteStream();
                 player.setXY(data.xy);
                 player.setSpriteID(data.sprite);
                 player.setPlaceDir(data.placeDir);
                 player.setIDs(data.ids);
 
                 output.write(player.toByteArray());
+            }
+
+            for (DataMessage data : randomData2) {
+                GameMessageByteStream message = new GameMessageByteStream();
+                message.setXY(data.xy);
+                message.setText(data.text);
+                message.setType(data.type);
+
+                output.write(message.toByteArray());
             }
         }
     }
@@ -143,6 +219,9 @@ public class DataStructureTest {
             for (Data data : randomData) {
                 oos.writeObject(data);
             }
+            for (DataMessage data : randomData2) {
+                oos.writeObject(data);
+            }
 
             oos.close();
             output.close();
@@ -150,17 +229,29 @@ public class DataStructureTest {
     }
 
     private static void generateRandomData() {
+        randomData = new Data[NUM_PACKETS];
+        randomData2 = new DataMessage[NUM_PACKETS];
+
         for (int i = 0; i < randomData.length; i++) {
             randomData[i] = new Data();
             randomData[i].xy = rand.nextInt();
             randomData[i].sprite = rand.nextInt();
             randomData[i].placeDir = (byte)rand.nextInt();
             randomData[i].ids = rand.nextInt();
+
+            randomData2[i] = new DataMessage();
+            randomData2[i].xy = rand.nextInt();
+            randomData2[i].type = (byte) rand.nextInt();
+
+            //byte[] tmp = new byte[rand.nextInt(60)];
+            byte[] tmp = new byte[59];
+            rand.nextBytes(tmp);
+            randomData2[i].text = new String(tmp);
         }
     }
 
     private static void showResults() {
-        Collections.sort(results);
+        //Collections.sort(results);
         Application.launch(ResultGUI.class, "");
     }
 
@@ -173,23 +264,58 @@ public class DataStructureTest {
 
         @SuppressWarnings("unchecked")
         public Parent createContent() {
-            chart.setTitle("Data structures test - " + NUM_PACKETS + " packets");
 
-            yAxis.setLabel("Compression Method");
-            yAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList(new String[] {"NONE", "ZIP", "LZMA"})));
+            if (type == TestType.PROTOCOL) {
+                chart.setTitle("Data structures test - " + NUM_PACKETS + " packets (= " + NUM_PACKETS + " players)");
 
-            xAxis.setLabel("Size (in bytes)");
+                yAxis.setLabel("Compression Method");
+                yAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList(new String[] {"NONE", "ZIP", "LZMA"})));
 
-            for (Result res : results) {
-                XYChart.Series<Number, String> series = new XYChart.Series<Number, String>();
-                series.setName(res.name);
-                series.getData().addAll(
-                        new XYChart.Data<Number, String>(res.size, "NONE"),
-                        new XYChart.Data<Number, String>(res.sizeZip, "ZIP"),
-                        new XYChart.Data<Number, String>(res.sizeLzma, "LZMA")
-                        );
+                xAxis.setLabel("Size (in bytes)");
 
-                chart.getData().add(series);
+                for (Result res : results) {
+                    XYChart.Series<Number, String> series = new XYChart.Series<Number, String>();
+                    series.setName(res.name + " " + String.format("(%.3f sec)", res.timeTook));
+                    series.getData().addAll(
+                            new XYChart.Data<Number, String>(res.size, "NONE"),
+                            new XYChart.Data<Number, String>(res.sizeZip, "ZIP"),
+                            new XYChart.Data<Number, String>(res.sizeLzma, "LZMA")
+                            );
+
+                    series.getData().forEach(data -> {
+                        Label l = new Label(data.getXValue().toString());
+                        l.setAlignment(Pos.CENTER_RIGHT);
+                        data.setNode(l);
+                    });
+
+                    chart.getData().add(series);
+                }
+            }
+            else {
+                chart.setTitle("Data structure packet size based on number of players");
+
+                yAxis.setLabel("Number of Players");
+                yAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList(new String[] {"1", "1000", "10000"})));
+
+                xAxis.setLabel("Size (in bytes)");
+
+                for (int i = 0; i < results1.size(); i++) {
+                    XYChart.Series<Number, String> series = new XYChart.Series<Number, String>();
+                    series.setName(results1.get(i).name);
+                    series.getData().addAll(
+                            new XYChart.Data<Number, String>(results1.get(i).size, "1"),
+                            new XYChart.Data<Number, String>(results1000.get(i).size, "1000"),
+                            new XYChart.Data<Number, String>(results10000.get(i).size, "10000")
+                            );
+
+                    series.getData().forEach(data -> {
+                        Label l = new Label(data.getXValue().toString());
+                        l.setAlignment(Pos.CENTER_RIGHT);
+                        data.setNode(l);
+                    });
+
+                    chart.getData().add(series);
+                }
             }
 
             return chart;
@@ -203,13 +329,46 @@ public class DataStructureTest {
     }
 
     public static void main(String[] args) {
-        generateRandomData();
 
-        new ASNOneTest().start();
-        new ProtoBufTest().start();
-        new ByteStreamTest().start();
-        new JavaSerializationTest().start();
+        switch (type) {
+            case PROTOCOL:
+                generateRandomData();
+                new ASNOneTest().start();
+                new ProtoBufTest().start();
+                new ByteStreamTest().start();
+                new JavaSerializationTest().start();
 
-        showResults();
+                showResults();
+                break;
+            case NUM_PLAYERS:
+                NUM_PLAYERS = 1;
+                NUM_PACKETS = NUM_PLAYERS + NUM_ENEMIES;
+                generateRandomData();
+                new ASNOneTest().start();
+                new ProtoBufTest().start();
+                new ByteStreamTest().start();
+                new JavaSerializationTest().start();
+
+                NUM_PLAYERS = 1000;
+                NUM_PACKETS = NUM_PLAYERS + NUM_ENEMIES;
+                generateRandomData();
+                new ASNOneTest().start();
+                new ProtoBufTest().start();
+                new ByteStreamTest().start();
+                new JavaSerializationTest().start();
+
+                NUM_PLAYERS = 10000;
+                NUM_PACKETS = NUM_PLAYERS + NUM_ENEMIES;
+                generateRandomData();
+                new ASNOneTest().start();
+                new ProtoBufTest().start();
+                new ByteStreamTest().start();
+                new JavaSerializationTest().start();
+
+                showResults();
+                break;
+            default:
+                break;
+        }
     }
 }
