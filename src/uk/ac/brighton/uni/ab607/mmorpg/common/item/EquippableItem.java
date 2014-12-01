@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import com.almasb.common.util.Out;
 
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Rune;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Essence;
 
 public abstract class EquippableItem extends GameItem {
@@ -27,6 +27,24 @@ public abstract class EquippableItem extends GameItem {
         private ItemLevel(int bonus, int chance) {
             this.bonus = bonus;
             this.refineChanceReduction = chance;
+        }
+    }
+
+    public enum Element {
+        NEUTRAL(1.00f, 0.75f, 0.75f, 0.75f, 0.75f),
+        FIRE   (1.25f, 0.00f, 0.25f, 0.50f, 2.00f),
+        WATER  (1.25f, 2.00f, 0.00f, 0.25f, 0.50f),
+        AIR    (1.25f, 0.50f, 2.00f, 0.00f, 0.25f),
+        EARTH  (1.25f, 0.25f, 0.50f, 2.00f, 0.00f);
+
+        private float[] modifiers;
+
+        public float getDamageModifierAgainst(Element ele) {
+            return this.modifiers[ele.ordinal()];
+        }
+
+        private Element(float... modifiers) {
+            this.modifiers = modifiers;
         }
     }
 

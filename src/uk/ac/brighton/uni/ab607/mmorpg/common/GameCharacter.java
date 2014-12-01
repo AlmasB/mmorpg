@@ -20,11 +20,10 @@ import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.ObjectManager;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 
 /**
  * Essentially alive game object
@@ -36,7 +35,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
 public abstract class GameCharacter implements java.io.Serializable, Drawable, ByteStream {
     private static final long serialVersionUID = -4840633591092062960L;
 
-    public static final int BYTE_STREAM_SIZE = 17;
+    public static final int BYTE_STREAM_SIZE = 13;
 
     public static class Experience implements java.io.Serializable {
         private static final long serialVersionUID = 2762180993708324531L;
@@ -51,6 +50,14 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
             this.stat += xp.stat;
             this.job += xp.job;
         }
+    }
+
+    /**
+     * Stats of a game character
+     *
+     */
+    public enum Stat {
+        MAX_HP, MAX_SP, ATK, MATK, DEF, MDEF, ARM, MARM, ASPD, MSPD, CRIT_CHANCE, MCRIT_CHANCE, CRIT_DMG, MCRIT_DMG, HP_REGEN, SP_REGEN
     }
 
     /**
@@ -476,8 +483,10 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
      * @return
      */
     public int dealPhysicalDamage(GameCharacter target, float baseDamage, Element element) {
+        boolean crit = false;
         if (GameMath.checkChance(getTotalStat(CRIT_CHANCE))) {
             baseDamage *= getTotalStat(CRIT_DMG);
+            crit = true;
         }
 
         float elementalDamageModifier = element.getDamageModifierAgainst(target.getArmorElement());
@@ -486,6 +495,9 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
         int totalDamage = Math.max(Math.round(elementalDamageModifier * damageAfterReduction), 0);
         target.hp -= totalDamage;
 
+        // set the negative bit on to indicate crit
+        if (crit)
+            totalDamage = totalDamage | (1 << 31);
         return totalDamage;
     }
 
@@ -749,7 +761,7 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
     @Override
     public byte[] toByteArray() {
-        byte[] data = new byte[17];
+        byte[] data = new byte[BYTE_STREAM_SIZE];
 
         int xy = x << 16 | y;
 
@@ -758,11 +770,33 @@ public abstract class GameCharacter implements java.io.Serializable, Drawable, B
 
         data[8] = (byte)((place << 2 | direction.ordinal()) & 0xFF);
 
-        ByteStream.intToByteArray(data, 9, id != null ? Integer.parseInt(id) : runtimeID);
-        ByteStream.intToByteArray(data, 13, runtimeID);
+        int idValue = id != null ? Integer.parseInt(id) : runtimeID;
+
+        int ids = idValue << 16 | runtimeID;
+
+        ByteStream.intToByteArray(data, 9, ids);
 
         return data;
     }
 
     public transient Sprite sprite = new Sprite("player1.png");
+
+    // test methods
+    public void setXY(int xy) {
+        x = xy >> 16 & 0xFFFF;
+        y = xy & 0xFFFF;
+    }
+
+    public void setPlaceDir(byte b) {
+        place = (byte)(b >> 2 & 0b11);
+        direction = Dir.values()[(byte)(b & 0b11)];
+    }
+
+    public void setSpriteID(int id) {
+        spriteID = id;
+    }
+
+    public void setIDs(int ids) {
+        runtimeID = ids & 0xFFFF;
+    }
 }

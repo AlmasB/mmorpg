@@ -12,7 +12,7 @@ public class TextAnimationMessage extends AnimationMessage {
     private String text;
 
     public enum AnimationMessageType {
-        DAMAGE_TO_PLAYER, BASIC_DAMAGE_TO_ENEMY, SKILL_DAMAGE_TO_ENEMY, TEXT
+        DAMAGE_TO_PLAYER, BASIC_DAMAGE_TO_ENEMY, SKILL_DAMAGE_TO_ENEMY, TEXT, BUFF
     }
 
     public TextAnimationMessage(int x, int y, AnimationMessageType type, String text) {

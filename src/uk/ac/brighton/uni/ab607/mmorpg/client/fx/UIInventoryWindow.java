@@ -24,8 +24,6 @@ import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -38,48 +36,27 @@ public class UIInventoryWindow extends UIFragmentWindow {
     private Player player;
 
     public UIInventoryWindow(Player player) {
-
         this.player = player;
 
         try {
-
             ImageView imgLeft = new ImageView(ResourceManager.loadFXImage("inventory_left.png"));
-
-            StackPane stack = new StackPane();
-
-
-
-
-
             ImageView imgRight = new ImageView(ResourceManager.loadFXImage("inventory_right.png"));
-
-
-
-
-            //stack.getChildren().add(imgRight)
-
 
             HBox hbox = new HBox();
 
             hbox.getChildren().addAll(imgLeft, imgRight);
             root.getChildren().add(hbox);
 
-
-
-
             // ITEMS
             int index = 0;
             for (int i = 0; i < 6; i++) {
-
                 HBox box = new HBox(5);
                 box.setTranslateX(205);
                 box.setTranslateY(i*40);
 
                 for (int j = 0; j < 5; j++) {
                     ItemView itemView = new ItemView(index);
-
                     box.getChildren().add(itemView);
-
                     index++;
                 }
 

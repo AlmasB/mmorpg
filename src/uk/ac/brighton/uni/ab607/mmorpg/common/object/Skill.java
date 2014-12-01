@@ -1,6 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.object;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 
 /**
  * Skill that can be learnt/used by game characters

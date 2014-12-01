@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Sys;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.AnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ImageAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.MessageType;

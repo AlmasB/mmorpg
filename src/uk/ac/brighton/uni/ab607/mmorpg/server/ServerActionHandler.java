@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Point2D;
 import com.almasb.common.util.Out;
 
@@ -19,10 +18,9 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Skill;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ActionRequest.Action;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage.AnimationMessageType;
@@ -120,9 +118,15 @@ public class ServerActionHandler {
 
                 if (player.canAttack()) {
                     int dmg = player.attack(target);
+
+                    boolean crit = ((dmg >> 31) & 0b01) == 1;
+
+                    dmg = dmg & 0x7FFFFFFF;
+
                     target.addAttackerRuntimeID(player.getRuntimeID());
 
-                    server.addTextAnimation(new TextAnimationMessage(target.getX(), target.getY(), AnimationMessageType.BASIC_DAMAGE_TO_ENEMY, dmg+""), req.data);
+                    server.addTextAnimation(new TextAnimationMessage(target.getX(), target.getY(),
+                            AnimationMessageType.BASIC_DAMAGE_TO_ENEMY, dmg + (crit ? "!" : "")), req.data);
 
                     if (target.getHP() <= 0) {
                         // process monster's death
@@ -152,51 +156,35 @@ public class ServerActionHandler {
         }
     }
 
-    // TODO: redesign
     public void serverActionSkillUse(Player player, ActionRequest req) {
+        String[] tokens = req.data.split(",");
+
         Skill skill = player.getSkills()[req.value1];
         if (skill != null && skill.isSelfTarget()) {
             SkillUseResult result = player.useSkill(req.value1, player);
+            if (result.success) {
+                server.addTextAnimation(new TextAnimationMessage(player.getX(), player.getY(), AnimationMessageType.BUFF, result.data), tokens[0]);
+            }
             return;
         }
-
-        String[] tokens = req.data.split(",");
 
         Enemy skTarget = server.getMapByName(tokens[0]).getEnemyByXY(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
         if (skTarget != null
                 && server.distanceBetween(player, skTarget) <= ((Weapon)player.getEquip(Player.RIGHT_HAND)).range) {
             SkillUseResult result = player.useSkill(req.value1, skTarget);
-            //            if (!result.success)
-            //                return;
+            if (!result.success)
+                return;
 
-            server.addTextAnimation(new TextAnimationMessage(skTarget.getX(), skTarget.getY(), AnimationMessageType.SKILL_DAMAGE_TO_ENEMY, result.damage+""), tokens[0]);
+            server.addTextAnimation(new TextAnimationMessage(skTarget.getX(), skTarget.getY(), AnimationMessageType.SKILL_DAMAGE_TO_ENEMY, result.data), tokens[0]);
 
             skTarget.addAttackerRuntimeID(player.getRuntimeID());
-            //
-            //            if (result.animations.length > 0) {
-            //                for (Animation a : result.animations)
-            //                    server.addAnimation(a, req.data);
-            //            }
-            //            else if (result.target == Target.ENEMY) {
-            //                //skTarget.addAttackerRuntimeID(player.getRuntimeID());
-            //                //server.addAnimation(new BasicAnimation(skTarget.getX(), skTarget.getY(), 1.0f), req.data);
-            //                //server.addAnimation(new TextAnimation(player.getX(), player.getY(), result.damage + "", TextAnimationType.SKILL), req.data);
-            //            }
-            //            else if (result.target == Target.SELF) {
-            //                //server.addAnimation(new BasicAnimation(player.getX(), player.getY(), 1.0f), req.data);
-            //            }
 
             if (skTarget.getHP() <= 0) {
-
-                //Out.d("hp < 0", "true " + tokens[0]);
-
                 // process monster's death
                 ArrayList<Player> attackers = new ArrayList<Player>();
                 for (int runtimeID : skTarget.getAttackers()) {
-                    //Out.d("id", runtimeID + "");
                     Player p = server.getPlayerByRuntimeID(runtimeID, tokens[0]);
                     if (p != null) {
-                        //Out.d("attackers", "added");
                         attackers.add(p);
                     }
                 }
@@ -218,9 +206,6 @@ public class ServerActionHandler {
             server.moveObject(p, req.data, req.value1, req.value2);
         else
             serverActionAttack(p, new ActionRequest(Action.ATTACK, p.name, req.data, e.getRuntimeID()));
-
-        //RTS click animation sprite
-        //server.addAnimation(new ImageAnimation());
     }
 
     public void serverActionChangeClass(Player p, ActionRequest req) {

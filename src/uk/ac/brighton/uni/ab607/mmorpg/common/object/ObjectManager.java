@@ -4,28 +4,26 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import com.almasb.common.graphics.Color;
-
 import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute;
-import uk.ac.brighton.uni.ab607.mmorpg.common.AttributeInfo;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Attribute.AttributeInfo;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Effect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Experience;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.Player;
-import uk.ac.brighton.uni.ab607.mmorpg.common.Stat;
+import uk.ac.brighton.uni.ab607.mmorpg.common.Rune;
+import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Stat;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect;
 import uk.ac.brighton.uni.ab607.mmorpg.common.StatusEffect.Status;
-import uk.ac.brighton.uni.ab607.mmorpg.common.combat.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.DroppableItem;
+import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.Element;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.EquippableItem.ItemLevel;
 import uk.ac.brighton.uni.ab607.mmorpg.common.item.GameItem;
-import uk.ac.brighton.uni.ab607.mmorpg.common.item.Rune;
-import uk.ac.brighton.uni.ab607.mmorpg.common.math.GameMath;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Armor.ArmorType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Enemy.EnemyType;
-import uk.ac.brighton.uni.ab607.mmorpg.common.object.SkillUseResult.Target;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.Weapon.WeaponType;
 import uk.ac.brighton.uni.ab607.mmorpg.common.object.GameMap.SpawnInfo;
+import uk.ac.brighton.uni.ab607.mmorpg.common.request.SkillUseResult;
 
 public class ObjectManager {
 
@@ -138,8 +136,10 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = (1 + (15 + 5*level) / 100.0f) * caster.getTotalStat(Stat.ATK);
-                caster.dealPhysicalDamage(target, dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
                 target.addStatusEffect(new StatusEffect(Status.STUNNED, 5.0f));
+
+                useResult = new SkillUseResult(GameMath.normalizeDamage(d) + ",STUNNED");
             }
         });
 
@@ -159,7 +159,7 @@ public class ObjectManager {
                 float diff = caster.getTotalAttribute(Attribute.STRENGTH) - target.getTotalAttribute(Attribute.STRENGTH);
                 float dmg = (Math.max(diff, 0) + 10*level) * 5;
                 int d = caster.dealPhysicalDamage(target, dmg);
-                useResult = new SkillUseResult(Target.ENEMY, d);
+                useResult = new SkillUseResult(GameMath.normalizeDamage(d));
             }
         });
 
@@ -179,6 +179,8 @@ public class ObjectManager {
                 float dmg = (0.1f + 0.02f * level) * caster.getHP();
                 caster.setHP(Math.round(caster.getHP() - dmg));
                 caster.dealPureDamage(target, 2*dmg);
+
+                useResult = new SkillUseResult(2*dmg + ",PURE");
             }
         });
 
@@ -202,6 +204,8 @@ public class ObjectManager {
                 },
                 new Essence[] {}
                         ));
+
+                useResult = new SkillUseResult("STR +" + level*2 + " VIT +" + level*2);
             }
 
             @Override
@@ -229,6 +233,8 @@ public class ObjectManager {
                         new Essence(Stat.ATK, Math.round(caster.getBaseStat(Stat.ATK)))
                 }
                         ));
+
+                useResult = new SkillUseResult("ATK UP!");
             }
 
             @Override
@@ -256,6 +262,8 @@ public class ObjectManager {
                         new Essence(Stat.ARM, -2*level)
                 }
                         ));
+
+                useResult = new SkillUseResult("ARM -" + 2*level);
             }
         });
 
@@ -335,9 +343,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
                 int d = caster.dealMagicalDamage(target, dmg, Element.AIR);
-                //                useResult = new SkillUseResult(Target.ENEMY, d,
-                //                        new ImageAnimation(caster.getX(), caster.getY(), target.getX(), target.getY(), 2.5f, R.drawable.level_up),
-                //                        new TextAnimation(target.getX(), target.getY(), d + "", Color.BLUE, 2.0f));
+
+                useResult = new SkillUseResult(d);
             }
         });
 
@@ -360,6 +367,8 @@ public class ObjectManager {
                         new Essence(Stat.MATK, 10*level)
                 }
                         ));
+
+                useResult = new SkillUseResult("MATK +" + 10*level);
             }
 
             @Override
@@ -403,7 +412,9 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *25;
-                caster.dealMagicalDamage(target, dmg, Element.EARTH);
+                int d = caster.dealMagicalDamage(target, dmg, Element.EARTH);
+
+                useResult = new SkillUseResult(d);
             }
         });
 
@@ -421,7 +432,9 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
-                caster.dealMagicalDamage(target, dmg, Element.FIRE);
+                int d = caster.dealMagicalDamage(target, dmg, Element.FIRE);
+
+                useResult = new SkillUseResult(d);
             }
         });
 
@@ -439,7 +452,9 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) + level *20;
-                caster.dealMagicalDamage(target, dmg, Element.WATER);
+                int d = caster.dealMagicalDamage(target, dmg, Element.WATER);
+
+                useResult = new SkillUseResult(d);
             }
         });
 
@@ -485,6 +500,8 @@ public class ObjectManager {
                         new Essence(Stat.ARM, 5*level)
                 }
                         ));
+
+                useResult = new SkillUseResult("ARM +" + 5*level);
             }
 
             @Override
@@ -509,6 +526,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) * (1 + level*0.1f);
                 caster.dealPureDamage(target, dmg);
+
+                useResult = new SkillUseResult(dmg + ",PURE");
             }
         });
 
@@ -529,8 +548,10 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.ATK) + 15 + 5 * level;
                 caster.addBonusStat(Stat.CRIT_CHANCE, 50 + level * 3);
-                caster.dealPhysicalDamage(target, dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
                 caster.addBonusStat(Stat.CRIT_CHANCE, -(50 + level * 3));
+
+                useResult = new SkillUseResult(GameMath.normalizeDamage(d));
             }
         });
 
@@ -553,6 +574,8 @@ public class ObjectManager {
                         new Essence(Stat.ARM, -2*level)
                 }
                         ));
+
+                useResult = new SkillUseResult("ARM -" + 2*level);
             }
         });
 
@@ -576,10 +599,9 @@ public class ObjectManager {
                     target.addStatusEffect(new StatusEffect(Status.STUNNED, 2.5f));
                     stun = true;
                 }
-                /*useResult = new SkillUseResult(Target.ENEMY, 0,
-                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, stun ? "STUNNED!" : "x2", TextAnimationType.FADE));*/
+
+                useResult = new SkillUseResult(GameMath.normalizeDamage(dmg1) + "," + GameMath.normalizeDamage(dmg2)
+                        + (stun ? ",STUNNED" : ",X2"));
             }
         });
 
@@ -626,7 +648,8 @@ public class ObjectManager {
                     dmg += level * 0.1f * (casterHPFactor - targetHPFactor) * dmg;
                 }
 
-                caster.dealPhysicalDamage(target, dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
+                useResult = new SkillUseResult(GameMath.normalizeDamage(d));
             }
         });
 
@@ -664,10 +687,14 @@ public class ObjectManager {
 
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
-                caster.attack(target);
+                int dmg = caster.attack(target);
+                boolean poison = false;
                 if (GameMath.checkChance(level*7)) {
                     target.addStatusEffect(new StatusEffect(Status.POISONED, 10.0f));
+                    poison = true;
                 }
+
+                useResult = new SkillUseResult(GameMath.normalizeDamage(dmg) + (poison ? ",POISONED" : ""));
             }
         });
 
@@ -685,10 +712,14 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.ATK) + level * 2 * GameMath.random(5);
-                caster.dealPhysicalDamage(target, dmg);
+                int d = GameMath.normalizeDamage(caster.dealPhysicalDamage(target, dmg));
+                boolean money = false;
                 if (caster instanceof Player) {
-                    ((Player)caster).incMoney((int)dmg);
+                    ((Player)caster).incMoney(d);
+                    money = true;
                 }
+
+                useResult = new SkillUseResult(d + (money ? ",MONEY" : ""));
             }
         });
 
@@ -710,19 +741,13 @@ public class ObjectManager {
                     dmg += level * 15;
                 }
 
-                int dmg1 = caster.dealPhysicalDamage(target, dmg);
-                int dmg2 = caster.dealPhysicalDamage(target, dmg);
-                int dmg3 = caster.dealPhysicalDamage(target, dmg);
+                int dmg1 = GameMath.normalizeDamage(caster.dealPhysicalDamage(target, dmg));
+                int dmg2 = GameMath.normalizeDamage(caster.dealPhysicalDamage(target, dmg));
+                int dmg3 = GameMath.normalizeDamage(caster.dealPhysicalDamage(target, dmg));
 
-                /*useResult = new SkillUseResult(Target.ENEMY, 0,
-                        new TextAnimation(target.getX(), target.getY(), dmg1 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX() + 20, target.getY()+20, dmg2 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX() + 40, target.getY()+40, dmg3 + "", TextAnimationType.DAMAGE_PLAYER),
-                        new TextAnimation(target.getX(), target.getY()+40, "x3", TextAnimationType.FADE));*/
+                useResult = new SkillUseResult(dmg1 + "," + dmg2 + "," + dmg3 + ",X3");
             }
         });
-
-        // NEWLY ADDED SKILLS
 
         addSkill(new Skill(ID.Skill.Crusader.HOLY_LIGHT, "Holy Light", Desc.Skill.Crusader.HOLY_LIGHT, true, 20.0f) {
             /**
@@ -742,6 +767,8 @@ public class ObjectManager {
                         new Rune(Attribute.VITALITY, level*2)
                 },
                 new Essence[] {}));
+
+                useResult = new SkillUseResult("VIT +" + level*2);
             }
         });
 
@@ -760,6 +787,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.ATK) + (caster.getTotalAttribute(Attribute.STRENGTH) / 10) * level;
                 caster.dealPureDamage(target, dmg);
+
+                useResult = new SkillUseResult((int)dmg);
             }
         });
 
@@ -815,6 +844,8 @@ public class ObjectManager {
                         new Essence(Stat.DEF, 2*level),
                         new Essence(Stat.HP_REGEN, 2*level)
                 }));
+
+                useResult = new SkillUseResult("DEF +" + level*2 + ", HP REGEN +" + 2*level);
             }
 
             @Override
@@ -837,8 +868,10 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) * (1.0f + level*0.15f);
-                caster.dealMagicalDamage(target, dmg, Element.FIRE);
-                caster.dealMagicalDamage(target, dmg, Element.AIR);
+                int dmg1 = caster.dealMagicalDamage(target, dmg, Element.FIRE);
+                int dmg2 = caster.dealMagicalDamage(target, dmg, Element.AIR);
+
+                useResult = new SkillUseResult(dmg1 + "," + dmg2);
             }
         });
 
@@ -856,8 +889,10 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = caster.getTotalStat(Stat.MATK) * (1.0f + level*0.15f);
-                caster.dealMagicalDamage(target, dmg, Element.WATER);
-                caster.dealMagicalDamage(target, dmg, Element.EARTH);
+                int dmg1 = caster.dealMagicalDamage(target, dmg, Element.WATER);
+                int dmg2 = caster.dealMagicalDamage(target, dmg, Element.EARTH);
+
+                useResult = new SkillUseResult(dmg1 + "," + dmg2);
             }
         });
 
@@ -876,7 +911,9 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 int oldSP = target.getSP();
                 target.setSP(Math.max(oldSP - 50 * level, 0));
-                caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
+                int dmg = caster.dealMagicalDamage(target, oldSP-target.getSP(), Element.NEUTRAL);
+
+                useResult = new SkillUseResult(dmg);
             }
         });
 
@@ -894,6 +931,8 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 target.addStatusEffect(new StatusEffect(Status.SILENCED, level*3));
+
+                useResult = new SkillUseResult("SILENCED");
             }
         });
 
@@ -928,7 +967,9 @@ public class ObjectManager {
             @Override
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = 20 + level*30 - target.getTotalStat(Stat.ARM);
-                caster.dealPhysicalDamage(target, dmg);
+                int d = caster.dealPhysicalDamage(target, dmg);
+
+                useResult = new SkillUseResult(GameMath.normalizeDamage(d));
             }
         });
 
@@ -947,6 +988,8 @@ public class ObjectManager {
             public void useImpl(GameCharacter caster, GameCharacter target) {
                 float dmg = 100 + 0.2f*level * caster.getTotalAttribute(Attribute.DEXTERITY) - target.getTotalStat(GameCharacter.DEF);
                 caster.dealPureDamage(target, dmg);
+
+                useResult = new SkillUseResult(dmg + ",PURE");
             }
         });
 
@@ -986,6 +1029,8 @@ public class ObjectManager {
             protected void useImpl(GameCharacter caster, GameCharacter target) {
                 float duration = target.getTotalStat(Stat.ARM) * 0.1f;
                 target.addStatusEffect(new StatusEffect(Status.STUNNED, duration));
+
+                useResult = new SkillUseResult("STUNNED");
             }
         });
 
@@ -1006,6 +1051,8 @@ public class ObjectManager {
                         new Essence[] {
                         new Essence(Stat.ASPD, level*2)
                 }));
+
+                useResult = new SkillUseResult("ASPD +" + level*2);
             }
 
             @Override
@@ -1019,15 +1066,15 @@ public class ObjectManager {
 
         addEnemy(new Enemy(ID.Enemy.MINOR_FIRE_SPIRIT, "Minor Fire Spirit", Desc.Enemy.MINOR_FIRE_SPIRIT,
                 EnemyType.NORMAL, Element.FIRE, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.KNIFE, 50)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.KNIFE, 50), new DroppableItem(ID.Armor.THANATOS_BODY_ARMOR, 10)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_EARTH_SPIRIT, "Minor Earth Spirit", Desc.Enemy.MINOR_EARTH_SPIRIT,
                 EnemyType.NORMAL, Element.EARTH, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.IRON_SWORD, 15)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Weapon.IRON_SWORD, 15), new DroppableItem(ID.Armor.SAPPHIRE_LEGION_PLATE_MAIL, 5)));
 
         addEnemy(new Enemy(ID.Enemy.MINOR_WATER_SPIRIT, "Minor Water Spirit", Desc.Enemy.MINOR_WATER_SPIRIT,
                 EnemyType.NORMAL, Element.WATER, 1, new AttributeInfo(),
-                new Experience(100, 100, 100), 0, new DroppableItem(ID.Armor.CHAINMAL, 25)));
+                new Experience(100, 100, 100), 0, new DroppableItem(ID.Armor.CHAINMAL, 25), new DroppableItem(ID.Weapon.SOUL_REAPER, 5)));
 
 
         // ESSENCES
@@ -1037,9 +1084,9 @@ public class ObjectManager {
         // MAPS
 
         addMap(new GameMap("map1.txt", 0,
-                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 4),
-                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 2),
-                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 3)));
+                new SpawnInfo(ID.Enemy.MINOR_EARTH_SPIRIT, 5),
+                new SpawnInfo(ID.Enemy.MINOR_FIRE_SPIRIT, 5),
+                new SpawnInfo(ID.Enemy.MINOR_WATER_SPIRIT, 5)));
     }
 
     private static void addArmor(Armor armor) {

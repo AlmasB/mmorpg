@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -442,17 +444,17 @@ public class GameWindow extends FXWindow {
                         int size = packet.byteData.length / GameCharacter.BYTE_STREAM_SIZE;
                         for (int i = 0; i < size; i++) {
                             byte[] data = new byte[9];
-                            byte[] name = new byte[4];
-                            byte[] id = new byte[4];
+                            byte[] idData = new byte[4];
 
 
                             try {
                                 in.read(data);
-                                in.read(name);
-                                in.read(id);
+                                in.read(idData);
 
-                                int runtimeID = ByteStream.byteArrayToInt(id, 0);
-                                int idValue = ByteStream.byteArrayToInt(name, 0);
+                                int ids = ByteStream.byteArrayToInt(idData, 0);
+
+                                int idValue = ByteStream.decodeA16(ids);
+                                int runtimeID = ByteStream.decodeB16(ids);
 
                                 String playerName = "";
                                 if (ObjectManager.getEnemyByID(idValue + "") != null) {
@@ -466,10 +468,6 @@ public class GameWindow extends FXWindow {
                                     //playerName = "UNDEFINED";
                                     continue;
                                 }
-
-                                //String playerName = new String(name).replace(new String(new byte[] {0}), "");
-
-                                //Out.d("runtimeID", runtimeID + " " + playerName);
 
                                 // search list of players for name
                                 // if found update their data
@@ -505,23 +503,9 @@ public class GameWindow extends FXWindow {
                         // END FOR
 
                         playerSprites.getChildren().removeIf(node -> {
-
-                            //Out.d("fx", "update");
-
                             Sprite s = (Sprite)node;
                             return !s.isValid();
                         });
-
-
-                        /*                    Platform.runLater(() -> {
-                        playerSprites.getChildren().removeIf(node -> {
-
-                            //Out.d("fx", "update");
-
-                            Sprite s = (Sprite)node;
-                            return !s.isValid();
-                        });
-                    });*/
 
                         playersList.removeIf(player -> !player.sprite.isValid());
                     });
@@ -557,6 +541,10 @@ public class GameWindow extends FXWindow {
                                 case TEXT:
                                     // TODO:
                                     Out.d("text", msg.getText());
+                                    break;
+                                case BUFF:
+                                    // TODO:
+                                    Out.d("buff", msg.getText());
                                     break;
                                 default:
                                     Out.d("unknown type of text animation", msg.getText());
