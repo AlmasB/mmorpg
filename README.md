@@ -9,8 +9,8 @@ email: a.baimagambetov1@uni.brighton.ac.uk
 
 ## Compile, Run ##
 
-New builds (0.1.3+) require one of my private libraries which isn't ready for release yet
-It will be available soon
+mvn package
+mvn exec:java
 
 ## Github Page ##
 
