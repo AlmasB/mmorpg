@@ -15,7 +15,7 @@ import javafx.scene.shape.Rectangle;
 import com.almasb.common.graphics.Color;
 import com.almasb.common.graphics.Drawable;
 import com.almasb.common.graphics.GraphicsContext;
-import com.almasb.common.util.ByteStream;
+import com.almasb.java.util.ByteStream;
 import com.almasb.common.util.Out;
 
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;

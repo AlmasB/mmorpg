@@ -2,7 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.common.request;
 
 import java.util.Arrays;
 
-import com.almasb.common.util.ByteStream;
+import com.almasb.java.util.ByteStream;
 
 public class TextAnimationMessage extends AnimationMessage {
 

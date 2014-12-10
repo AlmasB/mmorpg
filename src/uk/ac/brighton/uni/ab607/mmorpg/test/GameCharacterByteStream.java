@@ -5,7 +5,7 @@ import javafx.geometry.Rectangle2D;
 import uk.ac.brighton.uni.ab607.mmorpg.client.fx.Sprite;
 import uk.ac.brighton.uni.ab607.mmorpg.common.GameCharacter.Dir;
 
-import com.almasb.common.util.ByteStream;
+import com.almasb.java.util.ByteStream;
 
 public class GameCharacterByteStream implements ByteStream {
 
