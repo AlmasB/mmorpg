@@ -7,6 +7,7 @@ import com.almasb.common.test.Test;
 public abstract class OrionTestBase extends Test {
 
     public abstract Parent getResultsContent();
+    public abstract Parent getTestControls();
 
     @Override
     public String toString() {

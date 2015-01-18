@@ -35,7 +35,7 @@ import com.almasb.common.test.Test;
 import com.almasb.common.util.Out;
 import com.almasb.common.util.ZIPCompressor;
 
-public class DataStructureTest {
+public class DataStructureTestOld {
 
     enum TestType {
         PROTOCOL, NUM_PLAYERS

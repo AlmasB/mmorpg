@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.paint.Color?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" prefWidth="800" prefHeight="600">
+<VBox prefWidth="800" prefHeight="600" xmlns:fx="http://javafx.com/fxml">
     <fx:define>
     </fx:define>
 
@@ -27,19 +27,19 @@
     </MenuBar>
 
     <HBox>
-        <VBox prefWidth="200" prefHeight="600" alignment="top_center" spacing="20">
+        <VBox alignment="top_center" spacing="20">
             <Label text="Select Test" />
             <ChoiceBox fx:id="cbTests" />
             <Button fx:id="btnStart" text="Start" onAction="#onButtonPress" />
             <Label fx:id="labelMessage" />
         </VBox>
     
-        <Pane prefWidth="600" prefHeight="600">
+        <StackPane alignment="center">
             <Pane fx:id="resultsRoot">
             
             </Pane>
-            <ProgressIndicator fx:id="progressIndicator" />
-        </Pane>
+            <ProgressIndicator fx:id="progressIndicator" visible="false" />
+        </StackPane>
     </HBox>
     
 </VBox>

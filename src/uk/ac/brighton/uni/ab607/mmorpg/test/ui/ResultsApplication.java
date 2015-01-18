@@ -1,7 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.test.ui;
 
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
-import uk.ac.brighton.uni.ab607.mmorpg.test.SimpleTest;
+import uk.ac.brighton.uni.ab607.mmorpg.test.ProtocolSizeTest;
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -35,11 +35,17 @@ public class ResultsApplication extends Application {
         OrionTestBase test = cbTests.getValue();
         TestTask task = new TestTask(test);
         task.valueProperty().addListener((obs, oldValue, newValue) -> {
-            resultsRoot.getChildren().clear();
-            resultsRoot.getChildren().add(newValue);
+            if (newValue != null) {
+                Stage stage = new Stage();
+                stage.setTitle(test.toString());
+                Scene scene = new Scene(newValue);
+                stage.setScene(scene);
+                stage.show();
+            }
         });
         labelMessage.textProperty().bind(task.messageProperty());
         progressIndicator.progressProperty().bind(task.progressProperty());
+        progressIndicator.visibleProperty().bind(task.runningProperty());
 
         Thread bgThread = new Thread(task);
         bgThread.setDaemon(true);
@@ -72,7 +78,11 @@ public class ResultsApplication extends Application {
         loader.setController(this);
         Parent root = (Parent) loader.load();
 
-        cbTests.getItems().addAll(new SimpleTest());
+        cbTests.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
+            resultsRoot.getChildren().clear();
+            resultsRoot.getChildren().add(newValue.getTestControls());
+        });
+        cbTests.getItems().addAll(new ProtocolSizeTest());
         cbTests.getSelectionModel().selectFirst();
 
         primaryStage.setScene(new Scene(root));
