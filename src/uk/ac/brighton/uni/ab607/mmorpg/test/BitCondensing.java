@@ -1,6 +1,7 @@
 package uk.ac.brighton.uni.ab607.mmorpg.test;
 
-import com.almasb.common.test.Test;
+import org.junit.* ;
+import static org.junit.Assert.* ;
 
 /**
  * Proves that the last 4 bits of a byte can hold two values
@@ -16,10 +17,9 @@ import com.almasb.common.test.Test;
  * @version 1.0
  *
  */
-public class BitManipulationTest extends Test {
-
-    @Override
-    protected void run() {
+public class BitCondensing {
+    @Test
+    public void test() {
         // test byte
         for (byte i = 0; i < 4; i++) {
             for (byte j = 0; j < 4; j++) {
@@ -27,8 +27,8 @@ public class BitManipulationTest extends Test {
                 // because shifting is done on ints
                 byte b = (byte)((i << 2 | j) & 0xFF);
 
-                if (decodeA(b) != i || decodeB(b) != j)
-                    fail();
+                assertTrue(decodeA(b) == i);
+                assertTrue(decodeB(b) == j);
             }
         }
 
@@ -37,8 +37,8 @@ public class BitManipulationTest extends Test {
             for (int j = 0; j < 65536; j++) {
                 int enc = i << 16 | j;
 
-                if (decodeA(enc) != i || decodeB(enc) != j)
-                    fail();
+                assertTrue(decodeA(enc) == i);
+                assertTrue(decodeB(enc) == j);
             }
         }
     }
@@ -57,9 +57,5 @@ public class BitManipulationTest extends Test {
 
     private int decodeB(int i) {
         return i & 0xFFFF;
-    }
-
-    public static void main(String[] args) {
-        new BitManipulationTest().start();
     }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.paint.Color?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" prefWidth="800" prefHeight="600">
+    <fx:define>
+    </fx:define>
+
+    <MenuBar fx:id="menuBar">
+        <menus>
+            <Menu text="File">
+                <items>
+                    <MenuItem text="Exit"/>
+                </items>
+            </Menu>
+            <Menu text="Help">
+                <items>
+                    <MenuItem text="About"/>
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+
+    <HBox>
+        <VBox prefWidth="200" prefHeight="600" alignment="top_center" spacing="20">
+            <Label text="Select Test" />
+            <ChoiceBox fx:id="cbTests" />
+            <Button fx:id="btnStart" text="Start" onAction="#onButtonPress" />
+            <Label fx:id="labelMessage" />
+        </VBox>
+    
+        <Pane prefWidth="600" prefHeight="600">
+            <Pane fx:id="resultsRoot">
+            
+            </Pane>
+            <ProgressIndicator fx:id="progressIndicator" />
+        </Pane>
+    </HBox>
+    
+</VBox>
