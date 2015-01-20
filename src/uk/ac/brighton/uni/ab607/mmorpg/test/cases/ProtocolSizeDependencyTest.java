@@ -9,12 +9,15 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
 import uk.ac.brighton.uni.ab607.mmorpg.test.Result;
 
 public class ProtocolSizeDependencyTest extends OrionTestBase {
 
     private ArrayList<Result> results = new ArrayList<Result>();
+    int j = 0;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -27,12 +30,24 @@ public class ProtocolSizeDependencyTest extends OrionTestBase {
         ObservableList<XYChart.Series<Double, Double> > lineChartData = FXCollections.observableArrayList();
         for (int i = 0; i < 4; i++) {
             lineChartData.add(new LineChart.Series<Double, Double>(results.get(i).name, FXCollections.observableArrayList(
-                    new XYChart.Data<>(1.0, results.get(i).size),
-                    new XYChart.Data<>(10000.0, results.get(i+4).size),
-                    new XYChart.Data<>(30000.0, results.get(i+8).size),
-                    new XYChart.Data<>(50000.0, results.get(i+12).size),
-                    new XYChart.Data<>(90000.0, results.get(i+16).size)
+                    new XYChart.Data<>(1.0, results.get(i).size * 1.0),
+                    new XYChart.Data<>(10000.0, results.get(i+4).size * 1.0),
+                    new XYChart.Data<>(30000.0, results.get(i+8).size * 1.0),
+                    new XYChart.Data<>(50000.0, results.get(i+12).size * 1.0),
+                    new XYChart.Data<>(90000.0, results.get(i+16).size * 1.0)
                     )));
+        }
+
+
+        for (XYChart.Series<Double, Double> series : lineChartData) {
+            j = 0;
+            series.getData().forEach(data -> {
+                String text = String.format("+%.0f%s", (data.getYValue() / (results.get(j*4).size) * 100) - 100, "%");
+                Text node = new Text(text + " larger");
+                node.setFont(Font.font(20));
+                data.setNode(node);
+                j++;
+            });
         }
 
         chart = new LineChart(xAxis, yAxis, lineChartData);
