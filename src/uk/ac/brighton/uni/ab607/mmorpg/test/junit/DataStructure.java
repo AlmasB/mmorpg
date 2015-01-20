@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.test;
+package uk.ac.brighton.uni.ab607.mmorpg.test.junit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

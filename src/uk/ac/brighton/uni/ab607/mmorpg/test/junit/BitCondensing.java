@@ -1,4 +1,4 @@
-package uk.ac.brighton.uni.ab607.mmorpg.test;
+package uk.ac.brighton.uni.ab607.mmorpg.test.junit;
 
 import org.junit.* ;
 import static org.junit.Assert.* ;

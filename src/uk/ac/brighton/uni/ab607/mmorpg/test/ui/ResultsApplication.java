@@ -1,7 +1,8 @@
 package uk.ac.brighton.uni.ab607.mmorpg.test.ui;
 
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
-import uk.ac.brighton.uni.ab607.mmorpg.test.ProtocolSizeTest;
+import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeDependencyTest;
+import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeTest;
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -29,9 +30,11 @@ public class ResultsApplication extends Application {
     private ChoiceBox<OrionTestBase> cbTests;
 
     @FXML
-    private Pane resultsRoot;
+    private Pane testControlsPane;
 
     public void onButtonPress(ActionEvent event) {
+        progressIndicator.setVisible(true);
+
         OrionTestBase test = cbTests.getValue();
         TestTask task = new TestTask(test);
         task.valueProperty().addListener((obs, oldValue, newValue) -> {
@@ -45,7 +48,6 @@ public class ResultsApplication extends Application {
         });
         labelMessage.textProperty().bind(task.messageProperty());
         progressIndicator.progressProperty().bind(task.progressProperty());
-        progressIndicator.visibleProperty().bind(task.runningProperty());
 
         Thread bgThread = new Thread(task);
         bgThread.setDaemon(true);
@@ -61,8 +63,10 @@ public class ResultsApplication extends Application {
 
         @Override
         protected Parent call() throws Exception {
+            updateMessage("Test started");
             test.start();
             updateMessage(String.format("finished in %.5f seconds", test.getTimeTookSeconds()));
+            this.updateProgress(1, 1);
             return test.getResultsContent();
         }
     }
@@ -79,10 +83,11 @@ public class ResultsApplication extends Application {
         Parent root = (Parent) loader.load();
 
         cbTests.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
-            resultsRoot.getChildren().clear();
-            resultsRoot.getChildren().add(newValue.getTestControls());
+            testControlsPane.getChildren().clear();
+            testControlsPane.getChildren().add(newValue.getTestControls());
         });
-        cbTests.getItems().addAll(new ProtocolSizeTest());
+        cbTests.getItems().addAll(new ProtocolSizeTest(),
+                new ProtocolSizeDependencyTest());
         cbTests.getSelectionModel().selectFirst();
 
         primaryStage.setScene(new Scene(root));

@@ -26,20 +26,25 @@
         </menus>
     </MenuBar>
 
-    <HBox>
+    <HBox spacing="50">
+        <padding>
+            <Insets top="0" right="0" left="50" bottom="0" />
+        </padding>
+    
         <VBox alignment="top_center" spacing="20">
             <Label text="Select Test" />
             <ChoiceBox fx:id="cbTests" />
-            <Button fx:id="btnStart" text="Start" onAction="#onButtonPress" />
+            <HBox alignment="center" spacing="10">
+                <Button fx:id="btnStart" text="Start" onAction="#onButtonPress" />
+                <ProgressIndicator fx:id="progressIndicator" visible="false" />
+            </HBox>
             <Label fx:id="labelMessage" />
         </VBox>
     
-        <StackPane alignment="center">
-            <Pane fx:id="resultsRoot">
-            
-            </Pane>
-            <ProgressIndicator fx:id="progressIndicator" visible="false" />
-        </StackPane>
+        <VBox alignment="top_center" spacing="20">
+            <Label text="Test Controls" />
+            <Pane fx:id="testControlsPane" />
+        </VBox>
     </HBox>
     
 </VBox>
