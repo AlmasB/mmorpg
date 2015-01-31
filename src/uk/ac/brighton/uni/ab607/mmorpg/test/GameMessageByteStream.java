@@ -1,28 +1,17 @@
-package uk.ac.brighton.uni.ab607.mmorpg.common.request;
+package uk.ac.brighton.uni.ab607.mmorpg.test;
 
 import java.util.Arrays;
 
 import com.almasb.java.util.ByteStream;
 
-public class TextAnimationMessage extends AnimationMessage {
+public class GameMessageByteStream implements ByteStream {
 
-    public static final int BYTE_STREAM_SIZE = 64;
-
+    private int x, y;
     private AnimationMessageType type;
     private String text;
 
     public enum AnimationMessageType {
         DAMAGE_TO_PLAYER, BASIC_DAMAGE_TO_ENEMY, SKILL_DAMAGE_TO_ENEMY, TEXT, BUFF
-    }
-
-    public TextAnimationMessage(int x, int y, AnimationMessageType type, String text) {
-        super(x, y);
-        this.type = type;
-        this.text = text;
-    }
-
-    public TextAnimationMessage() {
-        this(0, 0, AnimationMessageType.TEXT, "");
     }
 
     @Override
@@ -52,14 +41,6 @@ public class TextAnimationMessage extends AnimationMessage {
         }
 
         return data;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public AnimationMessageType getType() {
-        return type;
     }
 
     public void setXY(int xy) {

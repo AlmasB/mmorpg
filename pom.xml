@@ -2,74 +2,73 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Orion</groupId>
   <artifactId>Orion</artifactId>
-  <version>0.4dev</version>
+  <version>0.5dev</version>
   <name>Orion</name>
   <description>Fantasy MMORPG</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
-            <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
+    <plugins>
+       <plugin>
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>3.1</version>
+           <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+           </configuration>
+       </plugin>
 
-            <!-- create jar with unpacked dependencies -->
+        <!-- create jar with unpacked dependencies -->
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
 
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>${project.artifactId}</finalName>
-                </configuration>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <finalName>${project.artifactId}</finalName>
+            </configuration>
 
-                <executions>
-                    <execution>
-                        <id>make-executable-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <executions>
+                <execution>
+                    <id>make-executable-jar</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
 
 
-            <!-- make mvn exec:java the run command -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>java</executable>
-                    <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
-                </configuration>
-            </plugin>
+        <!-- make mvn exec:java the run command -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>java</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <executable>java</executable>
+                <mainClass>uk.ac.brighton.uni.ab607.mmorpg.client.ClientMain</mainClass>
+            </configuration>
+        </plugin>
 
-        </plugins>
-    
-    
-      
-    
+    </plugins>
+
+    <!-- add resources folder into the build -->    
+
     <resources>
       <resource>
         <directory>res/</directory>
@@ -80,28 +79,33 @@
   </build>
   
   <dependencies>
-  
-              <dependency>
-            <groupId>com.almasb</groupId>
-            <artifactId>almasb-lib</artifactId>
-            <version>1.1.5</version>
-        </dependency>
+    <!--<dependency>
+	    <groupId>com.almasb</groupId>
+	    <artifactId>almasb-lib</artifactId>
+	    <version>1.1.5</version>
+    </dependency>-->
   
     <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
         <version>2.6.1</version>
     </dependency>
-   </dependencies>
+    <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.12</version>
+	</dependency>
+  </dependencies>
    
-       <!-- add local repo -->
+   
+  <!-- add local repo -->
 
-    <repositories>
-        <repository>
-            <id>myrepo</id>
-            <url>file://${basedir}/lib</url>
-        </repository>
-    </repositories>
+  <repositories>
+      <repository>
+          <id>myrepo</id>
+          <url>file://${basedir}/lib</url>
+      </repository>
+  </repositories>
   
   <scm>
   	<url>https://github.com/AlmasB/mmorpg</url>

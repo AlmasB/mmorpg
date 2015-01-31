@@ -1,6 +1,6 @@
 package uk.ac.brighton.uni.ab607.mmorpg.common.request;
 
-import com.almasb.common.util.ByteStream;
+import com.almasb.java.util.ByteStream;
 
 public abstract class AnimationMessage implements ByteStream {
 

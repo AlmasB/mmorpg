@@ -48,7 +48,7 @@ import uk.ac.brighton.uni.ab607.mmorpg.common.request.TextAnimationMessage;
 import com.almasb.common.net.DataPacket;
 import com.almasb.common.net.ServerPacketParser;
 import com.almasb.common.net.UDPClient;
-import com.almasb.common.util.ByteStream;
+import com.almasb.java.util.ByteStream;
 import com.almasb.common.util.Out;
 import com.almasb.java.ui.FXWindow;
 

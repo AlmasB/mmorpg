@@ -9,8 +9,19 @@ email: a.baimagambetov1@uni.brighton.ac.uk
 
 ## Compile, Run ##
 
-mvn package
-mvn exec:java
+Required:
+- Oracle JDK 1.8+
+
+other dependencies will be handled by maven
+
+Commands:
+
+(in project root)
+
+```bash
+$ mvn package
+$ mvn exec:java
+```
 
 ## Github Page ##
 
