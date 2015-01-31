@@ -42,7 +42,7 @@ public class DataStructureTestOld {
     }
 
     // default test to run
-    private static TestType type = TestType.NUM_PLAYERS;
+    private static TestType type = TestType.PROTOCOL;
 
     private static final int NUM_ENEMIES = 100;
     private static int NUM_PLAYERS = 10000;
@@ -243,8 +243,8 @@ public class DataStructureTestOld {
             randomData2[i].xy = rand.nextInt();
             randomData2[i].type = (byte) rand.nextInt();
 
-            //byte[] tmp = new byte[rand.nextInt(60)];
-            byte[] tmp = new byte[59];
+            byte[] tmp = new byte[rand.nextInt(60)];
+            //byte[] tmp = new byte[59];
             rand.nextBytes(tmp);
             randomData2[i].text = new String(tmp);
         }

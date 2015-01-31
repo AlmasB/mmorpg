@@ -1,8 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.test.ui;
 
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
+import uk.ac.brighton.uni.ab607.mmorpg.test.cases.BitPatternTest;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeDependencyTest;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeTest;
+import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSpeedTest;
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -87,7 +89,9 @@ public class ResultsApplication extends Application {
             testControlsPane.getChildren().add(newValue.getTestControls());
         });
         cbTests.getItems().addAll(new ProtocolSizeTest(),
-                new ProtocolSizeDependencyTest());
+                new ProtocolSizeDependencyTest(),
+                new BitPatternTest(),
+                new ProtocolSpeedTest());
         cbTests.getSelectionModel().selectFirst();
 
         primaryStage.setScene(new Scene(root));
