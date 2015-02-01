@@ -20,3 +20,6 @@ hs_err_pid*
 
 # Game Account DB #
 /res/db/accounts.db
+
+# logs #
+log.txt
