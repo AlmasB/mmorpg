@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import uk.ac.brighton.uni.ab607.mmorpg.test.GameCharacterProtoBuf.GameCharProtoBuf;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.AsnInputStream;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.AsnOutputStream;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.Tag;
@@ -78,6 +79,41 @@ public class DataStructure {
         recreated.ids = (int) in.readInteger();
 
         in.close();
+
+        assertEquals("Original and new object are different", data, recreated);
+    }
+
+    @Test
+    public void testProtoBuf() throws Exception {
+        DataCharacter data = new DataCharacter();
+        data.ids = 800244432;
+        data.placeDir = 122;
+        data.sprite = 912000;
+        data.xy = 34530;
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        GameCharProtoBuf.Builder playerBuilder = GameCharProtoBuf.newBuilder();
+        playerBuilder.setXy(data.xy);
+        playerBuilder.setSpriteID(data.sprite);
+        playerBuilder.setPlacedir(data.placeDir);
+        playerBuilder.setIds(data.ids);
+
+        GameCharProtoBuf player = playerBuilder.build();
+        output.write(player.toByteArray());
+
+
+
+        GameCharProtoBuf.Builder playerBuilder2 = GameCharProtoBuf.newBuilder();
+        playerBuilder2.mergeFrom(output.toByteArray());
+
+        GameCharProtoBuf player2 = playerBuilder2.build();
+
+        DataCharacter recreated = new DataCharacter();
+        recreated.xy = player2.getXy();
+        recreated.placeDir = (byte) player2.getPlacedir();
+        recreated.sprite = player2.getSpriteID();
+        recreated.ids = player2.getIds();
 
         assertEquals("Original and new object are different", data, recreated);
     }

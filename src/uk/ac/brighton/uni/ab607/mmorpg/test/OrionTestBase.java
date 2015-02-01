@@ -1,9 +1,12 @@
 package uk.ac.brighton.uni.ab607.mmorpg.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Random;
 
+import javafx.scene.Parent;
 import uk.ac.brighton.uni.ab607.mmorpg.test.GameCharacterProtoBuf.GameCharProtoBuf;
 import uk.ac.brighton.uni.ab607.mmorpg.test.GameMessageProtoBuf.MessageProtoBuf;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.AsnInputStream;
@@ -11,7 +14,6 @@ import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.AsnOutputStream;
 import uk.ac.brighton.uni.ab607.mmorpg.test.asn1.Tag;
 import uk.ac.brighton.uni.ab607.mmorpg.test.data.DataCharacter;
 import uk.ac.brighton.uni.ab607.mmorpg.test.data.DataMessage;
-import javafx.scene.Parent;
 
 import com.almasb.common.test.Test;
 
@@ -60,6 +62,9 @@ public abstract class OrionTestBase extends Test {
 
             GameCharProtoBuf player = playerBuilder.build();
             output.write(player.toByteArray());
+
+            GameCharProtoBuf.Builder playerBuilder2 = GameCharProtoBuf.newBuilder();
+            playerBuilder2.mergeFrom(player.toByteArray());
         }
 
         for (DataMessage data : randomData2) {
@@ -70,6 +75,9 @@ public abstract class OrionTestBase extends Test {
 
             MessageProtoBuf message = messageBuilder.build();
             output.write(message.toByteArray());
+
+            MessageProtoBuf.Builder messageBuilder2 = MessageProtoBuf.newBuilder();
+            messageBuilder2.mergeFrom(message.toByteArray());
         }
 
         return output.toByteArray().length;
@@ -157,6 +165,15 @@ public abstract class OrionTestBase extends Test {
         }
 
         oos.close();
+
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(output.toByteArray()));
+        for (DataCharacter data : randomData) {
+            ois.readObject();
+        }
+        for (DataMessage data : randomData2) {
+            ois.readObject();
+        }
+
         return output.toByteArray().length;
     }
 
