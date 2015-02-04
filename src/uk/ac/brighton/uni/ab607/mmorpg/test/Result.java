@@ -4,5 +4,6 @@ public class Result {
 
     public String name;
     public int size;
+    public int sizeCompressed;
     public double timeTook;
 }

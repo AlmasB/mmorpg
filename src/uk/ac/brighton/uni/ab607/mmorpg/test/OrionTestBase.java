@@ -210,10 +210,10 @@ public abstract class OrionTestBase extends Test {
     protected byte[] toASN1(DataCharacter data) throws Exception {
         AsnOutputStream out = new AsnOutputStream();
 
-        out.writeInteger(Tag.CLASS_UNIVERSAL, Tag.INTEGER, data.xy);
-        out.writeInteger(Tag.CLASS_UNIVERSAL, Tag.INTEGER, data.sprite);
+        out.writeInteger(data.xy);
+        out.writeInteger(data.sprite);
         out.write(data.placeDir);
-        out.writeInteger(Tag.CLASS_UNIVERSAL, Tag.INTEGER, data.ids);
+        out.writeInteger(data.ids);
         return out.toByteArray();
     }
 
