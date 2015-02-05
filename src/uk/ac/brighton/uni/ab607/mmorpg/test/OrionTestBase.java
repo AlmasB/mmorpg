@@ -50,7 +50,7 @@ public abstract class OrionTestBase extends Test {
         }
     }
 
-    protected int testProtoBuf() throws Exception {
+    protected byte[] testProtoBuf() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         for (DataCharacter data : randomData) {
@@ -80,10 +80,10 @@ public abstract class OrionTestBase extends Test {
             messageBuilder2.mergeFrom(message.toByteArray());
         }
 
-        return output.toByteArray().length;
+        return output.toByteArray();
     }
 
-    protected int testByteStream() throws Exception {
+    protected byte[] testByteStream() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         for (DataCharacter data : randomData) {
             GameCharacterByteStream player = new GameCharacterByteStream();
@@ -104,10 +104,10 @@ public abstract class OrionTestBase extends Test {
             output.write(message.toByteArray());
         }
 
-        return output.toByteArray().length;
+        return output.toByteArray();
     }
 
-    protected int testASN1() throws Exception {
+    protected byte[] testASN1() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         AsnOutputStream out = new AsnOutputStream();
 
@@ -151,10 +151,10 @@ public abstract class OrionTestBase extends Test {
 
         in.close();
 
-        return output.toByteArray().length;
+        return output.toByteArray();
     }
 
-    protected int testJavaSerialization() throws Exception {
+    protected byte[] testJavaSerialization() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(output);
         for (DataCharacter data : randomData) {
@@ -174,7 +174,7 @@ public abstract class OrionTestBase extends Test {
             ois.readObject();
         }
 
-        return output.toByteArray().length;
+        return output.toByteArray();
     }
 
     protected byte[] toByteStream(DataCharacter data) {

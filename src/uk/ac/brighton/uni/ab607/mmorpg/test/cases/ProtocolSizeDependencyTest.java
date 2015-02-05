@@ -63,25 +63,25 @@ public class ProtocolSizeDependencyTest extends OrionTestBase {
         numPackets = packets;
         generateRandomData();
 
-        int size = testByteStream();
+        int size = testByteStream().length;
         Result result = new Result();
         result.name = "ByteStream";
         result.size = size;
         results.add(result);
 
-        size = testProtoBuf();
+        size = testProtoBuf().length;
         result = new Result();
         result.name = "ProtoBuf";
         result.size = size;
         results.add(result);
 
-        size = testASN1();
+        size = testASN1().length;
         result = new Result();
         result.name = "ASN1";
         result.size = size;
         results.add(result);
 
-        size = testJavaSerialization();
+        size = testJavaSerialization().length;
         result = new Result();
         result.name = "JavaSerialization";
         result.size = size;

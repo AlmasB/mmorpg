@@ -3,6 +3,9 @@ package uk.ac.brighton.uni.ab607.mmorpg.test.cases;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.almasb.common.compression.LZMACompressor;
+import com.almasb.common.util.ZIPCompressor;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -17,28 +20,21 @@ import javafx.scene.layout.Pane;
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
 import uk.ac.brighton.uni.ab607.mmorpg.test.Result;
 
-public class ProtocolSizeTest extends OrionTestBase {
+public class ProtocolCompressionTest extends OrionTestBase {
 
     private ArrayList<Result> results = new ArrayList<Result>();
     private TextField fieldPackets = new TextField("1");
 
-    @Override
-    public Parent getTestControls() {
-        Label label = new Label("Enter number of packets");
-        return new Pane(new HBox(10, label, fieldPackets));
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public Parent getResultsContent() {
         NumberAxis xAxis = new NumberAxis();
         CategoryAxis yAxis = new CategoryAxis();
         BarChart<Number, String> chart = new BarChart<>(xAxis, yAxis);
 
-        chart.setTitle("Data structure packet size based on number of packets");
+        chart.setTitle(String.valueOf(numPackets) + " packets");
 
-        yAxis.setLabel("Number of Packets");
-        yAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList(new String[] {String.valueOf(numPackets)})));
+        yAxis.setLabel("Compression");
+        yAxis.setCategories(FXCollections.<String>observableArrayList("NONE", "ZIP", "LZMA"));
 
         xAxis.setLabel("Size (in bytes). Lower is better");
 
@@ -46,9 +42,9 @@ public class ProtocolSizeTest extends OrionTestBase {
             XYChart.Series<Number, String> series = new XYChart.Series<Number, String>();
             series.setName(results.get(i).name);
             series.getData().addAll(
-                    new XYChart.Data<Number, String>(results.get(i).size, String.valueOf(numPackets))
-                    //                    new XYChart.Data<Number, String>(results1000.get(i).size, "1000"),
-                    //                    new XYChart.Data<Number, String>(results10000.get(i).size, "10000")
+                    new XYChart.Data<Number, String>(results.get(i).size, "NONE"),
+                    new XYChart.Data<Number, String>(results.get(i).sizeCompressedZIP, "ZIP"),
+                    new XYChart.Data<Number, String>(results.get(i).sizeCompressedLZMA, "LZMA")
                     );
 
             series.getData().forEach(data -> {
@@ -64,33 +60,63 @@ public class ProtocolSizeTest extends OrionTestBase {
     }
 
     @Override
+    public Parent getTestControls() {
+        Label label = new Label("Enter number of packets");
+        return new Pane(new HBox(10, label, fieldPackets));
+    }
+
+    @Override
     protected void run() throws Exception {
         results.clear();
         numPackets = Integer.parseInt(fieldPackets.getText());
         generateRandomData();
 
-        int size = testByteStream().length;
+        ZIPCompressor zip = new ZIPCompressor();
+        LZMACompressor lzma = new LZMACompressor();
+
+        byte[] data = testByteStream();
+
+        int size = data.length;
+        int sizeZIP = zip.compress(data).length;
+        int sizeLZMA = lzma.compress(data).length;
         Result result = new Result();
         result.name = "ByteStream";
         result.size = size;
+        result.sizeCompressedZIP = sizeZIP;
+        result.sizeCompressedLZMA = sizeLZMA;
         results.add(result);
 
-        size = testProtoBuf().length;
+        data = testProtoBuf();
+        size = data.length;
+        sizeZIP = zip.compress(data).length;
+        sizeLZMA = lzma.compress(data).length;
         result = new Result();
         result.name = "ProtoBuf";
         result.size = size;
+        result.sizeCompressedZIP = sizeZIP;
+        result.sizeCompressedLZMA = sizeLZMA;
         results.add(result);
 
-        size = testASN1().length;
+        data = testASN1();
+        size = data.length;
+        sizeZIP = zip.compress(data).length;
+        sizeLZMA = lzma.compress(data).length;
         result = new Result();
         result.name = "ASN1";
         result.size = size;
+        result.sizeCompressedZIP = sizeZIP;
+        result.sizeCompressedLZMA = sizeLZMA;
         results.add(result);
 
-        size = testJavaSerialization().length;
+        data = testJavaSerialization();
+        size = data.length;
+        sizeZIP = zip.compress(data).length;
+        sizeLZMA = lzma.compress(data).length;
         result = new Result();
         result.name = "JavaSerialization";
         result.size = size;
+        result.sizeCompressedZIP = sizeZIP;
+        result.sizeCompressedLZMA = sizeLZMA;
         results.add(result);
     }
 }

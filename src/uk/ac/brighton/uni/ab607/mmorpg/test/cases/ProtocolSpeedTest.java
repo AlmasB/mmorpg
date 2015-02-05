@@ -66,7 +66,7 @@ public class ProtocolSpeedTest extends OrionTestBase {
         generateRandomData();
 
         long start = System.nanoTime();
-        int size = testByteStream();
+        int size = testByteStream().length;
         Result result = new Result();
         result.timeTook = (System.nanoTime() - start) / 1000000000.0;
         result.name = "ByteStream";
@@ -74,7 +74,7 @@ public class ProtocolSpeedTest extends OrionTestBase {
         results.add(result);
 
         start = System.nanoTime();
-        size = testProtoBuf();
+        size = testProtoBuf().length;
         result = new Result();
         result.timeTook = (System.nanoTime() - start) / 1000000000.0;
         result.name = "ProtoBuf";
@@ -82,7 +82,7 @@ public class ProtocolSpeedTest extends OrionTestBase {
         results.add(result);
 
         start = System.nanoTime();
-        size = testASN1();
+        size = testASN1().length;
         result = new Result();
         result.timeTook = (System.nanoTime() - start) / 1000000000.0;
         result.name = "ASN1";
@@ -90,7 +90,7 @@ public class ProtocolSpeedTest extends OrionTestBase {
         results.add(result);
 
         start = System.nanoTime();
-        size = testJavaSerialization();
+        size = testJavaSerialization().length;
         result = new Result();
         result.timeTook = (System.nanoTime() - start) / 1000000000.0;
         result.name = "JavaSerialization";

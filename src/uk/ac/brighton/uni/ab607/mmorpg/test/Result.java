@@ -4,6 +4,7 @@ public class Result {
 
     public String name;
     public int size;
-    public int sizeCompressed;
+    public int sizeCompressedZIP;
+    public int sizeCompressedLZMA;
     public double timeTook;
 }
