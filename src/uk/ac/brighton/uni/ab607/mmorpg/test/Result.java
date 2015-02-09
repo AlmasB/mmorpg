@@ -7,4 +7,6 @@ public class Result {
     public int sizeCompressedZIP;
     public int sizeCompressedLZMA;
     public double timeTook;
+    public double timeTookZIP;
+    public double timeTookLZMA;
 }

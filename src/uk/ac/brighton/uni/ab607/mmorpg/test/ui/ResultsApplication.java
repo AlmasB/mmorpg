@@ -2,6 +2,7 @@ package uk.ac.brighton.uni.ab607.mmorpg.test.ui;
 
 import uk.ac.brighton.uni.ab607.mmorpg.test.OrionTestBase;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.BitPatternTest;
+import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolCompressionSpeedTest;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolCompressionTest;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeDependencyTest;
 import uk.ac.brighton.uni.ab607.mmorpg.test.cases.ProtocolSizeTest;
@@ -93,7 +94,8 @@ public class ResultsApplication extends Application {
                 new ProtocolSizeDependencyTest(),
                 new BitPatternTest(),
                 new ProtocolSpeedTest(),
-                new ProtocolCompressionTest());
+                new ProtocolCompressionTest(),
+                new ProtocolCompressionSpeedTest());
         cbTests.getSelectionModel().selectFirst();
 
         primaryStage.setScene(new Scene(root));

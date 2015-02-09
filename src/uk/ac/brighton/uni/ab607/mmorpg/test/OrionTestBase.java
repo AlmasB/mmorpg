@@ -19,7 +19,7 @@ import com.almasb.common.test.Test;
 
 public abstract class OrionTestBase extends Test {
 
-    // TODO: read and write
+    public static boolean USE_FULL_LENGTH = true;
 
     protected static Random rand = new Random();
 
@@ -43,8 +43,15 @@ public abstract class OrionTestBase extends Test {
             randomData2[i].xy = rand.nextInt();
             randomData2[i].type = (byte) rand.nextInt();
 
-            byte[] tmp = new byte[59];
-            //byte[] tmp = new byte[rand.nextInt(60)];
+            byte[] tmp;
+
+            if (USE_FULL_LENGTH) {
+                tmp = new byte[59];
+            }
+            else {
+                tmp = new byte[rand.nextInt(60)];
+            }
+
             rand.nextBytes(tmp);
             randomData2[i].text = new String(tmp);
         }
