@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -35,6 +36,9 @@ public class ResultsApplication extends Application {
 
     @FXML
     private Pane testControlsPane;
+
+    @FXML
+    private CheckBox checkUseFullLength;
 
     public void onButtonPress(ActionEvent event) {
         progressIndicator.setVisible(true);
@@ -85,6 +89,10 @@ public class ResultsApplication extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ui.fxml"));
         loader.setController(this);
         Parent root = (Parent) loader.load();
+
+        checkUseFullLength.selectedProperty().addListener((obs, old, newValue) -> {
+            OrionTestBase.USE_FULL_LENGTH = newValue.booleanValue();
+        });
 
         cbTests.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
             testControlsPane.getChildren().clear();

@@ -35,6 +35,8 @@
             <Label text="Select Test" />
             <ChoiceBox fx:id="cbTests" />
             <HBox alignment="center" spacing="10">
+                <Text text="Use Full Length" />
+                <CheckBox fx:id="checkUseFullLength" selected="true" />
                 <Button fx:id="btnStart" text="Start" onAction="#onButtonPress" />
                 <ProgressIndicator fx:id="progressIndicator" visible="false" />
             </HBox>
