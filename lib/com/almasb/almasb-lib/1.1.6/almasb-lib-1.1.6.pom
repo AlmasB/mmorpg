@@ -4,6 +4,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.almasb</groupId>
   <artifactId>almasb-lib</artifactId>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
   <description>POM was created from install:install-file</description>
 </project>

@@ -79,11 +79,11 @@
   </build>
   
   <dependencies>
-    <!--<dependency>
+    <dependency>
 	    <groupId>com.almasb</groupId>
 	    <artifactId>almasb-lib</artifactId>
-	    <version>1.1.5</version>
-    </dependency>-->
+	    <version>1.1.6</version>
+    </dependency>
   
     <dependency>
         <groupId>com.google.protobuf</groupId>
