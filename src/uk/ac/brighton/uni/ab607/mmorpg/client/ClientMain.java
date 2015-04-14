@@ -55,10 +55,11 @@ public class ClientMain {
             if (local) {
                 new GameWindow("127.0.0.1", "Debug").init();
             }
-            else {
-                LoginFXGUI.main(args);  // to avoid many issues with javafx use static calls
+            else if (!server) {
+
+                new LoginFXGUI().init();
                 // will only be called after previous gui finishes
-                new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();
+                //new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();
             }
         }
         catch (Exception e) {

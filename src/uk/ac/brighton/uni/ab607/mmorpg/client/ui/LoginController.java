@@ -9,6 +9,7 @@ import com.almasb.common.net.DataPacketParser;
 import com.almasb.common.net.UDPClient;
 import com.almasb.common.util.Out;
 
+import uk.ac.brighton.uni.ab607.mmorpg.client.fx.GameWindow;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.QueryRequest.Query;
 import uk.ac.brighton.uni.ab607.mmorpg.common.request.ServerResponse;
@@ -161,7 +162,9 @@ public class LoginController extends AnchorPane implements Initializable {
                 if (loginParser.playerAccepted) {
                     LoginFXGUI.setIP(getIP());
                     LoginFXGUI.setUserName(getUserName());
-                    Platform.exit();
+
+                    new GameWindow(LoginFXGUI.getIP(), LoginFXGUI.getUserName()).init();
+                    break;
                 }
                 else {
                     delay(500);

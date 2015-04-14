@@ -55,6 +55,8 @@ public abstract class OrionTestBase extends Test {
             rand.nextBytes(tmp);
             randomData2[i].text = new String(tmp);
         }
+
+        randomData2 = new DataMessage[0];
     }
 
     protected byte[] testProtoBuf() throws Exception {

@@ -1,8 +1,10 @@
 package uk.ac.brighton.uni.ab607.mmorpg.client.ui;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.almasb.java.io.ResourceManager;
+import com.almasb.java.ui.FXWindow;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,24 +12,14 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-public class LoginFXGUI extends Application {
+public class LoginFXGUI extends FXWindow {
 
     private LoginController login;
 
     private static String IP = "", userName = "";
-
-    /**
-     * LoginFXGUI.main(args); for calling login gui
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    public LoginFXGUI() {}
 
     public static void setUserName(String name) {
         userName = name;
@@ -46,7 +38,7 @@ public class LoginFXGUI extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void initStage(Stage primaryStage) {
         primaryStage.setResizable(false);
         primaryStage.setTitle("Login GUI");
 
@@ -58,12 +50,22 @@ public class LoginFXGUI extends Application {
                 ? getClass().getResource("/res/UI/Login.fxml")
                         : ResourceManager.getLocalURL("UI/Login.fxml"));
 
-        AnchorPane page;
+        AnchorPane page = null;
         try {
-            page = (AnchorPane) loader.load(in);
+            try {
+                page = (AnchorPane) loader.load(in);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         finally {
-            in.close();
+            try {
+                in.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         ProgressIndicator p = new ProgressIndicator();
@@ -81,5 +83,17 @@ public class LoginFXGUI extends Application {
         login.setProgress(p);
 
         primaryStage.show();
+    }
+
+    @Override
+    protected void createContent(Pane root) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void initScene(Scene scene) {
+        // TODO Auto-generated method stub
+
     }
 }

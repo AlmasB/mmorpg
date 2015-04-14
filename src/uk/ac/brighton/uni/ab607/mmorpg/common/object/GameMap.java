@@ -135,18 +135,18 @@ public class GameMap {
         enemies.forEach(list -> list.forEach(enemy -> tmpList.add(enemy)));
 
 
-        Stream<Player> playerStream = tmpPlayers.stream();
-        Stream<TextAnimationMessage> animationStream = animationsText.stream();
-        Stream<ImageAnimationMessage> animationStream2 = animationsImage.stream();
-        Stream<Enemy> enemyStream = tmpList.stream();
+//        Stream<Player> playerStream = tmpPlayers.stream();
+//        Stream<TextAnimationMessage> animationStream = animationsText.stream();
+//        Stream<ImageAnimationMessage> animationStream2 = animationsImage.stream();
+//        Stream<Enemy> enemyStream = tmpList.stream();
 
         tmpPlayers.forEach(player -> {
             Rect2D playerVision = new Rect2D(player.getX() - 640, player.getY() - 360, 1280, 720);
 
-            Player[] playersToSend = playerStream.filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
-            TextAnimationMessage[] animationsToSend = animationStream.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(TextAnimationMessage[]::new);
-            ImageAnimationMessage[] animationsToSend2 = animationStream2.filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(ImageAnimationMessage[]::new);
-            Enemy[] enemiesToSend = enemyStream.filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
+            Player[] playersToSend = tmpPlayers.stream().filter(p -> playerVision.contains(new Point2D(p.getX(), p.getY()))).toArray(Player[]::new);
+            TextAnimationMessage[] animationsToSend = animationsText.stream().filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(TextAnimationMessage[]::new);
+            ImageAnimationMessage[] animationsToSend2 = animationsImage.stream().filter(anim -> playerVision.contains(new Point2D(anim.getX(), anim.getY()))).toArray(ImageAnimationMessage[]::new);
+            Enemy[] enemiesToSend =  tmpList.stream().filter(enemy -> playerVision.contains(new Point2D(enemy.getX(), enemy.getY()))).toArray(Enemy[]::new);
 
             try {
                 // send THE player

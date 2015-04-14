@@ -188,8 +188,13 @@ public class GameServer {
     }
 
     private void serverLoop() {
-        for (GameMap map : maps)
-            map.update(server);
+        try {
+            for (GameMap map : maps)
+                map.update(server);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
