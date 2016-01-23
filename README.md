@@ -1,11 +1,7 @@
 Orion MMORPG
 ======
 
-Final year project, an mmorpg game in java
-
-## Contact ##
-
-email: a.baimagambetov1@uni.brighton.ac.uk
+Final year project, an mmorpg game in java.
 
 ## Compile, Run ##
 
