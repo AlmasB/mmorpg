@@ -1,3 +1,8 @@
+Note
+======
+
+The development is continued [here](https://github.com/AlmasB/Zephyria).
+
 Orion MMORPG
 ======
 
